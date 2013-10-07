@@ -9,6 +9,7 @@
 #define PLUGINLISTMODEL_H_
 
 #include "FactoryItem.h"
+#include <gstreamermm.h>
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
@@ -20,6 +21,8 @@ private:
 
 	std::vector<FactoryItem*> items;
 	FactoryItem* root_item;
+
+	void add_plugin_to_model(const Glib::RefPtr<Gst::Plugin>& plugin);
 
 	Q_OBJECT
 

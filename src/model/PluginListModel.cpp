@@ -8,6 +8,7 @@
 #include "PluginListModel.h"
 #include "ElementFactoryItem.h"
 #include "TypeFindFactoryItem.h"
+#include "PluginItem.h"
 #include <glibmm.h>
 
 using namespace Gst;
@@ -42,8 +43,8 @@ QVariant PluginListModel::data(const QModelIndex &index, int role) const
 
 	return QVariant(
 			index.column() == 0 ?
-			item->get_name().c_str() :
-			item->get_desc().c_str());
+					item->get_name().c_str() :
+					item->get_desc().c_str());
 }
 
 Qt::ItemFlags PluginListModel::flags(const QModelIndex &index) const
@@ -117,49 +118,42 @@ void PluginListModel::setup_model_data()
 	RefPtr<Registry> registry = Registry::get();
 
 	Glib::ListHandle<RefPtr<Plugin>> plugins = registry->get_plugin_list();
-	int blacklist_count = 0,
-			feature_count = 0;
 
 	for (auto plugin : plugins)
 	{
-		if (GST_OBJECT_FLAG_IS_SET (plugin->gobj(), GST_PLUGIN_FLAG_BLACKLISTED))
-		{
-			blacklist_count++;
-			continue;
-		}
-		QList<FactoryItem*> parents;
-		QList<int> indentations;
-		parents << root_item;
-		indentations << 0;
-
-		Glib::ListHandle<RefPtr<PluginFeature>> features = registry->get_feature_list(plugin->get_name());
-
-		for (auto feature : features)
-		{
-			if (!feature)
-				continue;
-
-			feature_count++;
-
-			if (GST_IS_ELEMENT_FACTORY (feature->gobj()))
-			{
-				RefPtr<ElementFactory> factory = factory.cast_static(feature);
-
-				parents.last()->append_child(new ElementFactoryItem(factory, parents.last()));
-			}
-			else if (GST_IS_TYPE_FIND_FACTORY (feature->gobj()))
-			{
-				RefPtr<TypeFindFactory> factory = factory.cast_static(feature);
-				parents.last()->append_child(new TypeFindFactoryItem(factory, parents.last()));
-
-
-			}
-			else
-			{
-				g_print ("%s:  %s (%s)\n", plugin->get_name().c_str(),
-						feature->get_name().c_str(), feature->get_name().c_str());
-			}
-		}
+		add_plugin_to_model(plugin);
 	}
 }
 
+void PluginListModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
+{
+	if (GST_OBJECT_FLAG_IS_SET (plugin->gobj(), GST_PLUGIN_FLAG_BLACKLISTED))
+	{
+		continue;
+	}
+
+	PluginItem* plugin_item = new PluginItem(plugin, root_item);
+
+	root_item->append_child(plugin_item);
+
+	Glib::ListHandle<RefPtr<PluginFeature>> features = registry->get_feature_list(plugin->get_name());
+
+	for (auto feature : features)
+	{
+		if (!feature)
+			continue;
+
+		if (GST_IS_ELEMENT_FACTORY (feature->gobj()))
+		{
+			RefPtr<ElementFactory> factory = factory.cast_static(feature);
+
+			plugin_item->append_child(new ElementFactoryItem(factory, plugin_item));
+		}
+		else if (GST_IS_TYPE_FIND_FACTORY (feature->gobj()))
+		{
+			RefPtr<TypeFindFactory> factory = factory.cast_static(feature);
+
+			plugin_item->append_child(new TypeFindFactoryItem(factory, plugin_item));
+		}
+	}
+}

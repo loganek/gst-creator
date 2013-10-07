@@ -9,6 +9,7 @@
 #define ELEMENTFACTORYITEM_H_
 
 #include "FactoryItem.h"
+#include <gstreamermm.h>
 
 class ElementFactoryItem : public FactoryItem
 {
