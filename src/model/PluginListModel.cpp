@@ -129,9 +129,10 @@ void PluginListModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
 {
 	if (GST_OBJECT_FLAG_IS_SET (plugin->gobj(), GST_PLUGIN_FLAG_BLACKLISTED))
 	{
-		continue;
+		return;
 	}
 
+	RefPtr<Registry> registry = Registry::get();
 	PluginItem* plugin_item = new PluginItem(plugin, root_item);
 
 	root_item->append_child(plugin_item);
