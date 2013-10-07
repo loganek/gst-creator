@@ -1,61 +1,61 @@
 /*
- * ElementFactoryItem.cpp
+ * FactoryItem.cpp
  *
  *  Created on: 7 paź 2013
  *      Author: Marcin Kolny <marcin.kolny[at]gmail.com>
  */
 
-#include "ElementFactoryItem.h"
+#include "FactoryItem.h"
 #include <algorithm>
 
-ElementFactoryItem::ElementFactoryItem(const Glib::RefPtr<Gst::ElementFactory>& factory,
-		ElementFactoryItem* parent)
+FactoryItem::FactoryItem(const Glib::RefPtr<Gst::ElementFactory>& factory,
+		FactoryItem* parent)
 : factory(factory),
   parent_item(parent)
 {
 }
 
-ElementFactoryItem::~ElementFactoryItem()
+FactoryItem::~FactoryItem()
 {
 	for (auto item : children)
 		delete item;
 }
 
-void ElementFactoryItem::append_child(ElementFactoryItem *item)
+void FactoryItem::append_child(FactoryItem *item)
 {
 	children.push_back(item);
 }
 
-ElementFactoryItem* ElementFactoryItem::child(int row)
+FactoryItem* FactoryItem::child(int row)
 {
 	return children.at(row);
 }
 
-int ElementFactoryItem::child_count() const
+int FactoryItem::child_count() const
 {
 	return children.size();
 }
 
-ElementFactoryItem* ElementFactoryItem::parent()
+FactoryItem* FactoryItem::parent()
 {
 	return parent_item;
 }
 
-std::string ElementFactoryItem::get_name() const
+std::string FactoryItem::get_name() const
 {
 	return (factory) ?
 		factory->get_name().c_str() :
 		std::string();
 }
 
-std::string ElementFactoryItem::get_long_name() const
+std::string FactoryItem::get_long_name() const
 {
 	return (factory) ?
 			factory->get_metadata(GST_ELEMENT_METADATA_LONGNAME).c_str() :
 			std::string();
 }
 
-int ElementFactoryItem::row() const
+int FactoryItem::row() const
 {
 	if (parent_item)
 	{
@@ -65,7 +65,7 @@ int ElementFactoryItem::row() const
 	return 0;
 }
 
-const std::string& ElementFactoryItem::get_header(int index)
+const std::string& FactoryItem::get_header(int index)
 {
 	static std::string header_short_name = "Short Name";
 	static std::string header_long_name = "Long Name";

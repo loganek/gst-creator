@@ -8,7 +8,7 @@
 #ifndef PLUGINLISTMODEL_H_
 #define PLUGINLISTMODEL_H_
 
-#include "ElementFactoryItem.h"
+#include "FactoryItem.h"
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
@@ -18,8 +18,8 @@ class PluginListModel : public QAbstractItemModel
 private:
 	void setup_model_data();
 
-	std::vector<ElementFactoryItem*> items;
-	ElementFactoryItem* root_item;
+	std::vector<FactoryItem*> items;
+	FactoryItem* root_item;
 
 	Q_OBJECT
 
