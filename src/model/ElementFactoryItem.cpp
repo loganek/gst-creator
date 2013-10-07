@@ -2,7 +2,7 @@
  * ElementFactoryItem.cpp
  *
  *  Created on: 7 paź 2013
- *      Author: loganek
+ *      Author: Marcin Kolny <marcin.kolny[at]gmail.com>
  */
 
 #include "ElementFactoryItem.h"
