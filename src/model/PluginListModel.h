@@ -15,6 +15,12 @@
 
 class PluginListModel : public QAbstractItemModel
 {
+private:
+	void setup_model_data();
+
+	std::vector<ElementFactoryItem*> items;
+	ElementFactoryItem* root_item;
+
 	Q_OBJECT
 
 public:
@@ -30,11 +36,6 @@ public:
 	QModelIndex parent(const QModelIndex &index) const;
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
-
-private:
-	void setup_model_data();
-
-	ElementFactoryItem *root_item;
 };
 
 #endif /* PLUGINLISTMODEL_H_ */

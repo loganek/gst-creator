@@ -41,6 +41,19 @@ ElementFactoryItem* ElementFactoryItem::parent()
 	return parent_item;
 }
 
+std::string ElementFactoryItem::get_name() const
+{
+	return (factory) ?
+		factory->get_name().c_str() :
+		std::string();
+}
+
+std::string ElementFactoryItem::get_long_name() const
+{
+	return (factory) ?
+			factory->get_metadata(GST_ELEMENT_METADATA_LONGNAME).c_str() :
+			std::string();
+}
 
 int ElementFactoryItem::row() const
 {
@@ -52,3 +65,19 @@ int ElementFactoryItem::row() const
 	return 0;
 }
 
+const std::string& ElementFactoryItem::get_header(int index)
+{
+	static std::string header_short_name = "Short Name";
+	static std::string header_long_name = "Long Name";
+	static std::string header_invalid = "";
+
+	switch (index)
+	{
+	case 0:
+		return header_short_name;
+	case 1:
+		return header_long_name;
+	default:
+		return header_invalid;
+	}
+}

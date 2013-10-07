@@ -25,6 +25,10 @@ public:
 	int row() const;
 	ElementFactoryItem *parent();
 
+	std::string get_name() const;
+	std::string get_long_name() const;
+
+	static const std::string& get_header(int index);
 private:
 	std::vector<ElementFactoryItem*> children;
 	Glib::RefPtr<Gst::ElementFactory> factory;

@@ -38,7 +38,10 @@ QVariant PluginListModel::data(const QModelIndex &index, int role) const
 
 	ElementFactoryItem *item = static_cast<ElementFactoryItem*>(index.internalPointer());
 
-	return QVariant("Test");
+	return QVariant(
+			index.column() == 0 ?
+			item->get_name().c_str() :
+			item->get_long_name().c_str());
 }
 
 Qt::ItemFlags PluginListModel::flags(const QModelIndex &index) const
@@ -53,8 +56,7 @@ QVariant PluginListModel::headerData(int section, Qt::Orientation orientation,
 		int role) const
 {
 	if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-		//return rootItem->data(section);
-		return QVariant("Drugi test");
+		return QVariant(ElementFactoryItem::get_header(section).c_str());
 
 	return QVariant();
 }
@@ -123,6 +125,10 @@ void PluginListModel::setup_model_data()
 			blacklist_count++;
 			continue;
 		}
+		QList<ElementFactoryItem*> parents;
+		QList<int> indentations;
+		parents << root_item;
+		indentations << 0;
 
 		Glib::ListHandle<RefPtr<PluginFeature>> features = registry->get_feature_list(plugin->get_name());
 
@@ -136,6 +142,8 @@ void PluginListModel::setup_model_data()
 			if (GST_IS_ELEMENT_FACTORY (feature->gobj()))
 			{
 				RefPtr<ElementFactory> factory = factory.cast_static(feature);
+
+				parents.last()->append_child(new ElementFactoryItem(factory, parents.last()));
 
 				g_print ("%s:  %s: %s\n", plugin->get_name().c_str(),
 						factory->get_name().c_str(),
@@ -172,21 +180,6 @@ void PluginListModel::setup_model_data()
 						feature->get_name().c_str(), feature->get_name().c_str());
 			}
 		}
-	}
-
-	QList<ElementFactoryItem*> parents;
-	QList<int> indentations;
-	parents << root_item;
-	indentations << 0;
-
-	int number = 0;
-
-	for (int i = 0; i < 10; i++)
-	{
-		QList<QVariant> columnData;
-
-
-		parents.last()->append_child(new ElementFactoryItem((RefPtr<ElementFactory>)0, parents.last()));
 	}
 }
 
