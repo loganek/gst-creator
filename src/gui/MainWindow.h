@@ -17,6 +17,10 @@ public:
 	~MainWindow();
 
 	void set_model(QAbstractItemModel* model);
+
+private Q_SLOTS:
+    void on_actionAbout_triggered(bool checked);
+
 private:
 	Ui::MainWindow *ui;
 };
