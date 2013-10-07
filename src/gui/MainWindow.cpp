@@ -6,6 +6,7 @@ QMainWindow(parent),
 ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+	centralWidget()->setLayout(ui->verticalLayout);
 }
 
 MainWindow::~MainWindow()
@@ -15,5 +16,5 @@ MainWindow::~MainWindow()
 
 void MainWindow::set_model(QAbstractItemModel* model)
 {
-	ui->treeView->setModel(model);
+	ui->factoriesTreeView->setModel(model);
 }
