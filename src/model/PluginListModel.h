@@ -8,7 +8,7 @@
 #ifndef PLUGINLISTMODEL_H_
 #define PLUGINLISTMODEL_H_
 
-#include "ElementItem.h"
+#include "ElementFactoryItem.h"
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
@@ -34,7 +34,7 @@ public:
 private:
 	void setup_model_data();
 
-	ElementItem *root_item;
+	ElementFactoryItem *root_item;
 };
 
 #endif /* PLUGINLISTMODEL_H_ */

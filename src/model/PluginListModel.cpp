@@ -14,7 +14,7 @@ using Glib::RefPtr;
 PluginListModel::PluginListModel(QObject *parent)
 : QAbstractItemModel(parent)
 {
-	root_item = new ElementItem(Glib::RefPtr<Gst::Element>());
+	root_item = new ElementFactoryItem((RefPtr<ElementFactory>)0);
 	setup_model_data();
 }
 
@@ -36,7 +36,7 @@ QVariant PluginListModel::data(const QModelIndex &index, int role) const
 	if (role != Qt::DisplayRole)
 		return QVariant();
 
-	ElementItem *item = static_cast<ElementItem*>(index.internalPointer());
+	ElementFactoryItem *item = static_cast<ElementFactoryItem*>(index.internalPointer());
 
 	return QVariant("Test");
 }
@@ -65,14 +65,14 @@ const
 	if (!hasIndex(row, column, parent))
 		return QModelIndex();
 
-	ElementItem* parent_item;
+	ElementFactoryItem* parent_item;
 
 	if (!parent.isValid())
 		parent_item = root_item;
 	else
-		parent_item = static_cast<ElementItem*>(parent.internalPointer());
+		parent_item = static_cast<ElementFactoryItem*>(parent.internalPointer());
 
-	ElementItem *childItem = parent_item->child(row);
+	ElementFactoryItem *childItem = parent_item->child(row);
 	if (childItem)
 		return createIndex(row, column, childItem);
 	else
@@ -84,8 +84,8 @@ QModelIndex PluginListModel::parent(const QModelIndex &index) const
 	if (!index.isValid())
 		return QModelIndex();
 
-	ElementItem *child_item = static_cast<ElementItem*>(index.internalPointer());
-	ElementItem *parent_item = child_item->parent();
+	ElementFactoryItem *child_item = static_cast<ElementFactoryItem*>(index.internalPointer());
+	ElementFactoryItem *parent_item = child_item->parent();
 
 	if (parent_item == root_item)
 		return QModelIndex();
@@ -95,14 +95,14 @@ QModelIndex PluginListModel::parent(const QModelIndex &index) const
 
 int PluginListModel::rowCount(const QModelIndex &parent) const
 {
-	ElementItem *parent_item;
+	ElementFactoryItem *parent_item;
 	if (parent.column() > 0)
 		return 0;
 
 	if (!parent.isValid())
 		parent_item = root_item;
 	else
-		parent_item = static_cast<ElementItem*>(parent.internalPointer());
+		parent_item = static_cast<ElementFactoryItem*>(parent.internalPointer());
 
 	return parent_item->child_count();
 }
@@ -174,7 +174,7 @@ void PluginListModel::setup_model_data()
 		}
 	}
 
-	QList<ElementItem*> parents;
+	QList<ElementFactoryItem*> parents;
 	QList<int> indentations;
 	parents << root_item;
 	indentations << 0;
@@ -185,10 +185,8 @@ void PluginListModel::setup_model_data()
 	{
 		QList<QVariant> columnData;
 
-		for (int column = 0; column < 2; ++column)
-			columnData << "testowy";
 
-		parents.last()->append_child(new ElementItem(Glib::RefPtr<Gst::Element>(), parents.last()));
+		parents.last()->append_child(new ElementFactoryItem((RefPtr<ElementFactory>)0, parents.last()));
 	}
 }
 
