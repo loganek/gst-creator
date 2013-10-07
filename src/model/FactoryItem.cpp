@@ -8,10 +8,8 @@
 #include "FactoryItem.h"
 #include <algorithm>
 
-FactoryItem::FactoryItem(const Glib::RefPtr<Gst::ElementFactory>& factory,
-		FactoryItem* parent)
-: factory(factory),
-  parent_item(parent)
+FactoryItem::FactoryItem(FactoryItem* parent)
+: parent_item(parent)
 {
 }
 
@@ -41,20 +39,6 @@ FactoryItem* FactoryItem::parent()
 	return parent_item;
 }
 
-std::string FactoryItem::get_name() const
-{
-	return (factory) ?
-		factory->get_name().c_str() :
-		std::string();
-}
-
-std::string FactoryItem::get_long_name() const
-{
-	return (factory) ?
-			factory->get_metadata(GST_ELEMENT_METADATA_LONGNAME).c_str() :
-			std::string();
-}
-
 int FactoryItem::row() const
 {
 	if (parent_item)
@@ -65,18 +49,29 @@ int FactoryItem::row() const
 	return 0;
 }
 
+
+std::string FactoryItem::get_name() const
+{
+	return get_header(0);
+}
+
+std::string FactoryItem::get_desc() const
+{
+	return get_header(1);
+}
+
 const std::string& FactoryItem::get_header(int index)
 {
-	static std::string header_short_name = "Short Name";
-	static std::string header_long_name = "Long Name";
+	static std::string name = "Name";
+	static std::string desc = "Description";
 	static std::string header_invalid = "";
 
 	switch (index)
 	{
 	case 0:
-		return header_short_name;
+		return name;
 	case 1:
-		return header_long_name;
+		return desc;
 	default:
 		return header_invalid;
 	}

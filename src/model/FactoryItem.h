@@ -14,9 +14,8 @@
 class FactoryItem
 {
 public:
-	explicit FactoryItem(const Glib::RefPtr<Gst::ElementFactory>& factory,
-			FactoryItem *parent = 0);
-	~FactoryItem();
+	explicit FactoryItem(FactoryItem *parent = 0);
+	virtual ~FactoryItem();
 
 	void append_child(FactoryItem* child);
 
@@ -25,13 +24,12 @@ public:
 	int row() const;
 	FactoryItem *parent();
 
-	std::string get_name() const;
-	std::string get_long_name() const;
+	virtual std::string get_name() const;
+	virtual std::string get_desc() const;
 
 	static const std::string& get_header(int index);
 private:
 	std::vector<FactoryItem*> children;
-	Glib::RefPtr<Gst::ElementFactory> factory;
 	FactoryItem* parent_item;
 };
 

@@ -6,6 +6,8 @@
  */
 
 #include "PluginListModel.h"
+#include "ElementFactoryItem.h"
+#include "TypeFindFactoryItem.h"
 #include <glibmm.h>
 
 using namespace Gst;
@@ -14,7 +16,7 @@ using Glib::RefPtr;
 PluginListModel::PluginListModel(QObject *parent)
 : QAbstractItemModel(parent)
 {
-	root_item = new FactoryItem((RefPtr<ElementFactory>)0);
+	root_item = new FactoryItem();
 	setup_model_data();
 }
 
@@ -41,7 +43,7 @@ QVariant PluginListModel::data(const QModelIndex &index, int role) const
 	return QVariant(
 			index.column() == 0 ?
 			item->get_name().c_str() :
-			item->get_long_name().c_str());
+			item->get_desc().c_str());
 }
 
 Qt::ItemFlags PluginListModel::flags(const QModelIndex &index) const
@@ -143,36 +145,14 @@ void PluginListModel::setup_model_data()
 			{
 				RefPtr<ElementFactory> factory = factory.cast_static(feature);
 
-				parents.last()->append_child(new FactoryItem(factory, parents.last()));
-
-				g_print ("%s:  %s: %s\n", plugin->get_name().c_str(),
-						factory->get_name().c_str(),
-						factory->get_metadata(GST_ELEMENT_METADATA_LONGNAME).c_str());
+				parents.last()->append_child(new ElementFactoryItem(factory, parents.last()));
 			}
 			else if (GST_IS_TYPE_FIND_FACTORY (feature->gobj()))
 			{
 				RefPtr<TypeFindFactory> factory = factory.cast_static(feature);
+				parents.last()->append_child(new TypeFindFactoryItem(factory, parents.last()));
 
-				g_print ("%s: %s: ", plugin->get_name().c_str(),
-						feature->get_name().c_str());
 
-				std::vector<Glib::ustring> extensions = factory->get_extensions();
-
-				if (!extensions.empty())
-				{
-					guint i = 0;
-
-					for (auto extension : extensions)
-					{
-						g_print ("%s%s", i > 0 ? ", " : "", extension.c_str());
-						i++;
-					}
-					g_print ("\n");
-				}
-				else
-				{
-					g_print ("no extensions\n");
-				}
 			}
 			else
 			{
