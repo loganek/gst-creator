@@ -13,10 +13,13 @@
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
+#include <boost/optional.hpp>
 
 class PluginListModel : public QAbstractItemModel
 {
 private:
+	boost::optional<QString> user_filter;
+
 	void setup_model_data();
 
 	std::vector<FactoryItem*> items;
@@ -39,6 +42,7 @@ public:
 	QModelIndex parent(const QModelIndex &index) const;
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
+	void apply_filter(const QString& filter);
 };
 
 #endif /* PLUGINLISTMODEL_H_ */

@@ -10,6 +10,7 @@
 #include "TypeFindFactoryItem.h"
 #include "PluginItem.h"
 #include <glibmm.h>
+#include <regex>
 
 using namespace Gst;
 using Glib::RefPtr;
@@ -117,12 +118,17 @@ void PluginListModel::setup_model_data()
 {
 	RefPtr<Registry> registry = Registry::get();
 
+	delete root_item;
+	root_item = new FactoryItem();
+
 	Glib::ListHandle<RefPtr<Plugin>> plugins = registry->get_plugin_list();
 
 	for (auto plugin : plugins)
 	{
 		add_plugin_to_model(plugin);
 	}
+
+	//emit dataChanged(index, this->index(root_item->childCount(), index.column(), index));
 }
 
 void PluginListModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
@@ -144,6 +150,9 @@ void PluginListModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
 		if (!feature)
 			continue;
 
+		if (user_filter && !std::regex_match (feature->get_name().c_str() ,std::regex(std::string(user_filter.get().toUtf8().constData()))))
+			continue;
+
 		if (GST_IS_ELEMENT_FACTORY (feature->gobj()))
 		{
 			RefPtr<ElementFactory> factory = factory.cast_static(feature);
@@ -157,4 +166,17 @@ void PluginListModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
 			plugin_item->append_child(new TypeFindFactoryItem(factory, plugin_item));
 		}
 	}
+}
+
+void PluginListModel::apply_filter(const QString& filter)
+{/*
+    user_filter = "(.*)("+filter + ")(.*)";
+	setup_model_data();
+
+    int rc = rowCount();
+
+    auto i1 = index(0, 0);
+    auto i2 = index(rowCount() - 1, 1);
+
+    Q_EMIT dataChanged(index(0, 0), i2);*/
 }

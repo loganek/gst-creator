@@ -1,5 +1,6 @@
 #include "gui/MainWindow.h"
 #include "model/PluginListModel.h"
+#include "model/FactoryTreeProxyFilter.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -8,7 +9,9 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 	MainWindow w;
 
-	w.set_model(new PluginListModel());
+	FactoryTreeProxyFilter* filter = new FactoryTreeProxyFilter();
+	filter->setSourceModel(new PluginListModel());
+	w.set_model(filter);
 
 	w.show();
 

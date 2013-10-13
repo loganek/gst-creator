@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "../model/PluginListModel.h"
 #include <QMainWindow>
 #include <QAbstractItemModel>
 
@@ -19,7 +20,7 @@ public:
 	void set_model(QAbstractItemModel* model);
 
 private Q_SLOTS:
-    void on_actionAbout_triggered(bool checked);
+	void on_actionAbout_triggered(bool checked);
 
 private:
 	Ui::MainWindow *ui;

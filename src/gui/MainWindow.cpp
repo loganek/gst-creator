@@ -3,10 +3,11 @@
 #include <QtWidgets/qmessagebox.h>
 
 MainWindow::MainWindow(QWidget *parent) :
-QMainWindow(parent),
-ui(new Ui::MainWindow)
+		QMainWindow(parent),
+		ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
+
 }
 
 MainWindow::~MainWindow()
@@ -16,6 +17,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::set_model(QAbstractItemModel* model)
 {
+	connect(ui->factoryFilterEdit, SIGNAL(textChanged(QString)),
+			model, SLOT(setFilterFixedString(QString)));
 	ui->factoriesTreeView->setModel(model);
 }
 
@@ -26,3 +29,4 @@ void MainWindow::on_actionAbout_triggered(bool checked)
 			"E-mail:\tmarcin.kolny[at]gmail.com\n"
 			"License:\tGPL");
 }
+
