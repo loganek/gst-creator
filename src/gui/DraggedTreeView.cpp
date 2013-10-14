@@ -69,8 +69,6 @@ void DraggedTreeView::startDrag(Qt::DropActions supportedActions)
 
 void DraggedTreeView::on_listView_clicked(const QModelIndex &index)
 {
-	QModelIndex cur_index = model()->index(index.row(), 0);
-
-	current_location = cur_index.data(Qt::DisplayRole).toPoint();
-	current_text = cur_index.data(Qt::DisplayRole).toString();
+	current_location = index.data(Qt::DisplayRole).toPoint();
+	current_text = index.data(Qt::DisplayRole).toString();
 }

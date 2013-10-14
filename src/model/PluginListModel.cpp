@@ -50,10 +50,15 @@ QVariant PluginListModel::data(const QModelIndex &index, int role) const
 
 Qt::ItemFlags PluginListModel::flags(const QModelIndex &index) const
 {
-	if (!index.isValid())
-        return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+	FactoryItem *item = static_cast<FactoryItem*>(index.internalPointer());
 
-    return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | QAbstractItemModel::flags(index);
+	if (dynamic_cast<PluginItem*>(item) != 0 )
+		return 0;
+
+	if (!index.isValid())
+		return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+
+	return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | QAbstractItemModel::flags(index);
 }
 
 QVariant PluginListModel::headerData(int section, Qt::Orientation orientation,
@@ -113,7 +118,6 @@ int PluginListModel::rowCount(const QModelIndex &parent) const
 	return parent_item->child_count();
 }
 
-#include <gst/gst.h>
 void PluginListModel::setup_model_data()
 {
 	RefPtr<Registry> registry = Registry::get();
@@ -127,8 +131,6 @@ void PluginListModel::setup_model_data()
 	{
 		add_plugin_to_model(plugin);
 	}
-
-	//emit dataChanged(index, this->index(root_item->childCount(), index.column(), index));
 }
 
 void PluginListModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
