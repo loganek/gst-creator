@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include <QByteArray>
 #include <QMimeData>
+#include "GstBlock.h"
 
 
 DraggedTreeView::DraggedTreeView(QWidget* parent)
@@ -41,10 +42,10 @@ void DraggedTreeView::startDrag(Qt::DropActions supportedActions)
 	QByteArray itemData;
 	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
 
-	QLineEdit *lineEdit = new QLineEdit(this);
-	lineEdit->setText(current_text);
+	GstBlock* block = new GstBlock(this);
+	block->set_name(current_text);
 
-	QPixmap pixmap = QPixmap::grabWidget(lineEdit);
+	QPixmap pixmap = QPixmap::grabWidget(block);
 
 	dataStream << pixmap << current_location << current_text;
 
@@ -54,12 +55,12 @@ void DraggedTreeView::startDrag(Qt::DropActions supportedActions)
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);
 	drag->setHotSpot(current_location);
-	drag->setPixmap(QPixmap::grabWidget(lineEdit));
+	drag->setPixmap(QPixmap::grabWidget(block));
 
 	int row = currentIndex().row();
 	QModelIndex index = model()->index(row,0);
 
-	delete lineEdit;
+	delete block;
 
 	if (drag->exec(Qt::MoveAction | Qt::CopyAction) == Qt::MoveAction)
 	{

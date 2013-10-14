@@ -15,6 +15,9 @@ GstBlock::GstBlock(QWidget *parent)
 {
 	setup_layout();
 
+	setMinimumWidth(200);
+	setMinimumHeight(100);
+
 	add_pad("sink_video", PadDirection::INPUT);
 	add_pad("sink_audio", PadDirection::INPUT);
 	add_pad("src", PadDirection::OUTPUT);
