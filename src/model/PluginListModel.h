@@ -42,7 +42,9 @@ public:
 	QModelIndex parent(const QModelIndex &index) const;
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
-	void apply_filter(const QString& filter);
+
+    Qt::DropActions supportedDragActions() const;
+    Qt::DropActions supportedDropActions() const;
 };
 
 #endif /* PLUGINLISTMODEL_H_ */

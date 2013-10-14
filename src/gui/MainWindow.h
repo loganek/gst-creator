@@ -1,9 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "../model/PluginListModel.h"
 #include <QMainWindow>
 #include <QAbstractItemModel>
+#include "DraggedTreeView.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,6 +24,7 @@ private Q_SLOTS:
 
 private:
 	Ui::MainWindow *ui;
+	DraggedTreeView plugins_tree;
 };
 
 #endif // MAINWINDOW_H

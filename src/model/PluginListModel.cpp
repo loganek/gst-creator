@@ -51,9 +51,9 @@ QVariant PluginListModel::data(const QModelIndex &index, int role) const
 Qt::ItemFlags PluginListModel::flags(const QModelIndex &index) const
 {
 	if (!index.isValid())
-		return 0;
+        return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
 
-	return QAbstractItemModel::flags(index);
+    return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | QAbstractItemModel::flags(index);
 }
 
 QVariant PluginListModel::headerData(int section, Qt::Orientation orientation,
@@ -168,15 +168,12 @@ void PluginListModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
 	}
 }
 
-void PluginListModel::apply_filter(const QString& filter)
-{/*
-    user_filter = "(.*)("+filter + ")(.*)";
-	setup_model_data();
+Qt::DropActions PluginListModel::supportedDragActions() const
+{
+ return Qt::CopyAction | Qt::MoveAction;
+}
 
-    int rc = rowCount();
-
-    auto i1 = index(0, 0);
-    auto i2 = index(rowCount() - 1, 1);
-
-    Q_EMIT dataChanged(index(0, 0), i2);*/
+Qt::DropActions PluginListModel::supportedDropActions() const
+{
+ return Qt::CopyAction | Qt::MoveAction;
 }
