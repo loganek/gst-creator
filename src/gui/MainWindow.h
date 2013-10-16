@@ -1,9 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "DraggedTreeView.h"
+#include "WorkspaceCanvas.h"
+
 #include <QMainWindow>
 #include <QAbstractItemModel>
-#include "DraggedTreeView.h"
 
 namespace Ui {
 class MainWindow;
@@ -23,8 +25,11 @@ private Q_SLOTS:
 	void on_actionAbout_triggered(bool checked);
 
 private:
+	void add_workspace_canvas();
+
 	Ui::MainWindow *ui;
 	DraggedTreeView plugins_tree;
+	WorkspaceCanvas canvas;
 };
 
 #endif // MAINWINDOW_H

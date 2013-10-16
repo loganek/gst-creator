@@ -8,7 +8,21 @@ ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
 	ui->verticalLayout->addWidget(&plugins_tree);
+
+	add_workspace_canvas();
+
 	setAcceptDrops(false);
+}
+
+void MainWindow::add_workspace_canvas()
+{
+	QHBoxLayout *frameLayout = new QHBoxLayout;
+	QFrame *frame = new QFrame;
+
+	frameLayout->addWidget(&canvas);
+	frame->setLayout(frameLayout);
+	frame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	ui->mainVerticalLayout->addWidget(frame);
 }
 
 MainWindow::~MainWindow()
@@ -22,7 +36,6 @@ void MainWindow::set_model(QAbstractItemModel* model)
 			model, SLOT(setFilterFixedString(QString)));
 
 	plugins_tree.setModel(model);
-	ui->verticalLayout->addWidget(&plugins_tree);
 }
 
 void MainWindow::on_actionAbout_triggered(bool checked)
