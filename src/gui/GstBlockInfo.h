@@ -8,8 +8,13 @@
 #ifndef GSTBLOCKINFO_H_
 #define GSTBLOCKINFO_H_
 
+#include <QObject>
+#include <QtCore>
+#include <QtGui>
+
 class GstBlockInfo : public QObject
 {
+	Q_OBJECT
 private:
 	QString name;
 	QPoint location;
@@ -17,7 +22,16 @@ private:
 	QRect rect;
 
 public:
-	explicit GstBlockInfo(QObject* parent = 0);
+	explicit GstBlockInfo(const QPixmap& pixmap, const QPoint& location,
+			const QString& name, const QRect& rect, QObject* parent = 0)
+	: QObject(parent),
+	  pixmap(pixmap),
+	  location(location),
+	  name(name),
+	  rect(rect)
+	{}
+
+	virtual ~GstBlockInfo(){}
 
 	QString get_name() const
 	{
@@ -29,12 +43,12 @@ public:
 		this->name = name;
 	}
 
-	QString get_location() const
+	QPoint get_location() const
 	{
 		return location;
 	}
 
-	void set_location(const QString& location)
+	void set_location(const QPoint& location)
 	{
 		this->location = location;
 	}

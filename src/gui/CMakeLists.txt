@@ -3,6 +3,8 @@ add_library(gui
 	MainWindow.cpp
 	DraggedTreeView.cpp
 	GstBlock.cpp
+	WorkspaceCanvas.cpp
+	GstBlockInfo.h
 	${UIS_HDRS})
 
 qt5_use_modules(gui Widgets)
