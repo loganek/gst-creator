@@ -24,6 +24,8 @@ protected:
 	void dragEnterEvent(QDragEnterEvent* event);
 	void dragMoveEvent(QDragMoveEvent* event);
 	void dropEvent(QDropEvent* event);
+	void dragLeaveEvent(QDragLeaveEvent* event);
+	void paintEvent(QPaintEvent* event);
 
 public:
 	explicit WorkspaceCanvas(QWidget* parent = 0);

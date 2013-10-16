@@ -107,4 +107,21 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 	{
 		event->acceptProposedAction();
 	}
+	repaint();
+}
+
+void WorkspaceCanvas::dragLeaveEvent(QDragLeaveEvent* event)
+{
+	clear_workspace();
+}
+
+void WorkspaceCanvas::paintEvent(QPaintEvent* event)
+{
+	QPainter painter;
+	painter.begin(this);
+
+	for (auto info : blocks)
+	{
+		painter.drawPixmap(info->get_rect(), info->get_pixmap());
+	}
 }
