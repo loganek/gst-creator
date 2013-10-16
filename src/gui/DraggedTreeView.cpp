@@ -50,7 +50,7 @@ void DraggedTreeView::startDrag(Qt::DropActions supportedActions)
 	dataStream << pixmap << current_location << current_text;
 
 	QMimeData *mimeData = new QMimeData;
-	mimeData->setData("application/x-QListView-DragAndDrop", itemData);
+	mimeData->setData("application/x-DraggedTreeView-DragAndDrop", itemData);
 
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);
