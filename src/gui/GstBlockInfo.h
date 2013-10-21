@@ -34,13 +34,6 @@ public:
 
 	virtual ~GstBlockInfo(){}
 
-	static std::vector<GstBlockInfo*>& get_blocks()
-	{
-		static std::vector<GstBlockInfo*> blocks;
-
-		return blocks;
-	}
-
 	QString get_name() const
 	{
 		return name;
@@ -81,7 +74,5 @@ public:
 		this->rect = rect;
 	}
 };
-
-//std::vector<GstBlockInfo*> GstBlockInfo::blocks;
 
 #endif /* GSTBLOCKINFO_H_ */

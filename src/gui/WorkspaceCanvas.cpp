@@ -17,28 +17,48 @@ WorkspaceCanvas::WorkspaceCanvas(QWidget* parent)
 	setAcceptDrops(true);
 }
 
-void WorkspaceCanvas::clear_workspace()
+bool WorkspaceCanvas::check_mime_data(const QMimeData* mime_data) const
 {
+	return mime_data->hasFormat(mime_drag_drop_format);
+}
 
+void WorkspaceCanvas::set_style_sheet(const char* style_sheet)
+{
+	QFrame* frame = static_cast<QFrame*> (this->parent());
+	frame->setStyleSheet(style_sheet);
+}
+
+GstBlockInfo* WorkspaceCanvas::find_piece(const QRect& block_rect) const
+{
+	for (GstBlockInfo* info : blocks)
+	{
+		if (info->get_rect().contains(block_rect.x(),block_rect.y()))
+			return info;
+	}
+
+	return nullptr;
+}
+
+QRect WorkspaceCanvas::generate_rectangle(const QPoint& location) const
+{
+	return QRect(location.x(), location.y(), 150,50);
 }
 
 void WorkspaceCanvas::dragEnterEvent(QDragEnterEvent* event)
 {
-	if (!event->mimeData()->hasFormat("application/x-DraggedTreeView-DragAndDrop"))
+	if (!check_mime_data(event->mimeData()))
 	{
 		event->ignore();
 		return;
 	}
 
-	QFrame* frame = static_cast<QFrame*>(this->parent());
-	QString style_sheet = "QFrame{ border: 1px solid red; border-radius: 4px; padding: 2px;}";
-	frame->setStyleSheet(style_sheet);
+	set_style_sheet(active_style_sheet);
 	event->accept();
 }
 
 void WorkspaceCanvas::dragMoveEvent(QDragMoveEvent* event)
 {
-	if (!event->mimeData()->hasFormat("application/x-DraggedTreeView-DragAndDrop"))
+	if (!check_mime_data(event->mimeData()))
 	{
 		event->ignore();
 		return;
@@ -52,36 +72,29 @@ void WorkspaceCanvas::dragMoveEvent(QDragMoveEvent* event)
 
 void WorkspaceCanvas::dropEvent(QDropEvent* event)
 {
-	if (!event->mimeData()->hasFormat("application/x-DraggedTreeView-DragAndDrop"))
+	if (!check_mime_data(event->mimeData()))
 	{
 		event->ignore();
 		return;
 	}
 
-	QFrame* frame = static_cast<QFrame*>(this->parent());
+	set_style_sheet(passive_style_sheet);
 
 	bool present = false;
 	const QMimeData* mime = event->mimeData();
-	QByteArray item_data = mime->data("application/x-DraggedTreeView-DragAndDrop");
+	QByteArray item_data = mime->data(mime_drag_drop_format);
 	QDataStream data_stream(&item_data, QIODevice::ReadOnly);
 	QPixmap pixmap;
 	QPoint location;
 	QString text;
 	data_stream >> pixmap >> location >> text;
-	QPoint start = event->pos() - location;
-	QRect rectangle(start.x(), start.y(), 200, 50);
+	QRect rectangle = generate_rectangle(event->pos() - location);
 
 	GstBlockInfo* info = nullptr;
 
-	if (GstBlockInfo::get_blocks().size() == 0)
+	if (blocks.size() > 0)
 	{
-		info = new GstBlockInfo(pixmap, location, text, rectangle);
-
-		GstBlockInfo::get_blocks().push_back(info);
-	}
-	else
-	{
-		for (auto block_info : GstBlockInfo::get_blocks())
+		for (auto block_info : blocks)
 		{
 			if (block_info->get_name() == text)
 			{
@@ -92,13 +105,12 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 				break;
 			}
 		}
+	}
 
-		if (!present)
-		{
-			info = new GstBlockInfo(pixmap, location, text, rectangle);
-
-			GstBlockInfo::get_blocks().push_back(info);
-		}
+	if (blocks.size() == 0 || (blocks.size() > 0 && !present))
+	{
+		info = new GstBlockInfo(pixmap, location, text, rectangle);
+		blocks.push_back(info);
 	}
 
 	repaint();
@@ -117,61 +129,40 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 
 void WorkspaceCanvas::dragLeaveEvent(QDragLeaveEvent* event)
 {
+	set_style_sheet(passive_style_sheet);
 	repaint();
 }
 
 void WorkspaceCanvas::mousePressEvent(QMouseEvent* event)
 {
-	QRect rectangle(event->pos().x(), event->pos().y(), 200, 50);
-	int found = find_piece(rectangle);
+	QRect rectangle = generate_rectangle(event->pos());
+	current_info = find_piece(rectangle);
 	this->setFocus();
 
-	if (found == -1)
+	if (current_info == nullptr)
 		return;
 
-
-	current_info = GstBlockInfo::get_blocks().at(found);
-
-	QPoint position(current_info->get_rect().x(),current_info->get_rect().y());
+	QPoint position(current_info->get_rect().x(), current_info->get_rect().y());
 
 	QPoint location = event->pos() - position;
 	QPixmap pixmap = current_info->get_pixmap();
 	QString text = current_info->get_name();
 
-	QByteArray itemData;
-	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+	QByteArray item_data;
+	QDataStream dataStream(&item_data, QIODevice::WriteOnly);
 
 	dataStream << pixmap << location << text;
 
-	QMimeData *mimeData = new QMimeData;
-	mimeData->setData("application/x-DraggedTreeView-DragAndDrop", itemData);
+	QMimeData *mime_data = new QMimeData;
+	mime_data->setData(mime_drag_drop_format, item_data);
 
 	QDrag *drag = new QDrag(this);
-	drag->setMimeData(mimeData);
+	drag->setMimeData(mime_data);
 	drag->setHotSpot(location);
 	drag->setPixmap(pixmap);
 
+	drag->exec(Qt::MoveAction | Qt::CopyAction);
 	repaint();
-
-	if (drag->exec(Qt::MoveAction | Qt::CopyAction) == Qt::MoveAction)
-	{
-		repaint();
-	}
-}
-
-
-int WorkspaceCanvas::find_piece(const QRect& block_rect) const
-{
-	int i=0;
-	for (GstBlockInfo* info : GstBlockInfo::get_blocks())
-	{
-		if (info->get_rect().contains(block_rect.x(),block_rect.y()))
-			return i;
-
-		i++;
-	}
-
-	return -1;
 }
 
 void WorkspaceCanvas::paintEvent(QPaintEvent* event)
@@ -179,8 +170,9 @@ void WorkspaceCanvas::paintEvent(QPaintEvent* event)
 	QPainter painter;
 	painter.begin(this);
 
-	for (auto info : GstBlockInfo::get_blocks())
+	for (auto info : blocks)
 	{
 		painter.drawPixmap(info->get_rect(), info->get_pixmap());
 	}
 }
+
