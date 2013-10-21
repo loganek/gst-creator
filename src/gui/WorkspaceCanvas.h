@@ -18,15 +18,16 @@ class WorkspaceCanvas : public QWidget
 	Q_OBJECT
 private:
 	GstBlockInfo* current_info;
-	std::vector<GstBlockInfo*> blocks;
 
 protected:
 	void dragEnterEvent(QDragEnterEvent* event);
 	void dragMoveEvent(QDragMoveEvent* event);
 	void dropEvent(QDropEvent* event);
+	void mousePressEvent(QMouseEvent* event);
 	void dragLeaveEvent(QDragLeaveEvent* event);
 	void paintEvent(QPaintEvent* event);
 
+	int find_piece(const QRect& block_rect) const;
 public:
 	explicit WorkspaceCanvas(QWidget* parent = 0);
 	void clear_workspace();

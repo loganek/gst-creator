@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QtCore>
 #include <QtGui>
+#include <iostream>
 
 class GstBlockInfo : public QObject
 {
@@ -32,6 +33,13 @@ public:
 	{}
 
 	virtual ~GstBlockInfo(){}
+
+	static std::vector<GstBlockInfo*>& get_blocks()
+	{
+		static std::vector<GstBlockInfo*> blocks;
+
+		return blocks;
+	}
 
 	QString get_name() const
 	{
@@ -73,5 +81,7 @@ public:
 		this->rect = rect;
 	}
 };
+
+//std::vector<GstBlockInfo*> GstBlockInfo::blocks;
 
 #endif /* GSTBLOCKINFO_H_ */
