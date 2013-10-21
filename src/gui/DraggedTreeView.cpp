@@ -21,20 +21,29 @@ DraggedTreeView::DraggedTreeView(QWidget* parent)
 	setDragEnabled(true);
 	setAcceptDrops(true);
 	setDropIndicatorShown(true);
-	setDragDropMode(QAbstractItemView::InternalMove);
 
 	connect(this, SIGNAL(pressed(QModelIndex)), this, SLOT(on_listView_clicked(QModelIndex)));
 }
 
 void DraggedTreeView::dragEnterEvent(QDragEnterEvent *event)
 {
-	event->acceptProposedAction();
+	if (event->mimeData()->hasFormat("application/x-QListView-DragAndDrop"))
+	{
+		event->accept();
+	}
+	else
+		event->ignore();
 }
 
 void DraggedTreeView::dragMoveEvent(QDragMoveEvent *event)
 {
-	event->setDropAction(Qt::MoveAction);
-	event->accept();
+	if (event->mimeData()->hasFormat("application/x-QListView-DragAndDrop"))
+	{
+		event->setDropAction(Qt::MoveAction);
+		event->accept();
+	}
+	else
+		event->ignore();
 }
 
 void DraggedTreeView::startDrag(Qt::DropActions supportedActions)

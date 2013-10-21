@@ -11,7 +11,8 @@
 #include <QVBoxLayout>
 
 WorkspaceCanvas::WorkspaceCanvas(QWidget* parent)
-: QWidget(parent)
+: QWidget(parent),
+  current_info(nullptr)
 {
 	setAcceptDrops(true);
 }
@@ -45,6 +46,8 @@ void WorkspaceCanvas::dragMoveEvent(QDragMoveEvent* event)
 
 	event->setDropAction(Qt::MoveAction);
 	event->accept();
+
+	repaint();
 }
 
 void WorkspaceCanvas::dropEvent(QDropEvent* event)
@@ -54,8 +57,6 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 		event->ignore();
 		return;
 	}
-
-	clear_workspace();
 
 	QFrame* frame = static_cast<QFrame*>(this->parent());
 
@@ -68,7 +69,7 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 	QString text;
 	data_stream >> pixmap >> location >> text;
 	QPoint start = event->pos() - location;
-	QRect rectangle(start.x(), start.y(), 300, 100);
+	QRect rectangle(start.x(), start.y(), 200, 50);
 
 	GstBlockInfo* info = nullptr;
 
@@ -86,6 +87,8 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 			{
 				present = true;
 				current_info = block_info;
+				current_info->set_rect(rectangle);
+				current_info->set_location(location);
 				break;
 			}
 		}
@@ -98,6 +101,9 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 		}
 	}
 
+	repaint();
+
+
 	if (event->source() == this)
 	{
 		event->setDropAction(Qt::MoveAction);
@@ -107,17 +113,16 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 	{
 		event->acceptProposedAction();
 	}
-	repaint();
 }
 
 void WorkspaceCanvas::dragLeaveEvent(QDragLeaveEvent* event)
 {
-	clear_workspace();
+	repaint();
 }
 
 void WorkspaceCanvas::mousePressEvent(QMouseEvent* event)
 {
-	QRect rectangle(event->pos().x(), event->pos().y(), 300, 100);
+	QRect rectangle(event->pos().x(), event->pos().y(), 200, 50);
 	int found = find_piece(rectangle);
 	this->setFocus();
 
@@ -139,7 +144,7 @@ void WorkspaceCanvas::mousePressEvent(QMouseEvent* event)
 	dataStream << pixmap << location << text;
 
 	QMimeData *mimeData = new QMimeData;
-	mimeData->setData("application/x-QListView-DragAndDrop", itemData);
+	mimeData->setData("application/x-DraggedTreeView-DragAndDrop", itemData);
 
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);
@@ -148,13 +153,8 @@ void WorkspaceCanvas::mousePressEvent(QMouseEvent* event)
 
 	repaint();
 
-	if (drag->exec(Qt::MoveAction | Qt::CopyAction) == Qt::MoveAction) {
-		//        qDebugg()<<"Inside mouse press";
-		//        currentPiece->setPieceLocation(location);
-		//        currentPiece->setPiecePixmap(pixmap);
-		//        currentPiece->setPieceName(text);
-		//        currentPiece->setPieceRect(rectangle);
-		clear_workspace();
+	if (drag->exec(Qt::MoveAction | Qt::CopyAction) == Qt::MoveAction)
+	{
 		repaint();
 	}
 }
