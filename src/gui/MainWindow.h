@@ -1,8 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "DraggedTreeView.h"
-#include "WorkspaceCanvas.h"
+#include "blocks/DraggedTreeView.h"
+#include "blocks/WorkspaceCanvas.h"
 
 #include <QMainWindow>
 #include <QAbstractItemModel>
