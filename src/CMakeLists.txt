@@ -14,12 +14,13 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 include_directories(${GSTMM_INCLUDE_DIRS})
 link_directories(${GSTMM_LIBRARY_DIRS})
 
+include_directories(${gst-creator_SOURCE_DIR}/ObjectInspector/include)
 include_directories(./)
 
 add_subdirectory(gui)
-add_subdirectory(model)
+add_subdirectory(ObjectInspector)
 add_executable(gst-creator main.cpp)
 
-target_link_libraries(gst-creator model gui ${GSTMM_LIBRARIES})
+target_link_libraries(gst-creator ObjectInspector gui ${GSTMM_LIBRARIES})
 
 qt5_use_modules(gst-creator Widgets)

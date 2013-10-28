@@ -1,53 +1,33 @@
 /*
- * DraggedTreeView.cpp
+ * ObjectInspectorView.cpp
  *
- *  Created on: 14 pa? 2013
- *      Author: loganek
+ *  Created on: 28 pa? 2013
+ *      Author: Marcin Kolny
  */
 
-#include "DraggedTreeView.h"
+#include "ObjectInspectorView.h"
 #include <QDrag>
 #include <QDragEnterEvent>
 #include <QLineEdit>
 #include <QByteArray>
 #include <QMimeData>
-#include "GstBlock.h"
-#include "model/PluginListModel.h"
+#include "../gui/blocks/GstBlock.h"
+#include "ObjectInspectorModel.h"
 
 
-DraggedTreeView::DraggedTreeView(QWidget* parent)
+ObjectInspectorView::ObjectInspectorView(QWidget* parent)
 : QTreeView(parent)
 {
 	setSelectionMode(QAbstractItemView::SingleSelection);
 	setDragEnabled(true);
-	setAcceptDrops(true);
-	setDropIndicatorShown(true);
 
-	connect(this, SIGNAL(pressed(QModelIndex)), this, SLOT(on_listView_clicked(QModelIndex)));
+	QObject::connect(this, &ObjectInspectorView::pressed, this, &ObjectInspectorView::on_object_inspector_clicked);
 }
 
-void DraggedTreeView::dragEnterEvent(QDragEnterEvent *event)
-{
-	if (event->mimeData()->hasFormat("application/x-QListView-DragAndDrop"))
-	{
-		event->accept();
-	}
-	else
-		event->ignore();
-}
+ObjectInspectorView::~ObjectInspectorView()
+{}
 
-void DraggedTreeView::dragMoveEvent(QDragMoveEvent *event)
-{
-	if (event->mimeData()->hasFormat("application/x-QListView-DragAndDrop"))
-	{
-		event->setDropAction(Qt::MoveAction);
-		event->accept();
-	}
-	else
-		event->ignore();
-}
-
-void DraggedTreeView::startDrag(Qt::DropActions supportedActions)
+void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 {
 	QByteArray itemData;
 	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
@@ -65,11 +45,10 @@ void DraggedTreeView::startDrag(Qt::DropActions supportedActions)
 	drag->setMimeData(mimeData);
 	drag->setHotSpot(current_location);
 	drag->setPixmap(QPixmap::grabWidget(block));
+	delete block;
 
 	int row = currentIndex().row();
 	QModelIndex index = model()->index(row,0);
-
-	delete block;
 
 	if (drag->exec(Qt::MoveAction | Qt::CopyAction) == Qt::MoveAction)
 	{
@@ -77,8 +56,10 @@ void DraggedTreeView::startDrag(Qt::DropActions supportedActions)
 	}
 }
 
-void DraggedTreeView::on_listView_clicked(const QModelIndex &index)
+void ObjectInspectorView::on_object_inspector_clicked(const QModelIndex &index)
 {
 	current_location = index.data(Qt::DisplayRole).toPoint();
 	current_text = index.data(Qt::DisplayRole).toString();
 }
+
+

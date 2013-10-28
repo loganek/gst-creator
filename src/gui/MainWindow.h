@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "blocks/DraggedTreeView.h"
+#include "ObjectInspector/ObjectInspectorView.h"
 #include "blocks/WorkspaceCanvas.h"
 
 #include <QMainWindow>
@@ -28,7 +28,7 @@ private:
 	void add_workspace_canvas();
 
 	Ui::MainWindow *ui;
-	DraggedTreeView plugins_tree;
+	ObjectInspectorView plugins_tree;
 	WorkspaceCanvas canvas;
 };
 

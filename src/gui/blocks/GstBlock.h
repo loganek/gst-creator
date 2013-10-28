@@ -11,7 +11,6 @@
 #include <QFrame>
 #include <QVBoxLayout>
 #include <QLabel>
-#include "model/ElementFactoryItem.h"
 
 enum class PadDir
 {

@@ -8,14 +8,14 @@
 #ifndef PLUGINITEM_H_
 #define PLUGINITEM_H_
 
-#include "FactoryItem.h"
+#include "../ObjectInspector/ObjectInspectorItem.h"
 #include <gstreamermm.h>
 
-class PluginItem : public FactoryItem
+class PluginItem : public ObjectInspectorItem
 {
 public:
 	explicit PluginItem(const Glib::RefPtr<Gst::Plugin>& plugin,
-			FactoryItem* parent = 0);
+			ObjectInspectorItem* parent = 0);
 
 	virtual std::string get_name() const;
 	virtual std::string get_desc() const;

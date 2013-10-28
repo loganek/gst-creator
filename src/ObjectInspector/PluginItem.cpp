@@ -8,8 +8,8 @@
 #include "PluginItem.h"
 
 PluginItem::PluginItem(const Glib::RefPtr<Gst::Plugin>& plugin,
-		FactoryItem* parent)
-: FactoryItem(parent),
+		ObjectInspectorItem* parent)
+: ObjectInspectorItem("", FactoryType::UNKNOW_FACTORY, parent),
   plugin(plugin)
 {}
 

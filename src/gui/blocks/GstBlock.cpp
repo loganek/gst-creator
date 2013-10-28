@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <gstreamermm.h>
 
 using namespace Gst;
 using Glib::RefPtr;

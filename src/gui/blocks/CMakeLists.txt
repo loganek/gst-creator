@@ -1,5 +1,4 @@
 add_library(blocks
-	DraggedTreeView.cpp
 	GstBlock.cpp
 	WorkspaceCanvas.cpp
 	GstBlockInfo.h)

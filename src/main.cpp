@@ -1,6 +1,6 @@
 #include "gui/MainWindow.h"
-#include "model/PluginListModel.h"
-#include "model/FactoryTreeProxyFilter.h"
+#include "ObjectInspector/ObjectInspectorModel.h"
+#include "ObjectInspector/ObjectInspectorFilter.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -9,8 +9,8 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 	MainWindow w;
 
-	FactoryTreeProxyFilter* filter = new FactoryTreeProxyFilter();
-	filter->setSourceModel(new PluginListModel());
+	ObjectInspectorFilter* filter = new ObjectInspectorFilter();
+	filter->setSourceModel(new ObjectInspectorModel());
 	w.set_model(filter);
 
 	w.show();
