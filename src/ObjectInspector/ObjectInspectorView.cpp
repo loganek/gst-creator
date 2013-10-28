@@ -7,12 +7,11 @@
 
 #include "ObjectInspectorView.h"
 #include <QDrag>
-#include <QDragEnterEvent>
-#include <QLineEdit>
 #include <QByteArray>
 #include <QMimeData>
 #include "../gui/blocks/GstBlock.h"
 #include "ObjectInspectorModel.h"
+#include "common.h"
 
 
 ObjectInspectorView::ObjectInspectorView(QWidget* parent)
@@ -39,7 +38,7 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	dataStream << pixmap << current_location << current_text;
 
 	QMimeData *mimeData = new QMimeData;
-	mimeData->setData("application/x-DraggedTreeView-DragAndDrop", itemData);
+	mimeData->setData(DRAG_DROP_FORMAT, itemData);
 
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);

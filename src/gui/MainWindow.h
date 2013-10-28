@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include "ObjectInspector/ObjectInspectorView.h"
-#include "blocks/WorkspaceCanvas.h"
+#include "Workspace/WorkspaceWidget.h"
 
 #include <QMainWindow>
 #include <QAbstractItemModel>
@@ -29,7 +29,7 @@ private:
 
 	Ui::MainWindow *ui;
 	ObjectInspectorView plugins_tree;
-	WorkspaceCanvas canvas;
+	WorkspaceWidget canvas;
 };
 
 #endif // MAINWINDOW_H
