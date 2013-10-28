@@ -11,8 +11,9 @@
 #include <QFrame>
 #include <QVBoxLayout>
 #include <QLabel>
+#include "model/ElementFactoryItem.h"
 
-enum class PadDirection
+enum class PadDir
 {
 	INPUT,
 	OUTPUT
@@ -31,10 +32,10 @@ private:
 	QLabel* name_label;
 
 public:
-	explicit GstBlock(QWidget *parent = 0);
+	explicit GstBlock(const char* name, QWidget *parent = 0);
 	virtual ~GstBlock();
 	void set_name(const QString& name);
-	void add_pad(const QString& pad_name, PadDirection dir);
+	void add_pad(const QString& pad_name, PadDir dir);
 	void remove_pad(const QString& pad_name);
 };
 

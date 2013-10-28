@@ -9,6 +9,7 @@
 #include <QFrame>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include "GstBlock.h"
 
 WorkspaceCanvas::WorkspaceCanvas(QWidget* parent)
 : QWidget(parent),
@@ -69,7 +70,8 @@ void WorkspaceCanvas::dragMoveEvent(QDragMoveEvent* event)
 
 	repaint();
 }
-
+#include <QLineEdit>
+#include <QInputDialog>
 void WorkspaceCanvas::dropEvent(QDropEvent* event)
 {
 	if (!check_mime_data(event->mimeData()))
@@ -88,6 +90,7 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 	QPoint location;
 	QString text;
 	data_stream >> pixmap >> location >> text;
+
 	QRect rectangle = generate_rectangle(event->pos() - location);
 
 	GstBlockInfo* info = nullptr;
@@ -109,6 +112,7 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 
 	if (blocks.size() == 0 || (blocks.size() > 0 && !present))
 	{
+		QString new_name = get_new_name(text).toUtf8().constData();
 		info = new GstBlockInfo(pixmap, location, text, rectangle);
 		blocks.push_back(info);
 	}
@@ -125,6 +129,17 @@ void WorkspaceCanvas::dropEvent(QDropEvent* event)
 	{
 		event->acceptProposedAction();
 	}
+}
+
+QString WorkspaceCanvas::get_new_name(const QString& name)
+{
+	bool ok;
+	QString new_name = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+			tr("Element name:"), QLineEdit::Normal, name, &ok);
+	if (ok && !new_name.isEmpty())
+		return new_name;
+	else
+		return QString();
 }
 
 void WorkspaceCanvas::dragLeaveEvent(QDragLeaveEvent* event)

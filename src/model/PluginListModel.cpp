@@ -152,13 +152,10 @@ void PluginListModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
 		if (!feature)
 			continue;
 
-		if (user_filter && !std::regex_match (feature->get_name().c_str() ,std::regex(std::string(user_filter.get().toUtf8().constData()))))
-			continue;
-
 		if (GST_IS_ELEMENT_FACTORY (feature->gobj()))
 		{
 			RefPtr<ElementFactory> factory = factory.cast_static(feature);
-
+			factory->reference();
 			plugin_item->append_child(new ElementFactoryItem(factory, plugin_item));
 		}
 		else if (GST_IS_TYPE_FIND_FACTORY (feature->gobj()))

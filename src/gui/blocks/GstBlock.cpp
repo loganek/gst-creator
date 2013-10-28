@@ -10,7 +10,10 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
-GstBlock::GstBlock(QWidget *parent)
+using namespace Gst;
+using Glib::RefPtr;
+
+GstBlock::GstBlock(const char* element_name, QWidget *parent)
 : QFrame(parent)
 {
 	setup_layout();
@@ -18,11 +21,21 @@ GstBlock::GstBlock(QWidget *parent)
 	setMinimumWidth(200);
 	setMinimumHeight(100);
 
-	add_pad("sink_video", PadDirection::INPUT);
-	add_pad("sink_audio", PadDirection::INPUT);
-	add_pad("src", PadDirection::OUTPUT);
+	RefPtr<Element> element = ElementFactory::create_element(element_name);
 
-	remove_pad("sink_audio");
+	Iterator<Pad> p = element->iterate_pads();
+
+	while(p.next())
+	{
+		if (p->get_direction() == Gst::PAD_SRC)
+		{
+			add_pad(p->get_name().c_str(), PadDir::OUTPUT);
+		}
+		else if (p->get_direction() == Gst::PAD_SINK)
+		{
+			add_pad(p->get_name().c_str(), PadDir::INPUT);
+		}
+	}
 }
 
 GstBlock::~GstBlock()
@@ -49,12 +62,12 @@ void GstBlock::set_name(const QString& name)
 	name_label->setText(name);
 }
 
-void GstBlock::add_pad(const QString& pad_name, PadDirection dir)
+void GstBlock::add_pad(const QString& pad_name, PadDir dir)
 {
 	QLayout* layout;
 	Qt::Alignment alignment;
 
-	if (dir == PadDirection::INPUT)
+	if (dir == PadDir::INPUT)
 	{
 		layout = left_layout;
 		alignment = Qt::AlignLeft;

@@ -12,6 +12,7 @@
 #include <QByteArray>
 #include <QMimeData>
 #include "GstBlock.h"
+#include "model/PluginListModel.h"
 
 
 DraggedTreeView::DraggedTreeView(QWidget* parent)
@@ -51,8 +52,7 @@ void DraggedTreeView::startDrag(Qt::DropActions supportedActions)
 	QByteArray itemData;
 	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
 
-	GstBlock* block = new GstBlock(this);
-	block->set_name(current_text);
+	GstBlock* block = new GstBlock(current_text.toUtf8().constData(), this);
 
 	QPixmap pixmap = QPixmap::grabWidget(block);
 

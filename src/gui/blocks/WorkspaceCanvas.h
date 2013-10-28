@@ -28,6 +28,7 @@ private:
 	GstBlockInfo* find_piece(const QRect& block_rect) const;
 	QRect generate_rectangle(const QPoint& location) const;
 	void set_style_sheet(const char* style_sheet);
+	QString get_new_name(const QString& name);
 protected:
 	void dragEnterEvent(QDragEnterEvent* event);
 	void dragMoveEvent(QDragMoveEvent* event);

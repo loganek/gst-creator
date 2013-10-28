@@ -43,8 +43,8 @@ public:
 	int rowCount(const QModelIndex &parent = QModelIndex()) const;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
-    Qt::DropActions supportedDragActions() const;
-    Qt::DropActions supportedDropActions() const;
+	Qt::DropActions supportedDragActions() const;
+	Qt::DropActions supportedDropActions() const;
 };
 
 #endif /* PLUGINLISTMODEL_H_ */
