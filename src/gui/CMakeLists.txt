@@ -5,5 +5,5 @@ add_library(gui
 	blocks
 	${UIS_HDRS})
 
-target_link_libraries(gui blocks Workspace ObjectInspector)
+target_link_libraries(gui Console blocks Workspace ObjectInspector)
 qt5_use_modules(gui Widgets)
