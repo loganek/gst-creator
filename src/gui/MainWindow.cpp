@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include <QtWidgets/qmessagebox.h>
+#include "Console/ConsoleView.h"
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent),
@@ -20,6 +21,7 @@ void MainWindow::add_workspace_canvas()
 	QFrame *frame = new QFrame;
 
 	frameLayout->addWidget(&canvas);
+	//frameLayout->addWidget(new ConsoleView());
 	frame->setLayout(frameLayout);
 	frame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 	ui->mainVerticalLayout->addWidget(frame);

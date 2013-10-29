@@ -15,6 +15,7 @@ add_library(ObjectInspector
 	${OBJECT_INSPECTOR_HEADERS}
 )
 
+target_link_libraries(ObjectInspector FactoryInspector)
 include_directories(include/ObjectInspector)
 
 qt5_use_modules(ObjectInspector Widgets)

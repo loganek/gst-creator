@@ -17,6 +17,7 @@ class ObjectInspectorView : public QTreeView
 
 private Q_SLOTS:
 	void on_object_inspector_clicked(const QModelIndex &index);
+	void on_object_inspector_double_clicked(const QModelIndex &index);
 
 private:
 	QString current_text;

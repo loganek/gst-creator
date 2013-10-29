@@ -9,9 +9,11 @@
 #include <QDrag>
 #include <QByteArray>
 #include <QMimeData>
+#include <QMainWindow>
 #include "../gui/blocks/GstBlock.h"
 #include "ObjectInspectorModel.h"
 #include "common.h"
+#include "FactoryInspector/FactoryInspectorView.h"
 
 
 ObjectInspectorView::ObjectInspectorView(QWidget* parent)
@@ -21,6 +23,7 @@ ObjectInspectorView::ObjectInspectorView(QWidget* parent)
 	setDragEnabled(true);
 
 	QObject::connect(this, &ObjectInspectorView::pressed, this, &ObjectInspectorView::on_object_inspector_clicked);
+	QObject::connect(this, &ObjectInspectorView::doubleClicked, this, &ObjectInspectorView::on_object_inspector_double_clicked);
 }
 
 ObjectInspectorView::~ObjectInspectorView()
@@ -59,6 +62,17 @@ void ObjectInspectorView::on_object_inspector_clicked(const QModelIndex &index)
 {
 	current_location = index.data(Qt::DisplayRole).toPoint();
 	current_text = index.data(Qt::DisplayRole).toString();
+}
+
+void ObjectInspectorView::on_object_inspector_double_clicked(const QModelIndex &index)
+{
+	QString factory_name = index.data(Qt::DisplayRole).toString();
+	QDialog dialog;
+	dialog.setWindowTitle("Inspect " + factory_name);
+	QHBoxLayout* lay = new QHBoxLayout();
+	dialog.setLayout(lay);
+	dialog.layout()->addWidget(new FactoryInspectorView(factory_name));
+	dialog.exec();
 }
 
 

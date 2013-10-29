@@ -17,14 +17,16 @@ link_directories(${GSTMM_LIBRARY_DIRS})
 include_directories(${gst-creator_SOURCE_DIR}/ObjectInspector/include)
 include_directories(${gst-creator_SOURCE_DIR}/Workspace/include)
 include_directories(${gst-creator_SOURCE_DIR}/Console/include)
+include_directories(${gst-creator_SOURCE_DIR}/FactoryInspector/include)
 include_directories(./)
 
 add_subdirectory(gui)
 add_subdirectory(Workspace)
 add_subdirectory(ObjectInspector)
+add_subdirectory(FactoryInspector)
 add_subdirectory(Console)
 add_executable(gst-creator main.cpp)
 
-target_link_libraries(gst-creator Console Workspace ObjectInspector gui ${GSTMM_LIBRARIES})
+target_link_libraries(gst-creator Console Workspace ObjectInspector FactoryInspector gui ${GSTMM_LIBRARIES})
 
 qt5_use_modules(gst-creator Widgets)
