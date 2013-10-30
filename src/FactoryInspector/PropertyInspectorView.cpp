@@ -139,35 +139,27 @@ void PropertyInspectorView::generate_numeric_property(QTreeWidgetItem* item, GVa
 static gchar *
 flags_to_string (GFlagsValue * vals, guint flags)
 {
-	GString *s = NULL;
-	guint flags_left, i;
+	Glib::ustring str;
 
-	/* first look for an exact match and count the number of values */
-	for (i = 0; vals[i].value_name != NULL; ++i) {
+	int i;
+	for (i = 0; vals[i].value_name != nullptr; ++i)
 		if (vals[i].value == flags)
-			return g_strdup (vals[i].value_nick);
-	}
+			return g_strdup(vals[i].value_nick);
 
-	s = g_string_new (NULL);
-
-	/* we assume the values are sorted from lowest to highest value */
-	flags_left = flags;
-	while (i > 0) {
-		--i;
-		if (vals[i].value != 0 && (flags_left & vals[i].value) == vals[i].value) {
-			if (s->len > 0)
-				g_string_append_c (s, '+');
-			g_string_append (s, vals[i].value_nick);
-			flags_left -= vals[i].value;
-			if (flags_left == 0)
+	while (i-- > 0)
+	{
+		if (vals[i].value != 0 && (flags & vals[i].value) == vals[i].value)
+		{
+			if (!str.empty())
+				str += '+';
+			str += vals[i].value_nick;
+			flags -= vals[i].value;
+			if (flags == 0)
 				break;
 		}
 	}
 
-	if (s->len == 0)
-		g_string_assign (s, "(none)");
-
-	return g_string_free (s, FALSE);
+	return g_strdup(str.empty() ? "none" : str.c_str());
 }
 
 void PropertyInspectorView::generate_various_property(QTreeWidgetItem* item, GValue value, GParamSpec* param)
@@ -236,7 +228,7 @@ void PropertyInspectorView::generate_various_property(QTreeWidgetItem* item, GVa
 			item->addChild(new QTreeWidgetItem({"Type", "Pointer"}));
 	}
 
-	else if (param->value_type == G_TYPE_VALUE_ARRAY)
+	else if (param->value_type == G_TYPE_ARRAY)
 	{
 		GParamSpecValueArray *pvarray = G_PARAM_SPEC_VALUE_ARRAY (param);
 
