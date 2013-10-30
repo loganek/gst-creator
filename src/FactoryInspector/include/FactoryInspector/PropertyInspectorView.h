@@ -19,7 +19,6 @@ private:
 	Glib::ustring get_flags_string(GParamFlags param_flags);
 	bool is_numeric_property(GType type);
 	void generate_numeric_property(QTreeWidgetItem* item, GValue value, GParamSpec* param);
-	void generate_various_property(QTreeWidgetItem* item, GValue value, GParamSpec* param);
 
 public:
 	PropertyInspectorView();
