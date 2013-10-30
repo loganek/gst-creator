@@ -9,5 +9,6 @@
 #define FACTORYINSPECTOR_H_
 
 #include "FactoryInspector/FactoryInspectorView.h"
+#include "FactoryInspector/PropertyInspectorView.h"
 
 #endif /* FACTORYINSPECTOR_H_ */
