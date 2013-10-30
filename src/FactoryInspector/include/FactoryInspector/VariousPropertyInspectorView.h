@@ -17,7 +17,7 @@ class VariousPropertyInspectorView
 	GValue value;
 	GParamSpec* param;
 
-	static gchar* flags_to_string(GFlagsValue * vals, guint flags);
+	static Glib::ustring flags_to_string(GFlagsValue * vals, guint flags);
 
 	void param_spec_fraction();
 	void param_spec_flags();

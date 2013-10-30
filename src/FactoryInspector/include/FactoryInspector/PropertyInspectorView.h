@@ -19,7 +19,7 @@ private:
 	Glib::ustring get_flags_string(GParamFlags param_flags);
 	bool is_numeric_property(GType type);
 	void generate_numeric_property(QTreeWidgetItem* item, GValue value, GParamSpec* param);
-
+	QTreeWidgetItem* generate_property_item(GParamSpec* param, GstElement* element);
 public:
 	PropertyInspectorView();
 	QWidget* get_property_inspector_view(const Glib::RefPtr<Gst::ElementFactory>& factory);

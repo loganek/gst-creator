@@ -175,7 +175,9 @@ void FactoryInspectorView::build_pads_view(const RefPtr<ElementFactory>& factory
 		QTreeWidgetItem* item = new QTreeWidgetItem({iterator->get_name().c_str(),
 			pad_direction_to_string(iterator->get_direction())});
 		tree->addTopLevelItem(item);
-		item->addChild(new QTreeWidgetItem({"Pad template", iterator->get_pad_template()->get_name().c_str()}));
+		RefPtr<PadTemplate> tpl = iterator->get_pad_template();
+		if (tpl)
+			item->addChild(new QTreeWidgetItem({"Pad template", tpl->get_name().c_str()}));
 	}
 
 	layout()->addWidget(new QLabel("Pads:"));

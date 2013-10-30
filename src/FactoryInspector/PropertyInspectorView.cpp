@@ -37,49 +37,52 @@ QWidget* PropertyInspectorView::get_property_inspector_view(const RefPtr<Element
 
 	for (int i = 0; i < property_count; i++)
 	{
-		GValue value = { 0, };
-		GParamSpec* param = property_specs[i];
-		g_value_init (&value, param->value_type);
-
-		QTreeWidgetItem* item = new QTreeWidgetItem({g_param_spec_get_name(param),
-			g_param_spec_get_blurb(param)});
-
-		if (param->flags & G_PARAM_READABLE)
-			g_object_get_property(G_OBJECT (element->gobj()), param->name, &value);
-		else
-			g_param_value_set_default(param, &value);
-
-		Glib::ustring flags = get_flags_string(param->flags);
-
-		item->addChild(new QTreeWidgetItem({"Flags", flags.c_str()}));
-
-		GType value_type = G_VALUE_TYPE(&value);
-
-		if (is_numeric_property(value_type))
-			generate_numeric_property(item, value, param);
-
-		else if (value_type == G_TYPE_STRING)
-		{
-			const char *string_val = g_value_get_string (&value);
-			item->addChild(new QTreeWidgetItem({"Type", "String"}));
-			item->addChild(new QTreeWidgetItem({"Default value", (string_val == nullptr ? "NULL" : string_val)}));
-		}
-		else if (value_type == G_TYPE_BOOLEAN)
-		{
-			gboolean bool_val = g_value_get_boolean (&value);
-			item->addChild(new QTreeWidgetItem({"Type", "Boolean"}));
-			item->addChild(new QTreeWidgetItem({"Default value", bool_val ? "true" : "false"}));
-		}
-		else
-		{
-			VariousPropertyInspectorView various_property(item, value, param);
-			various_property.generate_various_property();
-		}
-
-		tree->addTopLevelItem(item);
+		tree->addTopLevelItem(generate_property_item(property_specs[i], element->gobj()));
 	}
 
 	return tree;
+}
+
+QTreeWidgetItem* PropertyInspectorView::generate_property_item(GParamSpec* param, GstElement* element)
+{
+	GValue value = { 0, };
+	g_value_init (&value, param->value_type);
+
+	QTreeWidgetItem* item = new QTreeWidgetItem({g_param_spec_get_name(param),
+		g_param_spec_get_blurb(param)});
+
+	if (param->flags & G_PARAM_READABLE)
+		g_object_get_property(G_OBJECT (element), param->name, &value);
+	else
+		g_param_value_set_default(param, &value);
+
+	Glib::ustring flags = get_flags_string(param->flags);
+	item->addChild(new QTreeWidgetItem({"Flags", flags.c_str()}));
+
+	GType value_type = G_VALUE_TYPE(&value);
+
+	if (is_numeric_property(value_type))
+		generate_numeric_property(item, value, param);
+
+	else if (value_type == G_TYPE_STRING)
+	{
+		const char *string_val = g_value_get_string (&value);
+		item->addChild(new QTreeWidgetItem({"Type", "String"}));
+		item->addChild(new QTreeWidgetItem({"Default value", (string_val == nullptr ? "NULL" : string_val)}));
+	}
+	else if (value_type == G_TYPE_BOOLEAN)
+	{
+		gboolean bool_val = g_value_get_boolean (&value);
+		item->addChild(new QTreeWidgetItem({"Type", "Boolean"}));
+		item->addChild(new QTreeWidgetItem({"Default value", bool_val ? "true" : "false"}));
+	}
+	else
+	{
+		VariousPropertyInspectorView various_property(item, value, param);
+		various_property.generate_various_property();
+	}
+
+	return item;
 }
 
 Glib::ustring PropertyInspectorView::get_flags_string(GParamFlags param_flags)

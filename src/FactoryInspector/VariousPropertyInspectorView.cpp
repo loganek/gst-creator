@@ -17,14 +17,14 @@ VariousPropertyInspectorView::VariousPropertyInspectorView(QTreeWidgetItem* item
   param(param)
 {}
 
-gchar* VariousPropertyInspectorView::flags_to_string(GFlagsValue * vals, guint flags)
+Glib::ustring VariousPropertyInspectorView::flags_to_string(GFlagsValue * vals, guint flags)
 {
 	Glib::ustring str;
 
 	int i;
 	for (i = 0; vals[i].value_name != nullptr; ++i)
 		if (vals[i].value == flags)
-			return g_strdup(vals[i].value_nick);
+			return Glib::ustring(vals[i].value_nick);
 
 	while (i-- > 0)
 	{
@@ -39,7 +39,7 @@ gchar* VariousPropertyInspectorView::flags_to_string(GFlagsValue * vals, guint f
 		}
 	}
 
-	return g_strdup(str.empty() ? "none" : str.c_str());
+	return str.empty() ? "none" : str;
 }
 
 void VariousPropertyInspectorView::generate_various_property()
@@ -76,10 +76,10 @@ void VariousPropertyInspectorView::param_spec_flags()
 
 	vals = pflags->flags_class->values;
 
-	char* cur = flags_to_string(vals, g_value_get_flags (&value));
+	Glib::ustring flags = flags_to_string(vals, g_value_get_flags (&value));
 
 	item->addChild(new QTreeWidgetItem({"Type", QString("Flags ") + g_type_name (G_VALUE_TYPE (&value))}));
-	item->addChild(new QTreeWidgetItem({"Default", cur}));
+	item->addChild(new QTreeWidgetItem({"Default", flags.c_str()}));
 
 	std::string values;
 	while (vals[0].value_name)
@@ -87,10 +87,11 @@ void VariousPropertyInspectorView::param_spec_flags()
 		values += std::to_string(vals->value);
 		values += std::string(": ") + vals->value_nick;
 		values += std::string(" - ") + vals->value_name;
+		values += "\n";
 		++vals;
 	}
 
-	g_free (cur);
+	item->addChild(new QTreeWidgetItem({"Values", values.c_str()}));
 }
 
 void VariousPropertyInspectorView::param_array()
