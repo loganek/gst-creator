@@ -1,30 +1,9 @@
-cmake_minimum_required(VERSION 2.8.9)
-
-project(gst-creator)
-
-INCLUDE(FindPkgConfig)
-
-set(CMAKE_PREFIX_PATH $ENV{QTDIR})
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-find_package(Qt5Widgets REQUIRED)
-ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
-pkg_check_modules(GSTMM REQUIRED gstreamermm-1.0)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11") 
-include_directories(${GSTMM_INCLUDE_DIRS})
-link_directories(${GSTMM_LIBRARY_DIRS})
-
-include_directories(${gst-creator_SOURCE_DIR}/ObjectInspector/include)
-include_directories(${gst-creator_SOURCE_DIR}/Workspace/include)
-include_directories(${gst-creator_SOURCE_DIR}/Console/include)
-include_directories(${gst-creator_SOURCE_DIR}/FactoryInspector/include)
-include_directories(./)
-
 add_subdirectory(gui)
 add_subdirectory(Workspace)
 add_subdirectory(ObjectInspector)
 add_subdirectory(FactoryInspector)
 add_subdirectory(Console)
+
 add_executable(gst-creator main.cpp)
 
 target_link_libraries(gst-creator Console Workspace ObjectInspector FactoryInspector gui ${GSTMM_LIBRARIES})
