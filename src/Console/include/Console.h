@@ -9,5 +9,6 @@
 #define CONSOLE_H_
 
 #include "Console/ConsoleView.h"
+#include "Console/ConsoleParser.h"
 
 #endif /* CONSOLE_H_ */

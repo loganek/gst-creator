@@ -1,11 +1,11 @@
 set(CONSOLE_HEADERS 
 	include/Console/ConsoleView.h
-	include/Console/ConsoleParser.h
+	include/Console/CommandParser.h
 )
 
 add_library(Console
 	ConsoleView.cpp
-	ConsoleParser.cpp
+	CommandParser.cpp
 	${CONSOLE_HEADERS}
 )
 

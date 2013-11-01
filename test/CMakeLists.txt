@@ -6,5 +6,5 @@ include_directories(${GTEST_INCLUDE_DIRS}
 add_subdirectory(Console)
 
 add_executable(Test ${SOURCE})
-target_link_libraries(Test ${GTEST_BOTH_LIBRARIES} pthread)
+target_link_libraries(Test ${GTEST_BOTH_LIBRARIES} Console pthread)
 

@@ -6,9 +6,12 @@
  */
 
 #include <gtest/gtest.h>
+#include "Console/CommandParser.h"
 
 TEST(CommandParser, DummyTest)
 {
+	CommandParser parser;
+	parser.parse("add xyz");
 	ASSERT_TRUE(true);
 }
 
