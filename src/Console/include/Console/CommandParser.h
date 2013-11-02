@@ -9,20 +9,15 @@
 #define COMMANDPARSER_H_
 
 #include <string>
-
-enum class CommandType
-{
-	ADD,
-	REMOVE,
-	RECONNECT,
-	UNKNOW
-};
+#include "Commands/Command.h"
 
 class CommandParser
 {
 private:
 	std::string parsed_text;
+	CommandType command_type;
 
+	void parse_command();
 	void syntax_error(const std::string& error);
 public:
 	CommandParser();

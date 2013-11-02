@@ -21,6 +21,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/Workspace/include
 	${PROJECT_SOURCE_DIR}/Console/include
 	${PROJECT_SOURCE_DIR}/FactoryInspector/include
+	${PROJECT_SOURCE_DIR}/Commands/include
 	${PROJECT_SOURCE_DIR}
 )
 

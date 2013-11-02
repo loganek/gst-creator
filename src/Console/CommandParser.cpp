@@ -6,6 +6,7 @@
  */
 
 #include "CommandParser.h"
+#include "Commands/enum_string_converter.h"
 #include <stdexcept>
 
 CommandParser::CommandParser()
@@ -23,16 +24,14 @@ CommandParser::~CommandParser()
  *  - add
  *    - element [to bin1:bin2:bin3 default=pipeline] factory
  *    - pad [bin1:bin2:element default=pipeline:element] using template
- *    - connection between
- *      - elements element1 element2
- *      - pads element1:pad1 element2:pad2
  *
  *  - remove
  *    - element
  *    - pad
- *    - connection between
- *      - elements
- *      - pads
+ *
+ *  - connect
+ *    - elements element1 to element2
+ *    - pads element1:pad1 element2:pad2
  *  - reconnect
  *    - {pad | element}
  *    - to {pad | element}
@@ -43,6 +42,11 @@ void CommandParser::parse(const std::string& text)
 {
 	parsed_text = text;
 
+	parse_command();
+}
+
+void CommandParser::parse_command()
+{
 	int end = parsed_text.find(' ');
 
 	if (end == std::string::npos)
@@ -50,21 +54,13 @@ void CommandParser::parse(const std::string& text)
 
 	std::string command = parsed_text.substr(0, end);
 
-	if (command == "add")
+	try
 	{
-		std::cout << "add command" << std::endl;
+		command_type = string_to_enum<CommandType>(command);
 	}
-	else if (command == "remove")
+	catch (std::runtime_error&)
 	{
-		std::cout << "remove command" << std::endl;
-	}
-	else if (command == "reconnect")
-	{
-		std::cout << "reconnect command" << std::endl;
-	}
-	else
-	{
-		syntax_error("unknow command `" + command + "`");
+		syntax_error("unknown command: " + command);
 	}
 }
 

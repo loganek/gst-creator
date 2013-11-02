@@ -87,8 +87,8 @@ $ifdef_str =~ s/[^a-zA-Z\d]+/_/g;
 print $output_file $autogenerate_string;
 print $output_file "#ifndef ".$ifdef_str."\n";
 print $output_file "#define ".$ifdef_str."\n\n";
+print $output_file "#include <stdexcept>\n\n";
 
-# TODO add declarations
 
 if ($ARGV[0] =~ m/include\/(.*)$/) {
 	$include_str = $1;
@@ -97,6 +97,12 @@ if ($ARGV[0] =~ m/include\/(.*)$/) {
 }
 
 print $output_file "#include \"$include_str\"\n\n";
+
+print $output_file "template<typename T>\n";
+print $output_file "T string_to_enum(const std::string&);\n";
+
+print $output_file "template<typename T>\n";
+print $output_file "std::string enum_to_string(T);\n\n";
 
 while ( my $line = <$input_file> ) {
 	$line = trim($line);
