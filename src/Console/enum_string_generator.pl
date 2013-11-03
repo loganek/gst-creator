@@ -67,9 +67,9 @@ sub trim($) {
 
 $arg_cnt = $#ARGV + 1;
 
-if ( $arg_cnt != 2 ) {
+if ( $arg_cnt != 3 ) {
 	print
-	  "\nUsage: enmu_string_generator.pl <enum's filename> <output filename>\n";
+	  "\nUsage: enmu_string_generator.pl <enum's filename> <output header filename> <output source filename>\n";
 	exit;
 }
 
@@ -80,6 +80,7 @@ my @enum_values = ();
 
 open my $input_file, "<", $ARGV[0] or die $!;
 open my $output_file, ">", $ARGV[1] or die $!;
+open my $output_file_cpp, ">", $ARGV[2] or die $!;
 
 $ifdef_str = uc($ARGV[1]);
 $ifdef_str =~ s/[^a-zA-Z\d]+/_/g;
@@ -87,8 +88,19 @@ $ifdef_str =~ s/[^a-zA-Z\d]+/_/g;
 print $output_file $autogenerate_string;
 print $output_file "#ifndef ".$ifdef_str."\n";
 print $output_file "#define ".$ifdef_str."\n\n";
-print $output_file "#include <stdexcept>\n\n";
 
+print $output_file "#include <string>\n\n";
+
+print $output_file "template<typename T>\n";
+print $output_file "T string_to_enum(const std::string&);\n";
+
+print $output_file "template<typename T>\n";
+print $output_file "std::string enum_to_string(T);\n\n";
+
+print $output_file "\n#endif\n";
+
+print $output_file_cpp "#include \"$ARGV[1]\"\n";
+print $output_file_cpp "#include <stdexcept>\n\n";
 
 if ($ARGV[0] =~ m/include\/(.*)$/) {
 	$include_str = $1;
@@ -96,13 +108,7 @@ if ($ARGV[0] =~ m/include\/(.*)$/) {
 	$include_str = $ARGV[0];
 }
 
-print $output_file "#include \"$include_str\"\n\n";
-
-print $output_file "template<typename T>\n";
-print $output_file "T string_to_enum(const std::string&);\n";
-
-print $output_file "template<typename T>\n";
-print $output_file "std::string enum_to_string(T);\n\n";
+print $output_file_cpp "#include \"$include_str\"\n\n";
 
 while ( my $line = <$input_file> ) {
 	$line = trim($line);
@@ -117,7 +123,7 @@ while ( my $line = <$input_file> ) {
 		$state = 2;
 	}
 	elsif ( ( $state == 2 || $state == 3 ) && $line =~ m/}\s*;$/ ) {
-		print $output_file generate_converter( $enum_name, @enum_values );
+		print $output_file_cpp generate_converter( $enum_name, @enum_values );
 
 		@enum_values = ();
 		$state       = 0;
@@ -141,4 +147,3 @@ while ( my $line = <$input_file> ) {
 	}
 }
 
-print $output_file "\n#endif\n";
