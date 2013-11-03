@@ -9,7 +9,8 @@
 #include "Commands/enum_string_converter.h"
 #include <stdexcept>
 
-CommandParser::CommandParser()
+CommandParser::CommandParser(const Glib::RefPtr<Gst::Pipeline>& model)
+: model(model)
 {
 
 }
@@ -22,7 +23,7 @@ CommandParser::~CommandParser()
 /**
  * Command list:
  *  - add
- *    - element [to bin1:bin2:bin3 default=pipeline] factory
+ *    - element factory [to bin1:bin2:bin3 default=pipeline]
  *    - pad [bin1:bin2:element default=pipeline:element] using template
  *
  *  - remove
@@ -37,34 +38,45 @@ CommandParser::~CommandParser()
  *    - to {pad | element}
  *
  */
-#include <iostream>
 void CommandParser::parse(const std::string& text)
 {
-	parsed_text = text;
-
-	parse_command();
-}
-
-void CommandParser::parse_command()
-{
-	int end = parsed_text.find(' ');
-
-	if (end == std::string::npos)
-		end = parsed_text.length();
-
-	std::string command = parsed_text.substr(0, end);
+	split_command_text(text);
 
 	try
 	{
-		command_type = string_to_enum<CommandType>(command);
+		type = string_to_enum<CommandType>(command_args[0]);
 	}
 	catch (std::runtime_error&)
 	{
-		syntax_error("unknown command: " + command);
+		Command::syntax_error("unknown command: " + command_args[0]);
 	}
+
+	command_args.erase(command_args.begin());
 }
 
-void CommandParser::syntax_error(const std::string& error)
+void CommandParser::split_command_text(std::string text)
 {
-	throw std::runtime_error("Syntax error: " + error);
+	int pos;
+
+	while ((pos = text.find(' ')) != std::string::npos)
+	{
+		std::string s = text.substr(0, pos);
+		text = text.substr(pos+1);
+
+		if (s.empty())
+			continue;
+
+		command_args.push_back(s);
+	}
+
+	command_args.push_back(text);
+}
+
+void CommandParser::build_command()
+{
+	switch (type)
+	{
+	case CommandType::ADD:
+		command = AddCommand::from_args(command_args, model);
+	}
 }

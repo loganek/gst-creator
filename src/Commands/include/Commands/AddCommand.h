@@ -9,6 +9,7 @@
 #define ADDCOMMAND_H_
 
 #include "Command.h"
+#include <vector>
 #include <gstreamermm.h>
 
 class AddCommand : public Command
@@ -23,6 +24,8 @@ public:
 			const Glib::RefPtr<Gst::Element>& parent,
 			const Glib::RefPtr<Gst::Object>& obj);
 	virtual ~AddCommand();
+
+	static AddCommand* from_args(const std::vector<std::string>& vect, const Glib::RefPtr<Gst::Pipeline>& model);
 
 	void run_command();
 };

@@ -8,19 +8,22 @@
 #ifndef COMMANDPARSER_H_
 #define COMMANDPARSER_H_
 
+#include "Commands.h"
 #include <string>
-#include "Commands/Command.h"
+#include <gstreamermm.h>
 
 class CommandParser
 {
 private:
-	std::string parsed_text;
-	CommandType command_type;
+	Command* command;
+	CommandType type;
+	std::vector<std::string> command_args;
+	Glib::RefPtr<Gst::Pipeline> model;
 
-	void parse_command();
-	void syntax_error(const std::string& error);
+	void build_command();
+	void split_command_text(std::string text);
 public:
-	CommandParser();
+	CommandParser(const Glib::RefPtr<Gst::Pipeline>& model);
 	virtual ~CommandParser();
 
 	void parse(const std::string& text);

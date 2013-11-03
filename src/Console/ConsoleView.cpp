@@ -28,3 +28,8 @@ void ConsoleView::execute_command()
 {
 
 }
+
+void ConsoleView::set_model(const Glib::RefPtr<Gst::Pipeline>& model)
+{
+	this->model = model;
+}

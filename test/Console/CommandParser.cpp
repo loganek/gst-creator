@@ -6,11 +6,13 @@
  */
 
 #include <gtest/gtest.h>
+#include <gstreamermm.h>
 #include "Console/CommandParser.h"
 
 TEST(CommandParser, DummyTest)
 {
-	CommandParser parser;
+	Glib::RefPtr<Gst::Pipeline> pipeline = Gst::Pipeline::create();
+	CommandParser parser(pipeline);
 	parser.parse("add xyz");
 	ASSERT_TRUE(true);
 }

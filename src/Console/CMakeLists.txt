@@ -10,5 +10,6 @@ add_library(Console
 )
 
 include_directories(include/Console)
+target_link_libraries(Console Commands) 
 
 qt5_use_modules(Console Widgets)

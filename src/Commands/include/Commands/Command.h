@@ -8,6 +8,8 @@
 #ifndef COMMAND_H_
 #define COMMAND_H_
 
+#include <stdexcept>
+
 enum class CommandType
 {
 	ADD,
@@ -40,6 +42,12 @@ public:
 	}
 
 	virtual void run_command() = 0;
+
+	static void syntax_error(const std::string& error)
+	{
+		throw std::runtime_error("Syntax error: " + error);
+	}
+
 };
 
 #endif /* COMMAND_H_ */

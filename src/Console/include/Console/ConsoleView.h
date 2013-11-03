@@ -10,6 +10,7 @@
 
 #include <QWidget>
 #include <QtWidgets>
+#include <gstreamermm.h>
 
 class ConsoleView : public QWidget
 {
@@ -18,11 +19,14 @@ private:
 	QLineEdit* edit;
 	QPushButton* button;
 
+	Glib::RefPtr<Gst::Pipeline> model;
+
 private Q_SLOTS:
 	void execute_command();
 
 public:
 	explicit ConsoleView(QWidget* parent = 0);
+	void set_model(const Glib::RefPtr<Gst::Pipeline>& model);
 };
 
 #endif /* CONSOLEVIEW_H_ */
