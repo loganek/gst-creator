@@ -13,7 +13,7 @@ TEST(CommandParser, DummyTest)
 {
 	Glib::RefPtr<Gst::Pipeline> pipeline = Gst::Pipeline::create();
 	CommandParser parser(pipeline);
-	parser.parse("add xyz");
+	parser.parse("ADD xyz r r g");
 	ASSERT_TRUE(true);
 }
 

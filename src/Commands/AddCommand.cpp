@@ -56,7 +56,26 @@ AddCommand* AddCommand::from_args(const std::vector<std::string>& args, const Re
 	std::set<int> allowed_args_count = {2, 3, 5};
 
 	if (allowed_args_count.find(args.size()) == allowed_args_count.end())
-		;					// TODO Throw some exception
+	{
+		std::string exp_args;
+		int i = 0;
+		for (auto it = allowed_args_count.begin(); it != allowed_args_count.end(); ++it)
+		{
+			exp_args += std::to_string(*it);
+			i++;
+			if (i == allowed_args_count.size() - 1)
+			{
+				exp_args += " or ";
+				break;
+			}
+			exp_args += ",";
+		}
+
+		exp_args += std::to_string(*(allowed_args_count.rbegin()));
+
+		syntax_error("invalid arguments count. Expected " + exp_args + ", but " +
+				std::to_string(allowed_args_count.size()) + " found.");
+	}
 
 	AddRemoveType type = string_to_enum<AddRemoveType>(args[0]);
 
