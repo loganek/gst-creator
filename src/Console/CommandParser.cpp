@@ -24,8 +24,8 @@ CommandParser::~CommandParser()
 /**
  * Command list:
  *  - add
- *    - element factory [to bin1:bin2:bin3 default=pipeline]
- *    - pad [bin1:bin2:element default=pipeline:element] using template
+ *    - element factory [_name_] [to bin1:bin2:bin3 default=pipeline]
+ *    - pad using _template_ [_name_] to [bin1:bin2 default=pipeline]:element
  *
  *  - remove
  *    - element

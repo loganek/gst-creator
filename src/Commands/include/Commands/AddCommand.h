@@ -19,6 +19,8 @@ private:
 	Glib::RefPtr<Gst::Element> parent;
 	ObjectType type;
 
+	static AddCommand* generate_add_pad_command(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
+	static AddCommand* generate_add_element_command(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
 public:
 	AddCommand(ObjectType type,
 			const Glib::RefPtr<Gst::Element>& parent,

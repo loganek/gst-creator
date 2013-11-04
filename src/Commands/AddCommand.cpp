@@ -54,57 +54,73 @@ void AddCommand::run_command()
 
 AddCommand* AddCommand::from_args(const std::vector<std::string>& args, const RefPtr<Pipeline>& model)
 {
+	if (args.size() < 1)
+		syntax_error("invalid arguments count. Expected 1, but 0 found.");
+
+	ObjectType type = EnumUtils<ObjectType>::string_to_enum(args[0]);
+
+	return (type == ObjectType::ELEMENT) ?
+			generate_add_element_command(args, model) :
+			generate_add_pad_command(args, model);
+}
+
+AddCommand* AddCommand::generate_add_element_command(const std::vector<std::string>& args, const RefPtr<Pipeline>& model)
+{
 	std::set<int> allowed_args_count = {2, 3, 5};
 
 	if (allowed_args_count.find(args.size()) == allowed_args_count.end())
 	{
-		std::string exp_args;
-		int i = 0;
-		for (auto it = allowed_args_count.begin(); it != allowed_args_count.end(); ++it)
-		{
-			exp_args += std::to_string(*it);
-			i++;
-			if (i == allowed_args_count.size() - 1)
-			{
-				exp_args += " or ";
-				break;
-			}
-			exp_args += ",";
-		}
-
-		exp_args += std::to_string(*(allowed_args_count.rbegin()));
-
-		syntax_error("invalid arguments count. Expected " + exp_args + ", but " +
-				std::to_string(allowed_args_count.size()) + " found.");
+		syntax_error("invalid arguments count. Expected 2, 3 or 5, but " +
+				std::to_string(args.size()) + " found.");
 	}
 
-	ObjectType type = EnumUtils<ObjectType>::string_to_enum(args[0]);
+	RefPtr<Object> object = ElementFactory::create_element(args[1]);
 
-	if (type == ObjectType::ELEMENT)
+	if (!object)
+		throw std::runtime_error("Cannot find element " + args[1]);
+
+	if (args.size() == 3 || args.size() == 5)
+		object->set_name(args[2]);
+
+	RefPtr<Element> parent;
+
+	if (args.size() == 5)
 	{
-		RefPtr<Element> element =
-				ElementFactory::create_element(args[1]);
+		if (args[3] != "to")
+			syntax_error("expected `to`, but " + args[3] + " found.");
 
-		if (!element)
-			throw std::runtime_error("Cannot find element " + args[1]);
-
-		if (args.size() == 3 || args.size() == 5) // element's name defined
-			element->set_name(args[2]);
-
-		RefPtr<Element> parent;
-
-		if (args.size() == 5)
-		{
-			if (args[3] != "to")
-				syntax_error("expected `to`, but " + args[3] + " found.");
-
-			parent = GstUtils::find_element(args[4], model);
-		}
-		else
-		{
-			parent = model;
-		}
-
-		return new AddCommand(type, parent, element);
+		parent = GstUtils::find_element(args[4], model);
 	}
+	else
+		parent = model;
+
+	return new AddCommand(ObjectType::ELEMENT, parent, object);
+}
+
+AddCommand* AddCommand::generate_add_pad_command(const std::vector<std::string>& args, const RefPtr<Pipeline>& model)
+{
+	if (args.size() != 5 && args.size() != 6)
+		syntax_error("invalid arguments count. Expected 5 or 6, but " +
+				std::to_string(args.size()) + " found.");
+
+	if (args[1] != "using")
+		syntax_error("expected `using` but " + args[1] + " found.");
+
+	int shift = args.size() == 5 ? 0 : 1;
+
+	if (args[3 + shift] != "to")
+		syntax_error("expected `to` but " + args[3+shift] + " found.");
+
+	RefPtr<Element> parent = GstUtils::find_element(args[4 + shift], model);
+	RefPtr<PadTemplate> tpl = parent->get_pad_template(args[2]);
+
+	if (!tpl)
+		std::runtime_error("unknown pad template: " + args[2]);
+
+	RefPtr<Object> object = Pad::create(tpl);
+
+	if (args.size() == 6)
+		object->set_name(args[3]);
+
+	return new AddCommand(ObjectType::PAD, parent, object);
 }
