@@ -8,6 +8,7 @@
 #ifndef COMMAND_H_
 #define COMMAND_H_
 
+#include "utils/StringUtils.h"
 #include <stdexcept>
 #include <vector>
 #include <gstreamermm.h>
@@ -19,6 +20,7 @@ enum class CommandType
 	CONNECT,
 	DISCONNECT,
 	RECONNECT,
+	STATE,
 	UNKNOW
 };
 
@@ -26,6 +28,13 @@ enum class AddRemoveType
 {
 	PAD,
 	ELEMENT
+};
+
+enum class State
+{
+	PLAY,
+	PAUSE,
+	STOP
 };
 
 class Command
@@ -52,21 +61,11 @@ public:
 
 	static Glib::RefPtr<Gst::Element> find_element(std::string text, const Glib::RefPtr<Gst::Pipeline>& model)
 	{
-		int pos;
-		std::vector<std::string> elements;
-
-		while ((pos = text.find(":")) != std::string::npos)
-		{
-			elements.push_back(text.substr(0, pos));
-			text.erase(0, pos + 1);
-		}
-
+		std::vector<std::string> elements = StringUtils::split(text, ":");
 		Glib::RefPtr<Gst::Bin> current_bin = model;
 
 		for (int i = 0; i < elements.size(); i++)
-		{
 			current_bin = current_bin.cast_static(model->get_element(elements[i].c_str()));
-		}
 
 		return current_bin->get_element(elements.back().c_str());
 	}

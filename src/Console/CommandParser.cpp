@@ -65,5 +65,9 @@ void CommandParser::build_command()
 	{
 	case CommandType::ADD:
 		command = AddCommand::from_args(command_args, model);
+		break;
+	case CommandType::STATE:
+		command = StateCommand::from_args(command_args, model);
+		break;
 	}
 }

@@ -31,7 +31,8 @@ ConsoleView::~ConsoleView()
 
 void ConsoleView::execute_command()
 {
-	parser->parse(edit->text().toUtf8().constData());
+	Command* cmd = parser->parse(edit->text().toUtf8().constData());
+	cmd->run_command();
 }
 
 void ConsoleView::set_model(const Glib::RefPtr<Gst::Pipeline>& model)
