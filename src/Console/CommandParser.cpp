@@ -38,7 +38,7 @@ CommandParser::~CommandParser()
  *    - to {pad | element}
  *
  */
-void CommandParser::parse(const std::string& text)
+Command* CommandParser::parse(const std::string& text)
 {
 	split_command_text(text);
 
@@ -54,6 +54,8 @@ void CommandParser::parse(const std::string& text)
 	command_args.erase(command_args.begin());
 
 	build_command();
+
+	return command;
 }
 
 void CommandParser::split_command_text(std::string text)

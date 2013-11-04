@@ -26,7 +26,7 @@ public:
 	CommandParser(const Glib::RefPtr<Gst::Pipeline>& model);
 	virtual ~CommandParser();
 
-	void parse(const std::string& text);
+	Command* parse(const std::string& text);
 };
 
 #endif /* COMMANDPARSER_H_ */

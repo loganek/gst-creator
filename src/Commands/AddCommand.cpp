@@ -94,7 +94,7 @@ AddCommand* AddCommand::from_args(const std::vector<std::string>& args, const Re
 			if (args[3] != "to")
 				syntax_error("expected `to`, but " + args[3] + " found.");
 
-			// TODO parse "TO" command
+			parent = find_element(args[4], model);
 		}
 		else
 		{

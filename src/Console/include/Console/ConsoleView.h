@@ -8,6 +8,7 @@
 #ifndef CONSOLEVIEW_H_
 #define CONSOLEVIEW_H_
 
+#include "Console/CommandParser.h"
 #include <QWidget>
 #include <QtWidgets>
 #include <gstreamermm.h>
@@ -21,11 +22,13 @@ private:
 
 	Glib::RefPtr<Gst::Pipeline> model;
 
+	CommandParser* parser;
 private Q_SLOTS:
 	void execute_command();
 
 public:
 	explicit ConsoleView(QWidget* parent = 0);
+	virtual ~ConsoleView();
 	void set_model(const Glib::RefPtr<Gst::Pipeline>& model);
 };
 

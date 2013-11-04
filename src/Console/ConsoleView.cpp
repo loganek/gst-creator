@@ -6,10 +6,10 @@
  */
 
 #include "ConsoleView.h"
-#include <QDebug>
 
 ConsoleView::ConsoleView(QWidget* parent)
-: QWidget(parent)
+: QWidget(parent),
+  parser(nullptr)
 {
 	edit = new QLineEdit();
 	button = new QPushButton("Execute");
@@ -24,12 +24,19 @@ ConsoleView::ConsoleView(QWidget* parent)
 	setLayout(lay);
 }
 
+ConsoleView::~ConsoleView()
+{
+	delete parser;
+}
+
 void ConsoleView::execute_command()
 {
-
+	parser->parse(edit->text().toUtf8().constData());
 }
 
 void ConsoleView::set_model(const Glib::RefPtr<Gst::Pipeline>& model)
 {
+	delete parser;
 	this->model = model;
+	parser = new CommandParser(model);
 }

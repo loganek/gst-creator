@@ -21,7 +21,7 @@ void MainWindow::add_workspace_canvas()
 	QFrame *frame = new QFrame;
 
 	frameLayout->addWidget(&canvas);
-	//frameLayout->addWidget(new ConsoleView());
+	frameLayout->addWidget(new ConsoleView());
 	frame->setLayout(frameLayout);
 	frame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 	ui->mainVerticalLayout->addWidget(frame);
