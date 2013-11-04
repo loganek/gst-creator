@@ -45,7 +45,7 @@ sub generate_converter {
 	$ret .= "template<>\n";
 	$ret .= "$enum_name string_to_enum(const std::string& enum_value)\n";
 	$ret .= "{\n";
-	$ret .= "\tstd::string val = enum_value;\n\n"; # TODO to upper
+	$ret .= "\tstd::string val = StringUtils::to_upper(enum_value);\n\n";
 	
 	for ( my $i = 0 ; $i < @enum_values ; $i++ ) {
 		$ret .= "\tif (val == \"$enum_values[$i]\")\n";
@@ -100,6 +100,7 @@ print $output_file "std::string enum_to_string(T);\n\n";
 print $output_file "\n#endif\n";
 
 print $output_file_cpp "#include \"$ARGV[1]\"\n";
+print $output_file_cpp "#include \"utils/StringUtils.h\"\n";
 print $output_file_cpp "#include <stdexcept>\n\n";
 
 if ($ARGV[0] =~ m/include\/(.*)$/) {
@@ -122,24 +123,21 @@ while ( my $line = <$input_file> ) {
 	elsif ( $state == 1 && $line eq "{" ) {
 		$state = 2;
 	}
-	elsif ( ( $state == 2 || $state == 3 ) && $line =~ m/}\s*;$/ ) {
+	elsif ( ( $state == 2 || $state == 3 ) && $line =~ m/}\s*;\s*$/ ) {
 		print $output_file_cpp generate_converter( $enum_name, @enum_values );
 
 		@enum_values = ();
 		$state       = 0;
 	}
-	elsif ( $state == 2 && $line =~ m/(.+)\s*=\s*(\d+)\s*(, *)$/ )
-	{                        # TODO it accepts VALUE = 3,, - it's incorrect
+	elsif ( $state == 2 && $line =~ m/([^,]+)\s*=\s*(\d+)\s*(,?)$/ ) {
 		if ( $3 ne "," ) {
-			print $1." Not equal\n";
 			$state = 3;
 		}
 
 		push( $enum_values, $1 );
 	}
-	elsif ( $state == 2 && $line =~ m/(.+)\s*(, *)$/ ) {
+	elsif ( $state == 2 && $line =~ m/([^,]+)\s*(,?)$/ ) {
 		if ( $2 ne "," ) {
-			print $2."Not equal\n";
 			$state = 3;
 		}
 
