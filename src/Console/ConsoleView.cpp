@@ -20,6 +20,7 @@ ConsoleView::ConsoleView(QWidget* parent)
 	lay->addWidget(button);
 
 	QObject::connect(button, &QPushButton::clicked, this, &ConsoleView::execute_command);
+	QObject::connect(edit, &QLineEdit::returnPressed, this, &ConsoleView::execute_command);
 
 	setLayout(lay);
 }
@@ -33,6 +34,7 @@ void ConsoleView::execute_command()
 {
 	Command* cmd = parser->parse(edit->text().toUtf8().constData());
 	cmd->run_command();
+	edit->clear();
 }
 
 void ConsoleView::set_model(const Glib::RefPtr<Gst::Pipeline>& model)
