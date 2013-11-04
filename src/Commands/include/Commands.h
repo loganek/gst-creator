@@ -12,5 +12,6 @@
 #include "Commands/Command.h"
 #include "Commands/enum_string_converter.h"
 #include "Commands/StateCommand.h"
+#include "Commands/ConnectCommand.h"
 
 #endif /* COMMANDS_H_ */

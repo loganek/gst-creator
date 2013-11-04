@@ -9,5 +9,6 @@
 #define UTILS_H_
 
 #include "utils/StringUtils.h"
+#include "utils/GstUtils.h"
 
 #endif /* UTILS_H_ */
