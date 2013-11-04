@@ -61,16 +61,10 @@ Command* CommandParser::parse(const std::string& text)
 void CommandParser::split_command_text(std::string text)
 {
 	int pos;
-
-	while ((pos = text.find(' ')) != std::string::npos)
+	while ((pos = text.find(":")) != std::string::npos)
 	{
-		std::string s = text.substr(0, pos);
-		text = text.substr(pos+1);
-
-		if (s.empty())
-			continue;
-
-		command_args.push_back(s);
+		command_args.push_back(text.substr(0, pos));
+		text.erase(0, pos + 1);
 	}
 
 	command_args.push_back(text);
