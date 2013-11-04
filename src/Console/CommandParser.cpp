@@ -7,6 +7,7 @@
 
 #include "CommandParser.h"
 #include "Commands/enum_string_converter.h"
+#include "utils/StringUtils.h"
 #include <stdexcept>
 
 CommandParser::CommandParser(const Glib::RefPtr<Gst::Pipeline>& model)
@@ -40,7 +41,7 @@ CommandParser::~CommandParser()
  */
 Command* CommandParser::parse(const std::string& text)
 {
-	split_command_text(text);
+	command_args = StringUtils::split(StringUtils::trim(text), " ");
 
 	try
 	{
@@ -56,24 +57,6 @@ Command* CommandParser::parse(const std::string& text)
 	build_command();
 
 	return command;
-}
-
-void CommandParser::split_command_text(std::string text)
-{
-	int pos;
-
-	while ((pos = text.find(' ')) != std::string::npos)
-	{
-		std::string s = text.substr(0, pos);
-		text = text.substr(pos+1);
-
-		if (s.empty())
-			continue;
-
-		command_args.push_back(s);
-	}
-
-	command_args.push_back(text);
 }
 
 void CommandParser::build_command()

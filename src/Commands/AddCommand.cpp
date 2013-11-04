@@ -84,6 +84,9 @@ AddCommand* AddCommand::from_args(const std::vector<std::string>& args, const Re
 		RefPtr<Element> element =
 				ElementFactory::create_element(args[1]);
 
+		if (!element)
+			throw std::runtime_error("Cannot find element " + args[1]);
+
 		if (args.size() == 3 || args.size() == 5) // element's name defined
 			element->set_name(args[2]);
 

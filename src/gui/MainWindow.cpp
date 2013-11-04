@@ -1,7 +1,8 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include <QtWidgets/qmessagebox.h>
 #include "Console/ConsoleView.h"
+#include <QtWidgets/qmessagebox.h>
+#include <gstreamermm.h>
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent),
@@ -21,7 +22,10 @@ void MainWindow::add_workspace_canvas()
 	QFrame *frame = new QFrame;
 
 	frameLayout->addWidget(&canvas);
-	frameLayout->addWidget(new ConsoleView());
+
+	ConsoleView* console = new ConsoleView();
+	console->set_model(Gst::Pipeline::create()); // TODO model should be created in the other place
+	frameLayout->addWidget(console);
 	frame->setLayout(frameLayout);
 	frame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 	ui->mainVerticalLayout->addWidget(frame);
