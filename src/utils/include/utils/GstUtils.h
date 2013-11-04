@@ -14,6 +14,7 @@ class GstUtils
 {
 public:
 	static Glib::RefPtr<Gst::Element> find_element(std::string text, const Glib::RefPtr<Gst::Pipeline>& model);
+	static Glib::RefPtr<Gst::Pad> find_pad(std::string text, const Glib::RefPtr<Gst::Pipeline>& model);
 };
 
 #endif /* GSTUTILS_H_ */

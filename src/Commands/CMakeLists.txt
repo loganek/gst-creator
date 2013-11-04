@@ -1,6 +1,7 @@
 set(CONSOLE_HEADERS 
 	include/Commands/AddCommand.h
 	include/Commands/StateCommand.h
+	include/Commands/ConnectCommand.h
 	include/Commands/Command.h
 	include/Commands/enum_string_converter.h
 )
@@ -8,6 +9,7 @@ set(CONSOLE_HEADERS
 add_library(Commands
 	AddCommand.cpp
 	StateCommand.cpp
+	ConnectCommand.cpp
 	enum_string_converter.cpp
 	${CONSOLE_HEADERS}
 )

@@ -32,7 +32,7 @@ CommandParser::~CommandParser()
  *    - pad
  *
  *  - connect
- *    - elements element1 to element2
+ *    - {element|pad} obj1 with obj2
  *    - pads element1:pad1 element2:pad2
  *  - reconnect
  *    - {pad | element}
@@ -68,6 +68,9 @@ void CommandParser::build_command()
 		break;
 	case CommandType::STATE:
 		command = StateCommand::from_args(command_args, model);
+		break;
+	case CommandType::CONNECT:
+		command = ConnectCommand::from_args(command_args, model);
 		break;
 	}
 }

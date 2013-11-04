@@ -7,12 +7,13 @@
 
 #include "AddCommand.h"
 #include "enum_string_converter.h"
+#include "utils/GstUtils.h"
 #include <set>
 
 using namespace Gst;
 using Glib::RefPtr;
 
-AddCommand::AddCommand(AddRemoveType type,
+AddCommand::AddCommand(ObjectType type,
 		const RefPtr<Element>& parent,
 		const RefPtr<Object>& object)
 : type(type),
@@ -28,7 +29,7 @@ AddCommand::~AddCommand()
 
 void AddCommand::run_command()
 {
-	if (type == AddRemoveType::PAD)
+	if (type == ObjectType::PAD)
 	{
 		if (GST_IS_PAD(object->gobj()))
 		{
@@ -77,9 +78,9 @@ AddCommand* AddCommand::from_args(const std::vector<std::string>& args, const Re
 				std::to_string(allowed_args_count.size()) + " found.");
 	}
 
-	AddRemoveType type = string_to_enum<AddRemoveType>(args[0]);
+	ObjectType type = string_to_enum<ObjectType>(args[0]);
 
-	if (type == AddRemoveType::ELEMENT)
+	if (type == ObjectType::ELEMENT)
 	{
 		RefPtr<Element> element =
 				ElementFactory::create_element(args[1]);
@@ -97,7 +98,7 @@ AddCommand* AddCommand::from_args(const std::vector<std::string>& args, const Re
 			if (args[3] != "to")
 				syntax_error("expected `to`, but " + args[3] + " found.");
 
-			parent = find_element(args[4], model);
+			parent = GstUtils::find_element(args[4], model);
 		}
 		else
 		{
