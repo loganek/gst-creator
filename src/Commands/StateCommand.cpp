@@ -6,7 +6,7 @@
  */
 
 #include "StateCommand.h"
-#include "enum_string_converter.h"
+#include "utils/EnumUtils.h"
 
 StateCommand::StateCommand(State state, const Glib::RefPtr<Gst::Pipeline>& model)
 : state(state),
@@ -19,7 +19,7 @@ StateCommand* StateCommand::from_args(const std::vector<std::string>& vect, cons
 	if (vect.size() != 1)
 		syntax_error("invalid arguments count. Expected 1, but " + std::to_string(vect.size()) + " found.");
 
-	State state = string_to_enum<State>(vect[0]);
+	State state = EnumUtils<State>::string_to_enum(vect[0]);
 
 	return new StateCommand(state, model);
 }

@@ -6,7 +6,7 @@
  */
 
 #include "AddCommand.h"
-#include "enum_string_converter.h"
+#include "utils/EnumUtils.h"
 #include "utils/GstUtils.h"
 #include <set>
 
@@ -78,7 +78,7 @@ AddCommand* AddCommand::from_args(const std::vector<std::string>& args, const Re
 				std::to_string(allowed_args_count.size()) + " found.");
 	}
 
-	ObjectType type = string_to_enum<ObjectType>(args[0]);
+	ObjectType type = EnumUtils<ObjectType>::string_to_enum(args[0]);
 
 	if (type == ObjectType::ELEMENT)
 	{

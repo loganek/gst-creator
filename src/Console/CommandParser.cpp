@@ -6,7 +6,7 @@
  */
 
 #include "CommandParser.h"
-#include "Commands/enum_string_converter.h"
+#include "utils/EnumUtils.h"
 #include "utils/StringUtils.h"
 #include <stdexcept>
 
@@ -45,7 +45,7 @@ Command* CommandParser::parse(const std::string& text)
 
 	try
 	{
-		type = string_to_enum<CommandType>(command_args[0]);
+		type = EnumUtils<CommandType>::string_to_enum(command_args[0]);
 	}
 	catch (std::runtime_error&)
 	{

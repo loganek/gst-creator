@@ -27,7 +27,7 @@ sub generate_converter {
 	my ( $enum_name, @enum_values ) = @_;
 
 	$ret = "template<>\n";
-	$ret .= "std::string enum_to_string<$enum_name>($enum_name enum_value)\n";
+	$ret .= "std::string EnumUtils<$enum_name>::enum_to_string($enum_name enum_value)\n";
 	$ret .= "{\n";
 	$ret .= "\tswitch (enum_value)\n";
 	$ret .= "\t{\n";
@@ -43,7 +43,7 @@ sub generate_converter {
 	$ret .= "}\n\n";
 
 	$ret .= "template<>\n";
-	$ret .= "$enum_name string_to_enum(const std::string& enum_value)\n";
+	$ret .= "$enum_name EnumUtils<$enum_name>::string_to_enum(const std::string& enum_value)\n";
 	$ret .= "{\n";
 	$ret .= "\tstd::string val = StringUtils::to_upper(enum_value);\n\n";
 	
@@ -91,12 +91,14 @@ print $output_file "#define ".$ifdef_str."\n\n";
 
 print $output_file "#include <string>\n\n";
 
-print $output_file "template<typename T>\n";
-print $output_file "T string_to_enum(const std::string&);\n";
+print $output_file "template<typename ENUM_TYPE>\n";
+print $output_file "class EnumUtils\n";
+print $output_file "{\n";
+print $output_file "public:\n";
+print $output_file "\tstatic ENUM_TYPE string_to_enum(const std::string&);\n\n";
 
-print $output_file "template<typename T>\n";
-print $output_file "std::string enum_to_string(T);\n\n";
-
+print $output_file "\tstatic std::string enum_to_string(ENUM_TYPE);\n";
+print $output_file "};\n";
 print $output_file "\n#endif\n";
 
 print $output_file_cpp "#include \"$ARGV[1]\"\n";

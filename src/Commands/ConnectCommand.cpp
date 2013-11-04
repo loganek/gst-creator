@@ -6,7 +6,7 @@
  */
 
 #include "ConnectCommand.h"
-#include "enum_string_converter.h"
+#include "utils/EnumUtils.h"
 #include "utils/GstUtils.h"
 
 using namespace Gst;
@@ -32,7 +32,7 @@ ConnectCommand* ConnectCommand::from_args(const std::vector<std::string>& args, 
 	if (args[2] != "with")
 		syntax_error("expected `with`, but " + args[2] + " found.");
 
-	ObjectType type = string_to_enum<ObjectType>(args[0]);
+	ObjectType type = EnumUtils<ObjectType>::string_to_enum(args[0]);
 
 	if (type == ObjectType::ELEMENT)
 	{
