@@ -4,6 +4,7 @@ add_subdirectory(ObjectInspector)
 add_subdirectory(FactoryInspector)
 add_subdirectory(Console)
 add_subdirectory(Commands)
+add_subdirectory(utils)
 
 add_executable(gst-creator main.cpp)
 

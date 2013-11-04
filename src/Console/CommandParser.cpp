@@ -6,7 +6,8 @@
  */
 
 #include "CommandParser.h"
-#include "Commands/enum_string_converter.h"
+#include "utils/EnumUtils.h"
+#include "utils/StringUtils.h"
 #include <stdexcept>
 
 CommandParser::CommandParser(const Glib::RefPtr<Gst::Pipeline>& model)
@@ -31,7 +32,7 @@ CommandParser::~CommandParser()
  *    - pad
  *
  *  - connect
- *    - elements element1 to element2
+ *    - {element|pad} obj1 with obj2
  *    - pads element1:pad1 element2:pad2
  *  - reconnect
  *    - {pad | element}
@@ -40,11 +41,11 @@ CommandParser::~CommandParser()
  */
 Command* CommandParser::parse(const std::string& text)
 {
-	split_command_text(text);
+	command_args = StringUtils::split(StringUtils::trim(text), " ");
 
 	try
 	{
-		type = string_to_enum<CommandType>(command_args[0]);
+		type = EnumUtils<CommandType>::string_to_enum(command_args[0]);
 	}
 	catch (std::runtime_error&)
 	{
@@ -58,23 +59,18 @@ Command* CommandParser::parse(const std::string& text)
 	return command;
 }
 
-void CommandParser::split_command_text(std::string text)
-{
-	int pos;
-	while ((pos = text.find(":")) != std::string::npos)
-	{
-		command_args.push_back(text.substr(0, pos));
-		text.erase(0, pos + 1);
-	}
-
-	command_args.push_back(text);
-}
-
 void CommandParser::build_command()
 {
 	switch (type)
 	{
 	case CommandType::ADD:
 		command = AddCommand::from_args(command_args, model);
+		break;
+	case CommandType::STATE:
+		command = StateCommand::from_args(command_args, model);
+		break;
+	case CommandType::CONNECT:
+		command = ConnectCommand::from_args(command_args, model);
+		break;
 	}
 }

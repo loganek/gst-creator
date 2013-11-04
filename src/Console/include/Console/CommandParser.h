@@ -21,7 +21,6 @@ private:
 	Glib::RefPtr<Gst::Pipeline> model;
 
 	void build_command();
-	void split_command_text(std::string text);
 public:
 	CommandParser(const Glib::RefPtr<Gst::Pipeline>& model);
 	virtual ~CommandParser();

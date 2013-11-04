@@ -17,10 +17,10 @@ class AddCommand : public Command
 private:
 	Glib::RefPtr<Gst::Object> object;
 	Glib::RefPtr<Gst::Element> parent;
-	AddRemoveType type;
+	ObjectType type;
 
 public:
-	AddCommand(AddRemoveType type,
+	AddCommand(ObjectType type,
 			const Glib::RefPtr<Gst::Element>& parent,
 			const Glib::RefPtr<Gst::Object>& obj);
 	virtual ~AddCommand();
