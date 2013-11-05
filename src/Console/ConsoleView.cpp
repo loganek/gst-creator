@@ -6,6 +6,7 @@
  */
 
 #include "ConsoleView.h"
+#include <memory>
 
 ConsoleView::ConsoleView(QWidget* parent)
 : QWidget(parent),
@@ -32,9 +33,18 @@ ConsoleView::~ConsoleView()
 
 void ConsoleView::execute_command()
 {
-	Command* cmd = parser->parse(edit->text().toUtf8().constData());
-	cmd->run_command();
-	edit->clear();
+	try
+	{
+		std::shared_ptr<Command> cmd(parser->parse(edit->text().toUtf8().constData()));
+		cmd->run_command();
+		edit->clear();
+	}
+	catch (const std::runtime_error& err)
+	{
+		QMessageBox msg_box;
+		msg_box.setText(err.what());
+		msg_box.exec();
+	}
 }
 
 void ConsoleView::set_model(const Glib::RefPtr<Gst::Pipeline>& model)
