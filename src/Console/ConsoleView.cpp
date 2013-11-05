@@ -37,6 +37,7 @@ void ConsoleView::execute_command()
 	{
 		std::shared_ptr<Command> cmd(parser->parse(edit->text().toUtf8().constData()));
 		cmd->run_command();
+		Q_EMIT commandAdded({edit->text()});
 		edit->clear();
 	}
 	catch (const std::runtime_error& err)

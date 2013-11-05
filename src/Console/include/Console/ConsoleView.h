@@ -26,6 +26,9 @@ private:
 private Q_SLOTS:
 	void execute_command();
 
+Q_SIGNALS:
+	void commandAdded(const QStringList& item);
+
 public:
 	explicit ConsoleView(QWidget* parent = 0);
 	virtual ~ConsoleView();

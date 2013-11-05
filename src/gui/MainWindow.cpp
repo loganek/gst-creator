@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "Console/ConsoleView.h"
+#include "Logger/LoggerView.h"
 #include <QtWidgets/qmessagebox.h>
 #include <gstreamermm.h>
 
@@ -18,16 +19,19 @@ ui(new Ui::MainWindow)
 
 void MainWindow::add_workspace_canvas()
 {
-	QHBoxLayout *frameLayout = new QHBoxLayout;
+	QVBoxLayout *frameLayout = new QVBoxLayout;
 	QFrame *frame = new QFrame;
 
 	frameLayout->addWidget(&canvas);
 
 	ConsoleView* console = new ConsoleView();
+	LoggerView* logger = new LoggerView();
+	QObject::connect(console, &ConsoleView::commandAdded, logger, &LoggerView::add_log);
 	console->set_model(Gst::Pipeline::create()); // TODO model should be created in the other place
 	frameLayout->addWidget(console);
 	frame->setLayout(frameLayout);
 	frame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	frameLayout->addWidget(logger);
 	ui->mainVerticalLayout->addWidget(frame);
 }
 
