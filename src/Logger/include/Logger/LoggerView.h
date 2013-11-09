@@ -15,7 +15,7 @@ class LoggerView : public QWidget
 	Q_OBJECT
 
 private:
-	QListWidget* list;
+	QTableWidget* table;
 
 public Q_SLOTS:
 	void add_log(const QStringList& item);
