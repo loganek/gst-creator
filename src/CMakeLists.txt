@@ -17,6 +17,7 @@ add_subdirectory(FactoryInspector)
 add_subdirectory(Console)
 add_subdirectory(Commands)
 add_subdirectory(Logger)
+add_subdirectory(Properties)
 
 add_executable(gst-creator main.cpp)
 

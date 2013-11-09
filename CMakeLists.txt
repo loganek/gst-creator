@@ -24,6 +24,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/Commands/include
 	${PROJECT_SOURCE_DIR}/utils/include
 	${PROJECT_SOURCE_DIR}/Logger/include
+	${PROJECT_SOURCE_DIR}/Properties/include
 	${PROJECT_SOURCE_DIR}
 )
 

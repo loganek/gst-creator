@@ -7,4 +7,4 @@ add_subdirectory(Console)
 
 add_executable(Test ${SOURCE})
 target_link_libraries(Test ${GTEST_BOTH_LIBRARIES} Console pthread ${GSTMM_LIBRARIES})
-
+qt5_use_modules(Test Widgets)

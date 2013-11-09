@@ -7,6 +7,7 @@
 
 #include "PropertyInspectorView.h"
 #include "VariousPropertyInspectorView.h"
+#include "utils/GstUtils.h"
 
 using namespace Gst;
 using Glib::RefPtr;
@@ -61,7 +62,7 @@ QTreeWidgetItem* PropertyInspectorView::generate_property_item(GParamSpec* param
 
 	GType value_type = G_VALUE_TYPE(&value);
 
-	if (is_numeric_property(value_type))
+	if (GstUtils::is_numeric_type(value_type))
 		generate_numeric_property(item, value, param);
 
 	else if (value_type == G_TYPE_STRING)
@@ -106,14 +107,6 @@ Glib::ustring PropertyInspectorView::get_flags_string(GParamFlags param_flags)
 		flags = "EMPTY";
 
 	return flags;
-}
-
-bool PropertyInspectorView::is_numeric_property(GType type)
-{
-	return (type & G_TYPE_ULONG) || (type & G_TYPE_LONG)
-			|| (type & G_TYPE_UINT) || (type & G_TYPE_INT)
-			|| (type & G_TYPE_UINT64) || (type & G_TYPE_INT64)
-			|| (type & G_TYPE_FLOAT) || (type & G_TYPE_DOUBLE);
 }
 
 void PropertyInspectorView::generate_numeric_property(QTreeWidgetItem* item, GValue value, GParamSpec* param)

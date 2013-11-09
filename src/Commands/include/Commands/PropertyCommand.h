@@ -11,19 +11,20 @@
 
 
 #include "Command.h"
+#include "Properties/Property.h"
 #include <vector>
 #include <gstreamermm.h>
 
 class PropertyCommand : public Command
 {
 private:
-	Glib::RefPtr<Gst::Element> element;
-	std::string property_name;
+	Property* property;
 
 public:
 	PropertyCommand(
 			const Glib::RefPtr<Gst::Element>& element,
-			const std::string& property_name);
+			const std::string& property_name,
+			const std::string& property_value);
 	virtual ~PropertyCommand();
 
 	static PropertyCommand* from_args(const std::vector<std::string>& vect, const Glib::RefPtr<Gst::Pipeline>& model);

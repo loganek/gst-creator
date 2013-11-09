@@ -30,3 +30,11 @@ RefPtr<Pad> GstUtils::find_pad(std::string text, const RefPtr<Pipeline>& model)
 
 	return element->get_static_pad(pad_name.c_str());
 }
+
+bool GstUtils::is_numeric_type(GType type)
+{
+	return (type & G_TYPE_ULONG) || (type & G_TYPE_LONG)
+			|| (type & G_TYPE_UINT) || (type & G_TYPE_INT)
+			|| (type & G_TYPE_UINT64) || (type & G_TYPE_INT64)
+			|| (type & G_TYPE_FLOAT) || (type & G_TYPE_DOUBLE);
+}

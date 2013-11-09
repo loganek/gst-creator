@@ -14,4 +14,8 @@ add_library(Commands
 	${CONSOLE_HEADERS}
 )
 
+target_link_libraries(Commands Properties)
+
 include_directories(include/Commands)
+
+qt5_use_modules(Commands Widgets)

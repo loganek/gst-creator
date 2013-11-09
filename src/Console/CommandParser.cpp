@@ -74,5 +74,8 @@ void CommandParser::build_command()
 	case CommandType::CONNECT:
 		command = ConnectCommand::from_args(command_args, model);
 		break;
+	case CommandType::PROPERTY:
+		command = PropertyCommand::from_args(command_args, model);
+		break;
 	}
 }
