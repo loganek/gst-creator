@@ -5,8 +5,7 @@
  *      Author: Marcin Kolny
  */
 
-#include "Property.h"
-#include "PropertyNumeric.h"
+#include "Properties.h"
 #include "utils/GstUtils.h"
 #include "utils/StringUtils.h"
 
@@ -39,19 +38,20 @@ Property* Property::build_property(GParamSpec* param_spec,
 	if (GstUtils::is_numeric_type(value_type))
 		return build_numeric_property(param_spec, element, value_type, str_value);
 	/*else if( G_IS_PARAM_SPEC_ENUM (param_spec))
-		return new PropertyEnum(param_spec, element);
+		return new PropertyEnum(param_spec, element);*/
 	else
 	{
 		switch (value_type)
 		{
 		case G_TYPE_BOOLEAN:
-			return new PropertyBoolean<bool>(param_spec, element);
+			return new PropertyBoolean(param_spec, element,
+					StringUtils::str_to_numeric<bool>(str_value));
 		case G_TYPE_STRING:
-			return new PropertyString<std::string>(param_spec, element);
+			return new PropertyString(param_spec, element, str_value);/*
 		case GST_TYPE_CAPS:
-			return new PropertyCaps(param_spec, element);
+			return new PropertyCaps(param_spec, element);*/
 		}
-	}*/
+	}
 	return nullptr;
 }
 

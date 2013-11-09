@@ -9,8 +9,6 @@
 #define PROPERTYNUMERIC_H_
 
 #include "Property.h"
-#include <string>
-#include <sstream>
 
 template<typename T>
 class PropertyNumeric : public Property
@@ -26,9 +24,6 @@ public:
 			T value);
 	QWidget* get_widget();
 	void set_value();
-	void set_value(const std::string& value);
-
-	typedef T command_type;
 };
 
 template<typename T>
