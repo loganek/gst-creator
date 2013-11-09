@@ -37,6 +37,8 @@ CommandParser::~CommandParser()
  *  - reconnect
  *    - {pad | element}
  *    - to {pad | element}
+ *  - property
+ *    - element property_name TYPE value
  *
  */
 Command* CommandParser::parse(const std::string& text)

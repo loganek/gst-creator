@@ -20,6 +20,7 @@ enum class CommandType
 	CONNECT,
 	DISCONNECT,
 	RECONNECT,
+	PROPERTY,
 	STATE,
 	UNKNOW
 };
@@ -28,6 +29,20 @@ enum class ObjectType
 {
 	PAD,
 	ELEMENT
+};
+
+enum class DataType
+{
+	INT,
+	UINT,
+	LONG,
+	ULONG,
+	INT64,
+	UINT64,
+	FLOAT,
+	DOUBLE,
+	STRING,
+	BOOLEAN
 };
 
 enum class State

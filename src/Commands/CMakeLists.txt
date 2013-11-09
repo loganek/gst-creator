@@ -3,10 +3,12 @@ set(CONSOLE_HEADERS
 	include/Commands/StateCommand.h
 	include/Commands/ConnectCommand.h
 	include/Commands/Command.h
+	include/Commands/PropertyCommand.h
 )
 
 add_library(Commands
 	AddCommand.cpp
+	PropertyCommand.cpp
 	StateCommand.cpp
 	ConnectCommand.cpp
 	${CONSOLE_HEADERS}
