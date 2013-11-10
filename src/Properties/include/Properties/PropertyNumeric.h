@@ -18,6 +18,7 @@ private:
 
 protected:
 	virtual void build_widget();
+	virtual void init();
 public:
 	PropertyNumeric(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
@@ -46,6 +47,12 @@ void PropertyNumeric<T>::build_widget()
 	widget->setLayout(new QHBoxLayout);
 	widget->layout()->addWidget(new QLabel(param_spec->name));
 	widget->layout()->addWidget(new QLineEdit());
+}
+
+template<typename T>
+void PropertyNumeric<T>::init()
+{
+	// TODO
 }
 
 #endif /* PROPERTYNUMERIC_H_ */

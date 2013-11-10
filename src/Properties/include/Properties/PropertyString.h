@@ -15,8 +15,11 @@ class PropertyString : public Property
 private:
 	std::string value;
 
+	QLineEdit* edit;
+
 protected:
 	virtual void build_widget();
+	virtual void init();
 public:
 	PropertyString(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,

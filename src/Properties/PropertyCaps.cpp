@@ -25,3 +25,7 @@ void PropertyCaps::build_widget()
 	// TODO
 }
 
+void PropertyCaps::init()
+{
+	// TODO
+}

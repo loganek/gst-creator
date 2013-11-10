@@ -24,3 +24,8 @@ void PropertyBoolean::build_widget()
 {
 	// TODO
 }
+
+void PropertyBoolean::init()
+{
+	// TODO
+}

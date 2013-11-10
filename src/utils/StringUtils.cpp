@@ -8,14 +8,18 @@
 #include "StringUtils.h"
 #include <algorithm>
 
-std::vector<std::string> StringUtils::split(std::string text, const std::string& delim)
+std::vector<std::string> StringUtils::split(std::string text,
+		const std::string& delim)
 {
 	int pos;
 	std::vector<std::string> values;
 
-	while ((pos = text.find(" ")) != std::string::npos)
+	while ((pos = text.find(delim)) != std::string::npos)
 	{
-		values.push_back(text.substr(0, pos));
+		// TODO support arguments with " "
+		std::string v = text.substr(0, pos);
+		if (!v.empty())
+			values.push_back(v);
 		text.erase(0, pos + 1);
 	}
 

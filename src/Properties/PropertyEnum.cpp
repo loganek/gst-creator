@@ -46,4 +46,7 @@ void PropertyEnum::build_widget()
 	// TODO
 }
 
-
+void PropertyEnum::init()
+{
+	// TODO
+}

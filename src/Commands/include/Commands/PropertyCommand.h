@@ -19,6 +19,8 @@ class PropertyCommand : public Command
 {
 private:
 	Property* property;
+	bool run_window;
+	Glib::RefPtr<Gst::Element> element;
 
 public:
 	PropertyCommand(

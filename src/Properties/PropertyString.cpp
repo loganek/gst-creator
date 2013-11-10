@@ -11,7 +11,8 @@ PropertyString::PropertyString(GParamSpec* param_spec,
 		const Glib::RefPtr<Gst::Element>& element,
 		const std::string& value)
 : Property(param_spec, element),
-  value(value)
+  value(value),
+  edit(nullptr)
 {
 }
 
@@ -22,6 +23,18 @@ void PropertyString::set_value()
 
 void PropertyString::build_widget()
 {
-	// TODO
+	widget = new QWidget();
+	widget->setLayout(new QHBoxLayout());
+	widget->layout()->addWidget(new QLabel(param_spec->name));
+	edit = new QLineEdit();
+	widget->layout()->addWidget(edit);
 }
+
+void PropertyString::init()
+{
+	Glib::ustring text;
+	element->get_property(param_spec->name, text);
+	edit->setText(text.c_str());
+}
+
 

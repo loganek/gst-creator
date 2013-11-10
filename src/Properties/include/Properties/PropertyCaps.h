@@ -17,6 +17,7 @@ private:
 
 protected:
 	virtual void build_widget();
+	virtual void init();
 public:
 	PropertyCaps(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
