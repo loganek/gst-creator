@@ -140,11 +140,15 @@ void VariousPropertyInspectorView::param_spec_enum()
 	item->addChild(new QTreeWidgetItem({"Type", "Enum"}));
 	item->addChild(new QTreeWidgetItem({"Default", std::to_string(enum_value).c_str()}));
 
-	QString enum_values;
+	std::vector<QString> enum_values;
 	while (values[j].value_name)
 	{
-		enum_values += QString("(") + std::to_string(values[j].value).c_str() + ") " + values[j].value_nick + " - " + values[j].value_name + "\n";
+		enum_values.push_back(QString("(") + std::to_string(values[j].value).c_str() + ") " + values[j].value_nick + " - " + values[j].value_name);
 		j++;
 	}
-	item->addChild(new QTreeWidgetItem({"Enum values", enum_values}));
+	item->addChild(new QTreeWidgetItem({"Enum values",
+		(enum_values.size() < 1 ? "none" : enum_values[0])}));
+
+	for (int i = 1; i < enum_values.size(); i++)
+		item->addChild(new QTreeWidgetItem({"", enum_values[i]}));
 }
