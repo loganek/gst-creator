@@ -12,5 +12,7 @@
 #include "Properties/PropertyBoolean.h"
 #include "Properties/PropertyNumeric.h"
 #include "Properties/PropertyString.h"
+#include "Properties/PropertyCaps.h"
+#include "Properties/PropertyEnum.h"
 
 #endif /* PROPERTIES_H_ */

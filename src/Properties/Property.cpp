@@ -37,8 +37,11 @@ Property* Property::build_property(GParamSpec* param_spec,
 
 	if (GstUtils::is_numeric_type(value_type))
 		return build_numeric_property(param_spec, element, value_type, str_value);
-	/*else if( G_IS_PARAM_SPEC_ENUM (param_spec))
-		return new PropertyEnum(param_spec, element);*/
+	else if( G_IS_PARAM_SPEC_ENUM (param_spec))
+		return new PropertyEnum(param_spec, element, str_value);
+	else if (!strcmp("GstCaps", g_type_name(value_type)))
+		return new PropertyCaps(param_spec, element,
+				Gst::Caps::create_from_string(str_value.c_str()));
 	else
 	{
 		switch (value_type)
@@ -47,9 +50,7 @@ Property* Property::build_property(GParamSpec* param_spec,
 			return new PropertyBoolean(param_spec, element,
 					StringUtils::str_to_numeric<bool>(str_value));
 		case G_TYPE_STRING:
-			return new PropertyString(param_spec, element, str_value);/*
-		case GST_TYPE_CAPS:
-			return new PropertyCaps(param_spec, element);*/
+			return new PropertyString(param_spec, element, str_value);
 		}
 	}
 	return nullptr;

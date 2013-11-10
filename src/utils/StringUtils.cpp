@@ -43,3 +43,9 @@ std::string StringUtils::to_upper(std::string text)
 	std::transform(text.begin(), text.end(), text.begin(), ::toupper);
 	return text;
 }
+
+bool StringUtils::is_number(const std::string& s)
+{
+	return !s.empty() && std::find_if(s.begin(),
+			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
