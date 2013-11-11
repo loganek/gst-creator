@@ -12,14 +12,19 @@
 
 class PropertyString : public Property
 {
+	Q_OBJECT
 private:
 	std::string value;
 
 	QLineEdit* edit;
 
+public Q_SLOTS:
+	void update_value(const QString& new_value);
+
 protected:
 	virtual void build_widget();
 	virtual void init();
+
 public:
 	PropertyString(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,

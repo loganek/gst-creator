@@ -14,5 +14,6 @@
 #include "Properties/PropertyString.h"
 #include "Properties/PropertyCaps.h"
 #include "Properties/PropertyEnum.h"
+#include "Properties/PropertyWidget.h"
 
 #endif /* PROPERTIES_H_ */

@@ -28,6 +28,11 @@ void PropertyString::build_widget()
 	widget->layout()->addWidget(new QLabel(param_spec->name));
 	edit = new QLineEdit();
 	widget->layout()->addWidget(edit);
+	QObject::connect(edit, &QLineEdit::textChanged, this, &PropertyString::update_value);
+	QObject::connect(edit, &QLineEdit::returnPressed, [&]{
+		set_value();
+		init();
+	});
 }
 
 void PropertyString::init()
@@ -37,4 +42,7 @@ void PropertyString::init()
 	edit->setText(text.c_str());
 }
 
-
+void PropertyString::update_value(const QString& new_value)
+{
+	value = new_value.toUtf8().constData();
+}

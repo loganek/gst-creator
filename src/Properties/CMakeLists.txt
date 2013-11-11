@@ -5,6 +5,7 @@ set(PROPERTIES_HEADERS
 	include/Properties/PropertyString.h
 	include/Properties/PropertyCaps.h
 	include/Properties/PropertyEnum.h
+	include/Properties/PropertyWidget.h
 )
 
 add_library(Properties
@@ -13,6 +14,7 @@ add_library(Properties
 	PropertyString.cpp
 	PropertyCaps.cpp
 	PropertyEnum.cpp
+	PropertyWidget.cpp
 	${PROPERTIES_HEADERS}
 )
 

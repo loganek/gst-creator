@@ -42,7 +42,24 @@ void PropertyCommand::run_command()
 		QDialog* dlg = new QDialog();
 		dlg->setLayout(new QHBoxLayout());
 		dlg->layout()->addWidget(
-		Property::build_property_window(element));
+				Property::build_property_window(element));
+
+		class TmpClass : public QObject
+		{
+		public:
+			bool eventFilter(QObject *obj, QEvent *evt)
+			{
+				if(evt->type() == QEvent::KeyPress) {
+					QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
+					if(keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return )
+						return true;
+				}
+				return false;
+			}
+		}tmp_obj;
+		// TODO build custom Dialog class with disabled enters
+
+		dlg->installEventFilter(&tmp_obj);
 		dlg->exec();
 	}
 	else if (property != nullptr)
@@ -58,17 +75,11 @@ PropertyCommand* PropertyCommand::from_args(const std::vector<std::string>& args
 	if (!element)
 		throw std::runtime_error("cannot find element " + args[0]);
 
-	if (args.size() != 3 && args.size() != 2)
-		syntax_error("invalid arguments count. Expected 2 or 3, but " + std::to_string(args.size()) + " found.");
+	if (args.size() != 3 && args.size() != 1)
+		syntax_error("invalid arguments count. Expected 1 or 3, but " + std::to_string(args.size()) + " found.");
 
-	if (args.size() == 2)
-	{
-		if (args[1] != "-g")
-			syntax_error("expected `-g`, but " + args[1] + " found");
-
+	if (args.size() == 1)
 		return new PropertyCommand(element, "", "");
-
-	}
 
 	return new PropertyCommand(element, args[1], args[2]);
 }

@@ -12,7 +12,7 @@
 #include <QtWidgets>
 #include <memory>
 
-class Property
+class Property : public QObject
 {
 protected:
 	GParamSpec* param_spec;

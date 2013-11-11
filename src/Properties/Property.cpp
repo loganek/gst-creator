@@ -85,8 +85,7 @@ Property* Property::build_numeric_property(GParamSpec* param_spec,
 QWidget* Property::build_property_window(const RefPtr<Element>& element)
 {
 	guint property_count;
-	QWidget* widget = new QWidget();
-	widget->setLayout(new QHBoxLayout());
+	PropertyWidget* widget = new PropertyWidget();
 
 	GParamSpec **property_specs = g_object_class_list_properties(
 			G_OBJECT_GET_CLASS(element->gobj()), &property_count);
@@ -95,7 +94,7 @@ QWidget* Property::build_property_window(const RefPtr<Element>& element)
 	{
 		Property* property = build_property(property_specs[i], element, "");
 		if (property != nullptr)
-			widget->layout()->addWidget(property->get_widget());
+			widget->add_property(property);
 	}
 
 	return widget;
