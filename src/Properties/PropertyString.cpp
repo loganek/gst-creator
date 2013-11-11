@@ -40,6 +40,7 @@ void PropertyString::init()
 	Glib::ustring text;
 	element->get_property(param_spec->name, text);
 	edit->setText(text.c_str());
+	value = text.c_str();
 }
 
 void PropertyString::update_value(const QString& new_value)

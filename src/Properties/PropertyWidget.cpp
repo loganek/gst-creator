@@ -13,7 +13,7 @@ PropertyWidget::PropertyWidget(QWidget* parent)
 	QPushButton* ok_button = new QPushButton("OK");
 	QPushButton* cancel_button = new QPushButton("Cancel");
 
-	setLayout(new QHBoxLayout());
+	setLayout(new QVBoxLayout());
 	layout()->addWidget(ok_button);
 	layout()->addWidget(cancel_button);
 

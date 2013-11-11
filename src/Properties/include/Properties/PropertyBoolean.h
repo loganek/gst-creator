@@ -15,6 +15,7 @@ class PropertyBoolean : public Property
 private:
 	bool value;
 
+	QCheckBox* checkbox;
 protected:
 	virtual void build_widget();
 	virtual void init();
@@ -22,7 +23,6 @@ public:
 	PropertyBoolean(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
 			bool value);
-	QWidget* get_widget();
 
 	void set_value();
 };

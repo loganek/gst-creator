@@ -40,7 +40,7 @@ void PropertyCommand::run_command()
 	if (run_window)
 	{
 		QDialog* dlg = new QDialog();
-		dlg->setLayout(new QHBoxLayout());
+		dlg->setLayout(new QVBoxLayout());
 		dlg->layout()->addWidget(
 				Property::build_property_window(element));
 

@@ -14,6 +14,8 @@ class PropertyCaps : public Property
 {
 private:
 	Glib::RefPtr<Gst::Caps> value;
+	Glib::ustring tmp_value;
+	QLineEdit* caps_edit;
 
 protected:
 	virtual void build_widget();
@@ -22,7 +24,6 @@ public:
 	PropertyCaps(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
 			const Glib::RefPtr<Gst::Caps>& value);
-	QWidget* get_widget();
 
 	void set_value();
 };
