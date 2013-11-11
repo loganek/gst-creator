@@ -23,9 +23,6 @@ void PropertyBoolean::set_value()
 
 void PropertyBoolean::build_widget()
 {
-	widget = new QWidget();
-	widget->setLayout(new QHBoxLayout());
-	widget->layout()->addWidget(new QLabel(param_spec->name));
 	checkbox = new QCheckBox();
 	widget->layout()->addWidget(checkbox);
 	QObject::connect(checkbox, &QCheckBox::stateChanged, [&](int state){

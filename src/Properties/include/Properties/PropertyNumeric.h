@@ -53,9 +53,6 @@ void PropertyNumeric<T>::set_value()
 template<typename T>
 void PropertyNumeric<T>::build_widget()
 {
-	widget = new QFrame();
-	widget->setLayout(new QHBoxLayout);
-	widget->layout()->addWidget(new QLabel(param_spec->name));
 	T min, max;
 	get_min_max(min, max);
 	std::string min_max_info = "<" + std::to_string(min) + ", " + std::to_string(max) + ">";

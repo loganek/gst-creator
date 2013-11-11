@@ -14,6 +14,8 @@
 
 class Property : public QObject
 {
+private:
+	bool was_built;
 protected:
 	GParamSpec* param_spec;
 	Glib::RefPtr<Gst::Element> element;

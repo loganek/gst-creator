@@ -23,9 +23,6 @@ void PropertyString::set_value()
 
 void PropertyString::build_widget()
 {
-	widget = new QWidget();
-	widget->setLayout(new QHBoxLayout());
-	widget->layout()->addWidget(new QLabel(param_spec->name));
 	edit = new QLineEdit();
 	widget->layout()->addWidget(edit);
 	QObject::connect(edit, &QLineEdit::textChanged, this, &PropertyString::update_value);

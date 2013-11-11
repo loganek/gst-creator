@@ -43,9 +43,6 @@ void PropertyEnum::set_value()
 
 void PropertyEnum::build_widget()
 {
-	widget = new QWidget();
-	widget->setLayout(new QHBoxLayout());
-	widget->layout()->addWidget(new QLabel(param_spec->name));
 	combobox = new QComboBox();
 	widget->layout()->addWidget(combobox);
 

@@ -15,8 +15,12 @@ using Glib::RefPtr;
 Property::Property(GParamSpec* param_spec, const RefPtr<Element>& element)
 : param_spec(param_spec),
   element(element),
-  widget(nullptr)
-{}
+  was_built(false)
+{
+	widget = new QWidget();
+	widget->setLayout(new QHBoxLayout());
+	widget->layout()->addWidget(new QLabel(param_spec->name));
+}
 
 Property::~Property()
 {
@@ -25,8 +29,11 @@ Property::~Property()
 
 QWidget* Property::get_widget()
 {
-	if (widget == nullptr)
+	if (!was_built)
+	{
 		build_widget();
+		was_built = true;
+	}
 
 	init();
 

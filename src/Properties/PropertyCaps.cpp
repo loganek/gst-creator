@@ -22,9 +22,6 @@ void PropertyCaps::set_value()
 
 void PropertyCaps::build_widget()
 {
-	widget = new QWidget();
-	widget->setLayout(new QHBoxLayout());
-	widget->layout()->addWidget(new QLabel(param_spec->name));
 	caps_edit = new QLineEdit();
 	widget->layout()->addWidget(caps_edit);
 	QObject::connect(caps_edit, &QLineEdit::textChanged, [&](const QString& txt){
