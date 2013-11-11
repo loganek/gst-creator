@@ -86,6 +86,7 @@ QWidget* Property::build_property_window(const RefPtr<Element>& element)
 {
 	guint property_count;
 	PropertyWidget* widget = new PropertyWidget();
+	QScrollArea* scroll_area = new QScrollArea();
 
 	GParamSpec **property_specs = g_object_class_list_properties(
 			G_OBJECT_GET_CLASS(element->gobj()), &property_count);
@@ -97,5 +98,7 @@ QWidget* Property::build_property_window(const RefPtr<Element>& element)
 			widget->add_property(property);
 	}
 
-	return widget;
+	scroll_area->setWidget(widget);
+
+	return scroll_area;
 }

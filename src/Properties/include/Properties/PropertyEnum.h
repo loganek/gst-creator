@@ -12,12 +12,17 @@
 
 class PropertyEnum : public Property
 {
+	Q_OBJECT
 private:
 	std::string value;
 
+	QComboBox* combobox;
 protected:
 	virtual void build_widget();
 	virtual void init();
+
+private Q_SLOTS:
+	void update_position(int pos);
 public:
 	PropertyEnum(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,

@@ -43,10 +43,39 @@ void PropertyEnum::set_value()
 
 void PropertyEnum::build_widget()
 {
-	// TODO
+	widget = new QWidget();
+	widget->setLayout(new QHBoxLayout());
+	widget->layout()->addWidget(new QLabel(param_spec->name));
+	combobox = new QComboBox();
+	widget->layout()->addWidget(combobox);
+
+	GEnumValue *values;
+	guint j = 0;
+	values = G_ENUM_CLASS (g_type_class_ref(param_spec->value_type))->values;
+
+	while (values[j].value_name)
+	{
+		combobox->addItems({values[j].value_nick});
+		j++;
+	}
+	connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(update_position(int)));
 }
 
 void PropertyEnum::init()
 {
-	// TODO
+	gint enum_value;
+	GValue g_value = { 0, };
+	g_value_init (&g_value, param_spec->value_type);
+	g_object_get_property(G_OBJECT (element->gobj()), param_spec->name, &g_value);
+	enum_value = g_value_get_enum (&g_value);
+	combobox->setCurrentIndex(enum_value);
+	value = std::to_string(enum_value);
+
+}
+
+void PropertyEnum::update_position(int pos)
+{
+	value = std::to_string(pos);
+	set_value();
+	init();
 }
