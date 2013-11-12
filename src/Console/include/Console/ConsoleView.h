@@ -19,12 +19,21 @@ class ConsoleView : public QWidget
 private:
 	QLineEdit* edit;
 	QPushButton* button;
+	QTreeWidget* suggestions;
 
 	Glib::RefPtr<Gst::Pipeline> model;
 
 	CommandParser* parser;
+	std::vector<std::string> command_args;
+
+	std::vector<std::string> get_current_suggestions(std::vector<std::string> command_args);
+	void make_suggestion_widget();
+	bool eventFilter(QObject *obj, QEvent *ev);
+	void make_suggestion(const QString& text, bool autocomplete = false);
 private Q_SLOTS:
 	void execute_command();
+	void suggest(const QString& text);
+
 
 Q_SIGNALS:
 	void commandAdded(const QStringList& item);

@@ -12,9 +12,10 @@
 
 using namespace Gst;
 using Glib::RefPtr;
+using namespace std;
 
 PropertyCommand::PropertyCommand(const RefPtr<Element>& element,
-		const std::string& property_name, const std::string& property_value)
+		const string& property_name, const string& property_value)
 : element(element)
 {
 	run_window = property_name.empty();
@@ -65,21 +66,31 @@ void PropertyCommand::run_command()
 	else if (property != nullptr)
 		property->set_value();
 	else
-		throw std::runtime_error("Cannot set property. Property unavailable.");
+		throw runtime_error("Cannot set property. Property unavailable.");
 }
 
-PropertyCommand* PropertyCommand::from_args(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model)
+PropertyCommand* PropertyCommand::from_args(const vector<string>& args, const RefPtr<Pipeline>& model)
 {
 	RefPtr<Element> element = GstUtils::find_element(args[0], model);
 
 	if (!element)
-		throw std::runtime_error("cannot find element " + args[0]);
+		throw runtime_error("cannot find element " + args[0]);
 
 	if (args.size() != 3 && args.size() != 1)
-		syntax_error("invalid arguments count. Expected 1 or 3, but " + std::to_string(args.size()) + " found.");
+		syntax_error("invalid arguments count. Expected 1 or 3, but " + to_string(args.size()) + " found.");
 
 	if (args.size() == 1)
 		return new PropertyCommand(element, "", "");
 
 	return new PropertyCommand(element, args[1], args[2]);
 }
+
+vector<string> PropertyCommand::get_suggestions(const vector<string>& args, const RefPtr<Pipeline>& model)
+{
+	if (args.size() == 1)
+		return GstUtils::get_elements_from_bin_string(model, false);
+	if (args.size() == 2)
+		return GstUtils::get_properties_string(GstUtils::find_element(args[0], model));
+	return vector<string>();
+}
+

@@ -7,6 +7,8 @@
 
 #include "StringUtils.h"
 #include <algorithm>
+#include <sstream>
+#include <iterator>
 
 std::vector<std::string> StringUtils::split(std::string text,
 		const std::string& delim)
@@ -26,6 +28,16 @@ std::vector<std::string> StringUtils::split(std::string text,
 	values.push_back(text);
 
 	return values;
+}
+
+std::string StringUtils::join(const std::vector<std::string>& arr,
+		const std::string& separator)
+{
+	std::ostringstream imploded;
+	std::copy(arr.begin(), arr.end(),
+			std::ostream_iterator<std::string>(imploded, separator.c_str()));
+
+	return imploded.str();
 }
 
 std::string StringUtils::trim(std::string text)
@@ -52,4 +64,9 @@ bool StringUtils::is_number(const std::string& s)
 {
 	return !s.empty() && std::find_if(s.begin(),
 			s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
+
+bool StringUtils::are_equal_case_no_sense(const std::string& s1, const std::string& s2)
+{
+	return to_upper(s1) == to_upper(s2);
 }

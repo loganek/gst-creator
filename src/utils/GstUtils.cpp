@@ -38,3 +38,63 @@ bool GstUtils::is_numeric_type(GType type)
 			|| (type == G_TYPE_UINT64) || (type == G_TYPE_INT64)
 			|| (type == G_TYPE_FLOAT) || (type == G_TYPE_DOUBLE);
 }
+
+std::vector<std::string> GstUtils::get_avaliable_elements_string()
+{
+	std::vector<std::string> values;
+
+	RefPtr<Registry> registry = Registry::get();
+	Glib::ListHandle<RefPtr<Plugin>> plugins = registry->get_plugin_list();
+
+	for (auto plugin : plugins)
+	{
+		Glib::ListHandle<RefPtr<PluginFeature>> features = registry->get_feature_list(plugin->get_name());
+
+		for (auto feature : features)
+		{
+			if (!feature)
+				continue;
+
+			values.push_back(feature->get_name());
+		}
+	}
+
+	return values;
+}
+
+std::vector<std::string> GstUtils::get_elements_from_bin_string(const RefPtr<Bin>& bin, bool must_bin, const std::string& prefix)
+{
+	std::vector<std::string> values;
+
+	Iterator<Element> iterator = bin->iterate_elements();
+
+	while (iterator.next())
+	{
+		if (GST_IS_BIN(iterator->gobj()))
+		{
+			RefPtr<Bin> internal_bin = internal_bin.cast_static(*iterator);
+			std::vector<std::string> internal_values =
+					get_elements_from_bin_string(internal_bin, must_bin, iterator->get_name().c_str() + std::string(":"));
+
+			values.insert(values.end(), internal_values.begin(), internal_values.end());
+			values.push_back(prefix + iterator->get_name().c_str());
+		}
+		else if (!must_bin)
+			values.push_back(prefix + iterator->get_name().c_str());
+	}
+
+	return values;
+}
+
+std::vector<std::string> GstUtils::get_properties_string(const RefPtr<Element>& element)
+{
+	std::vector<std::string> values;
+	guint property_count;
+	GParamSpec **property_specs = g_object_class_list_properties(
+			G_OBJECT_GET_CLASS(element->gobj()), &property_count);
+
+	for (int i = 0; i < property_count; i++)
+		values.push_back(property_specs[i]->name);
+
+	return values;
+}

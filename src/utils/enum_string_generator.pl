@@ -43,6 +43,18 @@ sub generate_converter {
 	$ret .= "}\n\n";
 
 	$ret .= "template<>\n";
+	$ret .= "std::vector<std::string> EnumUtils<$enum_name>::get_string_values()\n";
+	$ret .= "{\n";
+	$ret .= "\tstd::vector<std::string> values = {";
+	
+	for ( my $i = 0 ; $i < @enum_values ; $i++ ) {
+		$ret .= "\"$enum_values[$i]\",";
+	}
+	$ret .= "};\n\n";
+	$ret .= "\t return values;\n";
+	$ret .= "}\n\n";
+	
+	$ret .= "template<>\n";
 	$ret .= "$enum_name EnumUtils<$enum_name>::string_to_enum(const std::string& enum_value)\n";
 	$ret .= "{\n";
 	$ret .= "\tstd::string val = StringUtils::to_upper(enum_value);\n\n";
@@ -89,15 +101,16 @@ print $output_file $autogenerate_string;
 print $output_file "#ifndef ".$ifdef_str."\n";
 print $output_file "#define ".$ifdef_str."\n\n";
 
+print $output_file "#include <vector>\n";
 print $output_file "#include <string>\n\n";
 
 print $output_file "template<typename ENUM_TYPE>\n";
 print $output_file "class EnumUtils\n";
 print $output_file "{\n";
 print $output_file "public:\n";
-print $output_file "\tstatic ENUM_TYPE string_to_enum(const std::string&);\n\n";
-
+print $output_file "\tstatic ENUM_TYPE string_to_enum(const std::string&);\n";
 print $output_file "\tstatic std::string enum_to_string(ENUM_TYPE);\n";
+print $output_file "\tstatic std::vector<std::string> get_string_values();\n";
 print $output_file "};\n";
 print $output_file "\n#endif\n";
 

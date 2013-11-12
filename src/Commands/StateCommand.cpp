@@ -8,16 +8,19 @@
 #include "StateCommand.h"
 #include "utils/EnumUtils.h"
 
-StateCommand::StateCommand(State state, const Glib::RefPtr<Gst::Pipeline>& model)
+using Glib::RefPtr;
+using namespace std;
+
+StateCommand::StateCommand(State state, const RefPtr<Gst::Pipeline>& model)
 : state(state),
   model(model)
 {
 }
 
-StateCommand* StateCommand::from_args(const std::vector<std::string>& vect, const Glib::RefPtr<Gst::Pipeline>& model)
+StateCommand* StateCommand::from_args(const std::vector<std::string>& vect, const RefPtr<Gst::Pipeline>& model)
 {
 	if (vect.size() != 1)
-		syntax_error("invalid arguments count. Expected 1, but " + std::to_string(vect.size()) + " found.");
+		syntax_error("invalid arguments count. Expected 1, but " + to_string(vect.size()) + " found.");
 
 	State state = EnumUtils<State>::string_to_enum(vect[0]);
 
@@ -42,4 +45,12 @@ void StateCommand::run_command()
 	}
 
 	model->set_state(gst_state);
+}
+
+vector<string> StateCommand::get_suggestions(const vector<string>& args, const RefPtr<Gst::Pipeline>& model)
+{
+	if (args.size() == 1)
+			return EnumUtils<State>::get_string_values();
+
+	return vector<string>();
 }

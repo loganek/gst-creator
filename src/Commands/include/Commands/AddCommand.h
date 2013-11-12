@@ -27,7 +27,8 @@ public:
 			const Glib::RefPtr<Gst::Object>& obj);
 	virtual ~AddCommand();
 
-	static AddCommand* from_args(const std::vector<std::string>& vect, const Glib::RefPtr<Gst::Pipeline>& model);
+	static AddCommand* from_args(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
+	static std::vector<std::string> get_suggestions(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
 
 	void run_command();
 };
