@@ -13,5 +13,6 @@
 #include "Commands/StateCommand.h"
 #include "Commands/ConnectCommand.h"
 #include "Commands/PropertyCommand.h"
+#include "Commands/RemoveCommand.h"
 
 #endif /* COMMANDS_H_ */

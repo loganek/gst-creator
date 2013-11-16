@@ -221,13 +221,12 @@ std::vector<std::string> ConsoleView::get_current_suggestions(std::vector<std::s
 			return AddCommand::get_suggestions(command_args, model);
 		case CommandType::STATE:
 			return StateCommand::get_suggestions(command_args, model);
-			break;
 		case CommandType::CONNECT:
 			return ConnectCommand::get_suggestions(command_args, model);
-			break;
 		case CommandType::PROPERTY:
 			return PropertyCommand::get_suggestions(command_args, model);
-			break;
+		case CommandType::REMOVE:
+			return RemoveCommand::get_suggestions(command_args, model);
 		}
 	}
 	catch (...)
@@ -235,5 +234,5 @@ std::vector<std::string> ConsoleView::get_current_suggestions(std::vector<std::s
 		return std::vector<std::string>();
 	}
 
-
+	return std::vector<std::string>();
 }

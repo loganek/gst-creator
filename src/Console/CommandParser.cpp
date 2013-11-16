@@ -77,5 +77,7 @@ void CommandParser::build_command()
 	case CommandType::PROPERTY:
 		command = PropertyCommand::from_args(command_args, model);
 		break;
+	case CommandType::REMOVE:
+		command = RemoveCommand::from_args(command_args, model);
 	}
 }
