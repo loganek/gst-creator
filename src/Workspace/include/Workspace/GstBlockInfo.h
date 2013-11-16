@@ -1,7 +1,7 @@
 /*
  * GstBlockInfo.h
  *
- *  Created on: 16 pa? 2013
+ *  Created on: 16 lis 2013
  *      Author: Marcin Kolny
  */
 
@@ -11,7 +11,6 @@
 #include <QObject>
 #include <QtCore>
 #include <QtGui>
-#include <iostream>
 
 class GstBlockInfo : public QObject
 {

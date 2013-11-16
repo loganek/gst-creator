@@ -10,7 +10,7 @@
 #include <QByteArray>
 #include <QMimeData>
 #include <QMainWindow>
-#include "../gui/blocks/GstBlock.h"
+#include "Workspace/GstBlock.h"
 #include "ObjectInspectorModel.h"
 #include "common.h"
 #include "FactoryInspector/FactoryInspectorView.h"
@@ -34,7 +34,7 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	QByteArray itemData;
 	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
 
-	GstBlock* block = new GstBlock(current_text.toUtf8().constData(), this);
+	GstBlock* block = new GstBlock(Gst::ElementFactory::create_element("videotestsrc"), this);// current_text.toUtf8().constData(), this);
 
 	QPixmap pixmap = QPixmap::grabWidget(block);
 
