@@ -12,6 +12,7 @@
 #include "Commands/Command.h"
 #include "Commands/StateCommand.h"
 #include "Commands/ConnectCommand.h"
+#include "Commands/DisconnectCommand.h"
 #include "Commands/PropertyCommand.h"
 #include "Commands/RemoveCommand.h"
 

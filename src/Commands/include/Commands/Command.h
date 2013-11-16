@@ -19,10 +19,8 @@ enum class CommandType
 	REMOVE,
 	CONNECT,
 	DISCONNECT,
-	RECONNECT,
 	PROPERTY,
 	STATE,
-	UNKNOW
 };
 
 enum class ObjectType
@@ -59,7 +57,6 @@ private:
 
 public:
 	Command(CommandType type):type(type){}
-	Command():type(CommandType::UNKNOW){}
 	virtual ~Command(){}
 
 	CommandType get_type()

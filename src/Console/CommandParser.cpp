@@ -79,5 +79,9 @@ void CommandParser::build_command()
 		break;
 	case CommandType::REMOVE:
 		command = RemoveCommand::from_args(command_args, model);
+		break;
+	case CommandType::DISCONNECT:
+		command = DisconnectCommand::from_args(command_args, model);
+		break;
 	}
 }

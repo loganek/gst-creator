@@ -16,7 +16,8 @@ using namespace std;
 
 PropertyCommand::PropertyCommand(const RefPtr<Element>& element,
 		const string& property_name, const string& property_value)
-: element(element)
+: element(element),
+  Command(CommandType::PROPERTY)
 {
 	run_window = property_name.empty();
 

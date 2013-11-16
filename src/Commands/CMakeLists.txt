@@ -5,6 +5,7 @@ set(CONSOLE_HEADERS
 	include/Commands/Command.h
 	include/Commands/PropertyCommand.h
 	include/Commands/RemoveCommand.h
+	include/Commands/DisconnectCommand.h
 )
 
 add_library(Commands
@@ -13,6 +14,7 @@ add_library(Commands
 	StateCommand.cpp
 	ConnectCommand.cpp
 	RemoveCommand.cpp
+	DisconnectCommand.cpp
 	${CONSOLE_HEADERS}
 )
 

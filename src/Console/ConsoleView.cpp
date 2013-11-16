@@ -227,6 +227,8 @@ std::vector<std::string> ConsoleView::get_current_suggestions(std::vector<std::s
 			return PropertyCommand::get_suggestions(command_args, model);
 		case CommandType::REMOVE:
 			return RemoveCommand::get_suggestions(command_args, model);
+		case CommandType::DISCONNECT:
+			return DisconnectCommand::get_suggestions(command_args, model);
 		}
 	}
 	catch (...)

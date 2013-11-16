@@ -1,11 +1,11 @@
 /*
- * ConnectCommand.cpp
+ * DisconnectCommand.cpp
  *
- *  Created on: 4 lis 2013
+ *  Created on: 16 lis 2013
  *      Author: Marcin Kolny
  */
 
-#include "ConnectCommand.h"
+#include "DisconnectCommand.h"
 #include "utils/EnumUtils.h"
 #include "utils/GstUtils.h"
 
@@ -13,10 +13,10 @@ using namespace Gst;
 using Glib::RefPtr;
 using namespace std;
 
-ConnectCommand::ConnectCommand(const RefPtr<Object>& src, const RefPtr<Object>& dst)
+DisconnectCommand::DisconnectCommand(const RefPtr<Object>& src, const RefPtr<Object>& dst)
 : src(src),
   dst(dst),
-  Command(CommandType::CONNECT)
+  Command(CommandType::DISCONNECT)
 {
 	if (GST_IS_ELEMENT(src->gobj()) || GST_IS_ELEMENT(dst->gobj()))
 		type = ObjectType::ELEMENT;
@@ -26,7 +26,7 @@ ConnectCommand::ConnectCommand(const RefPtr<Object>& src, const RefPtr<Object>& 
 		syntax_error("unknown object type");
 }
 
-ConnectCommand* ConnectCommand::from_args(const vector<string>& args, const Glib::RefPtr<Gst::Pipeline>& model)
+DisconnectCommand* DisconnectCommand::from_args(const vector<string>& args, const Glib::RefPtr<Gst::Pipeline>& model)
 {
 	if (args.size() != 4)
 		syntax_error("invalid arguments count. Expected 4, but " + to_string(args.size()) + " found.");
@@ -41,34 +41,34 @@ ConnectCommand* ConnectCommand::from_args(const vector<string>& args, const Glib
 		RefPtr<Element> src = GstUtils::find_element(args[1], model),
 				dest = GstUtils::find_element(args[3], model);
 
-		return new ConnectCommand(src, dest);
+		return new DisconnectCommand(src, dest);
 	}
 	else
 	{
 		RefPtr<Pad> src = GstUtils::find_pad(args[1], model),
 				dest = GstUtils::find_pad(args[3], model);
 
-		return new ConnectCommand(src, dest);
+		return new DisconnectCommand(src, dest);
 	}
 }
 
-void ConnectCommand::run_command()
+void DisconnectCommand::run_command()
 {
 	if (type == ObjectType::ELEMENT)
 	{
 		RefPtr<Element> e_src = e_src.cast_static(src),
 				e_dst = e_dst.cast_static(dst);
-		e_src->link(e_dst);
+		e_src->unlink(e_dst);
 	}
 	else
 	{
 		RefPtr<Pad> p_src = p_src.cast_static(src),
 				p_dst = p_dst.cast_static(dst);
-		p_src->link(p_dst);
+		p_src->unlink(p_dst);
 	}
 }
 
-vector<string> ConnectCommand::get_suggestions(const vector<string>& args, const RefPtr<Pipeline>& model)
+vector<string> DisconnectCommand::get_suggestions(const vector<string>& args, const RefPtr<Pipeline>& model)
 {
 	try
 	{
@@ -89,5 +89,4 @@ vector<string> ConnectCommand::get_suggestions(const vector<string>& args, const
 
 	return vector<string>();
 }
-
 
