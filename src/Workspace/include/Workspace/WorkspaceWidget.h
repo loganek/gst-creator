@@ -11,6 +11,7 @@
 #include "GstBlockInfo.h"
 #include <QWidget>
 #include <QMimeData>
+#include <gstreamermm.h>
 
 class WorkspaceWidget : public QWidget
 {
@@ -26,6 +27,9 @@ private:
 	QPixmap pixmap;
 	GstBlockInfo* current_info;
 	std::vector<GstBlockInfo*> blocks;
+
+	Glib::RefPtr<Gst::Pipeline> model;
+
 protected:
 	void dragEnterEvent(QDragEnterEvent* event);
 	void dragMoveEvent(QDragMoveEvent* event);
@@ -35,7 +39,7 @@ protected:
 	void mousePressEvent(QMouseEvent* event);
 
 public:
-	explicit WorkspaceWidget(QWidget* parent = 0);
+	explicit WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent = 0);
 	virtual ~WorkspaceWidget();
 };
 

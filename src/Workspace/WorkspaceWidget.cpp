@@ -11,8 +11,10 @@
 #include <QtGui>
 #include <QFrame>
 
-WorkspaceWidget::WorkspaceWidget(QWidget* parent)
-: QWidget(parent)
+WorkspaceWidget::WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent)
+: QWidget(parent),
+  model(model),
+  current_info(nullptr)
 {
 	setAcceptDrops(true);
 }
@@ -66,7 +68,7 @@ void WorkspaceWidget::dragLeaveEvent(QDragLeaveEvent* event)
 
 QRect generate_rectangle(const QPoint& location)
 {
-	return QRect(location.x(), location.y(), 150,50);
+	return QRect(location.x(), location.y(), 150, 50);
 }
 QString WorkspaceWidget::get_new_name(const QString& name)
 {
@@ -95,7 +97,10 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 	QPixmap pixmap;
 	QPoint location;
 	QString text;
-	data_stream >> pixmap >> location >> text;
+	GstBlock* element;
+	int val;
+	data_stream >> pixmap >> location >> text >> val;
+	element = reinterpret_cast<GstBlock*>(val); // fixme ugly code
 
 	QRect rectangle = generate_rectangle(event->pos() - location);
 
@@ -119,7 +124,8 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 	if (blocks.size() == 0 || (blocks.size() > 0 && !present))
 	{
 		QString new_name = get_new_name(text).toUtf8().constData();
-		info = new GstBlockInfo(pixmap, location, text, rectangle);
+		element->get_model()->set_name(new_name.toUtf8().constData());
+		info = new GstBlockInfo(QPixmap::grabWidget(element), location, new_name, rectangle);
 		blocks.push_back(info);
 	}
 

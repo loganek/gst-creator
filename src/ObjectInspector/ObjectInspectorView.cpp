@@ -34,11 +34,14 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	QByteArray itemData;
 	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
 
-	GstBlock* block = new GstBlock(Gst::ElementFactory::create_element("videotestsrc"), this);// current_text.toUtf8().constData(), this);
+	auto element = Gst::ElementFactory::create_element(current_text.toUtf8().constData());
+	element->reference();
+	GstBlock* block = new GstBlock(element, this);
 
 	QPixmap pixmap = QPixmap::grabWidget(block);
 
-	dataStream << pixmap << current_location << current_text;
+	int val = reinterpret_cast<int>(block);
+	dataStream << pixmap << current_location << current_text << val;
 
 	QMimeData *mimeData = new QMimeData;
 	mimeData->setData(DRAG_DROP_FORMAT, itemData);
@@ -47,7 +50,7 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	drag->setMimeData(mimeData);
 	drag->setHotSpot(current_location);
 	drag->setPixmap(QPixmap::grabWidget(block));
-	delete block;
+	//delete block;
 
 	int row = currentIndex().row();
 	QModelIndex index = model()->index(row,0);

@@ -28,7 +28,6 @@ private:
 	void add_workspace_canvas();
 	Ui::MainWindow *ui;
 	ObjectInspectorView plugins_tree;
-	WorkspaceWidget canvas;
 };
 
 #endif // MAINWINDOW_H

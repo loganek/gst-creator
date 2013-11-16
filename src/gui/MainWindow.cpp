@@ -10,7 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent),
 ui(new Ui::MainWindow)
 {
-	//splitter = new QSplitter();
 	ui->setupUi(this);
 	ui->objectInspectorFrame->layout()->addWidget(&plugins_tree);
 
@@ -27,11 +26,14 @@ void MainWindow::add_workspace_canvas()
 	QFrame *frame = new QFrame;
 	ConsoleView* console = new ConsoleView();
 	LoggerView* logger = new LoggerView();
-	WorkspaceWidget* workspace = new WorkspaceWidget();
+
+	Glib::RefPtr<Gst::Pipeline> model = Gst::Pipeline::create(); // TODO model should be created in the other place
+
+	WorkspaceWidget* workspace = new WorkspaceWidget(model);
 	QSplitter* spl = new QSplitter();
 
 	QObject::connect(console, &ConsoleView::commandAdded, logger, &LoggerView::add_log);
-	console->set_model(Gst::Pipeline::create()); // TODO model should be created in the other place
+	console->set_model(model);
 
 	workspace_frame->layout()->addWidget(workspace);
 	spl->setOrientation(Qt::Vertical);
