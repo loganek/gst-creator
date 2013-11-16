@@ -141,9 +141,7 @@ void WorkspaceWidget::paintEvent(QPaintEvent* event)
 	painter.begin(this);
 
 	for (auto info : blocks)
-	{
 		painter.drawPixmap(info->get_rect(), info->get_pixmap());
-	}
 }
 
 void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
@@ -167,9 +165,9 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 	QPoint location = event->pos() - position;
 
 	QByteArray item_data;
-	QDataStream dataStream(&item_data, QIODevice::WriteOnly);
+	QDataStream data_stream(&item_data, QIODevice::WriteOnly);
 
-	dataStream << location << reinterpret_cast<int>(current_info->get_block());
+	data_stream << location << reinterpret_cast<int>(current_info->get_block());
 
 	QMimeData* mime_data = new QMimeData;
 	mime_data->setData(DRAG_DROP_FORMAT, item_data);
@@ -178,7 +176,7 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 	drag->setMimeData(mime_data);
 	drag->setHotSpot(location);
 	drag->setPixmap(current_info->get_pixmap());
-
 	drag->exec(Qt::MoveAction | Qt::CopyAction);
+
 	repaint();
 }

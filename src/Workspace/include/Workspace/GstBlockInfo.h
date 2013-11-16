@@ -8,10 +8,10 @@
 #ifndef GSTBLOCKINFO_H_
 #define GSTBLOCKINFO_H_
 
+#include "GstBlock.h"
 #include <QObject>
 #include <QtCore>
 #include <QtGui>
-#include "GstBlock.h"
 
 class GstBlockInfo : public QObject
 {

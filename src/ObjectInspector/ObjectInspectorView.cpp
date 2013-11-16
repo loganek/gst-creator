@@ -32,20 +32,20 @@ ObjectInspectorView::~ObjectInspectorView()
 void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 {
 	QByteArray itemData;
-	QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+	QDataStream data_stream(&itemData, QIODevice::WriteOnly);
 
 	auto element = Gst::ElementFactory::create_element(current_text.toUtf8().constData());
 	element->reference();
 	GstBlock* block = new GstBlock(element, this);
 
 	int val = reinterpret_cast<int>(block);
-	dataStream << current_location << val;
+	data_stream << current_location << val;
 
-	QMimeData *mimeData = new QMimeData;
-	mimeData->setData(DRAG_DROP_FORMAT, itemData);
+	QMimeData *mime_data = new QMimeData;
+	mime_data->setData(DRAG_DROP_FORMAT, itemData);
 
 	QDrag *drag = new QDrag(this);
-	drag->setMimeData(mimeData);
+	drag->setMimeData(mime_data);
 	drag->setHotSpot(current_location);
 	drag->setPixmap(block->grab());
 	//delete block;
