@@ -2,6 +2,7 @@
 #include "ui_MainWindow.h"
 #include "Console/ConsoleView.h"
 #include "Logger/LoggerView.h"
+#include "Workspace/WorkspaceController.h"
 #include <QtWidgets/qmessagebox.h>
 #include <gstreamermm.h>
 
@@ -9,8 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent),
 ui(new Ui::MainWindow)
 {
+	//splitter = new QSplitter();
 	ui->setupUi(this);
-	ui->verticalLayout->addWidget(&plugins_tree);
+	ui->objectInspectorFrame->layout()->addWidget(&plugins_tree);
 
 	add_workspace_canvas();
 
@@ -20,19 +22,25 @@ ui(new Ui::MainWindow)
 void MainWindow::add_workspace_canvas()
 {
 	QVBoxLayout *frameLayout = new QVBoxLayout;
+	QFrame* workspace_frame = new QFrame();
+	workspace_frame->setLayout(new QGridLayout());
 	QFrame *frame = new QFrame;
-
-	frameLayout->addWidget(&canvas);
-
 	ConsoleView* console = new ConsoleView();
 	LoggerView* logger = new LoggerView();
+	WorkspaceWidget* workspace = new WorkspaceWidget();
+	QSplitter* spl = new QSplitter();
+
 	QObject::connect(console, &ConsoleView::commandAdded, logger, &LoggerView::add_log);
 	console->set_model(Gst::Pipeline::create()); // TODO model should be created in the other place
-	frameLayout->addWidget(console);
+
+	workspace_frame->layout()->addWidget(workspace);
+	spl->setOrientation(Qt::Vertical);
+	spl->addWidget(workspace_frame);
+	spl->addWidget(frame);
 	frame->setLayout(frameLayout);
-	frame->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	frameLayout->addWidget(console);
 	frameLayout->addWidget(logger);
-	ui->mainVerticalLayout->addWidget(frame);
+	ui->rightFrame->layout()->addWidget(spl);
 }
 
 MainWindow::~MainWindow()

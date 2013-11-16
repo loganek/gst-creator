@@ -26,7 +26,6 @@ private Q_SLOTS:
 
 private:
 	void add_workspace_canvas();
-
 	Ui::MainWindow *ui;
 	ObjectInspectorView plugins_tree;
 	WorkspaceWidget canvas;
