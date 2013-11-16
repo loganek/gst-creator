@@ -41,6 +41,9 @@ protected:
 public:
 	explicit WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent = 0);
 	virtual ~WorkspaceWidget();
+
+Q_SIGNALS:
+	void current_element_changed(const Glib::RefPtr<Gst::Element>& element);
 };
 
 

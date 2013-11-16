@@ -8,6 +8,7 @@
 #include "WorkspaceWidget.h"
 #include "GstBlock.h"
 #include "common.h"
+#include "Commands.h"
 #include <QtGui>
 #include <QFrame>
 
@@ -110,6 +111,7 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 				current_info = block_info;
 				current_info->set_rect(rectangle);
 				current_info->set_location(location);
+				Q_EMIT current_element_changed(current_info->get_block()->get_model());
 				break;
 			}
 		}
@@ -121,6 +123,8 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 		element->get_model()->set_name(new_name.toUtf8().constData());
 		GstBlockInfo* info = new GstBlockInfo(element, location, rectangle);
 		blocks.push_back(info);
+		AddCommand cmd(ObjectType::ELEMENT, model, element->get_model());
+		cmd.run_command();
 	}
 
 	repaint();
@@ -179,4 +183,6 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 	drag->exec(Qt::MoveAction | Qt::CopyAction);
 
 	repaint();
+
+	Q_EMIT current_element_changed(current_info->get_block()->get_model());
 }

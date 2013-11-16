@@ -35,6 +35,8 @@ void MainWindow::add_workspace_canvas()
 	QObject::connect(console, &ConsoleView::commandAdded, logger, &LoggerView::add_log);
 	console->set_model(model);
 
+	QObject::connect(workspace, &WorkspaceWidget::current_element_changed, this, &MainWindow::current_element_info);
+
 	workspace_frame->layout()->addWidget(workspace);
 	spl->setOrientation(Qt::Vertical);
 	spl->addWidget(workspace_frame);
@@ -66,3 +68,7 @@ void MainWindow::on_actionAbout_triggered(bool checked)
 			"License:\tGPL");
 }
 
+void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)
+{
+	ui->currentElementLabel->setText(element->get_name().c_str());
+}
