@@ -11,36 +11,35 @@
 #include <QObject>
 #include <QtCore>
 #include <QtGui>
+#include "GstBlock.h"
 
 class GstBlockInfo : public QObject
 {
 	Q_OBJECT
 private:
-	QString name;
+	GstBlock* block;
 	QPoint location;
-	QPixmap pixmap;
 	QRect rect;
 
 public:
-	explicit GstBlockInfo(const QPixmap& pixmap, const QPoint& location,
-			const QString& name, const QRect& rect, QObject* parent = 0)
+	explicit GstBlockInfo(GstBlock* block, const QPoint& location,
+			const QRect& rect, QObject* parent = 0)
 	: QObject(parent),
-	  pixmap(pixmap),
+	  block(block),
 	  location(location),
-	  name(name),
 	  rect(rect)
 	{}
 
 	virtual ~GstBlockInfo(){}
 
-	QString get_name() const
+	GstBlock* get_block()
 	{
-		return name;
+		return block;
 	}
 
-	void set_name(const QString& name)
+	QString get_name() const
 	{
-		this->name = name;
+		return block->get_model()->get_name().c_str();
 	}
 
 	QPoint get_location() const
@@ -55,12 +54,7 @@ public:
 
 	QPixmap get_pixmap() const
 	{
-		return pixmap;
-	}
-
-	void set_pixmap(const QPixmap& pixmap)
-	{
-		this->pixmap = pixmap;
+		return block->grab();
 	}
 
 	QRect get_rect() const

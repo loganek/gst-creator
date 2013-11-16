@@ -54,7 +54,6 @@ void WorkspaceWidget::dragMoveEvent(QDragMoveEvent* event)
 		return;
 	}
 
-	event->setDropAction(Qt::MoveAction); // todo necessary?
 	event->accept();
 
 	repaint();
@@ -91,26 +90,21 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 	set_style_sheet(passive_style_sheet);
 
 	bool present = false;
-	const QMimeData* mime = event->mimeData();
-	QByteArray item_data = mime->data(DRAG_DROP_FORMAT);
+	QByteArray item_data = event->mimeData()->data(DRAG_DROP_FORMAT);
 	QDataStream data_stream(&item_data, QIODevice::ReadOnly);
-	QPixmap pixmap;
 	QPoint location;
-	QString text;
-	GstBlock* element;
 	int val;
-	data_stream >> pixmap >> location >> text >> val;
-	element = reinterpret_cast<GstBlock*>(val); // fixme ugly code
+
+	data_stream >> location >> val;
+	GstBlock* element = reinterpret_cast<GstBlock*>(val); // fixme ugly code
 
 	QRect rectangle = generate_rectangle(event->pos() - location);
-
-	GstBlockInfo* info = nullptr;
 
 	if (blocks.size() > 0)
 	{
 		for (auto block_info : blocks)
 		{
-			if (block_info->get_name() == text)
+			if (block_info->get_block()->get_model() == element->get_model())
 			{
 				present = true;
 				current_info = block_info;
@@ -123,9 +117,9 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 
 	if (blocks.size() == 0 || (blocks.size() > 0 && !present))
 	{
-		QString new_name = get_new_name(text).toUtf8().constData();
+		QString new_name = get_new_name(element->get_model()->get_name().c_str());
 		element->get_model()->set_name(new_name.toUtf8().constData());
-		info = new GstBlockInfo(QPixmap::grabWidget(element), location, new_name, rectangle);
+		GstBlockInfo* info = new GstBlockInfo(element, location, rectangle);
 		blocks.push_back(info);
 	}
 
@@ -170,23 +164,20 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 		return;
 
 	QPoint position(current_info->get_rect().x(), current_info->get_rect().y());
-
 	QPoint location = event->pos() - position;
-	QPixmap pixmap = current_info->get_pixmap();
-	QString text = current_info->get_name();
 
 	QByteArray item_data;
 	QDataStream dataStream(&item_data, QIODevice::WriteOnly);
 
-	dataStream << pixmap << location << text;
+	dataStream << location << reinterpret_cast<int>(current_info->get_block());
 
-	QMimeData *mime_data = new QMimeData;
+	QMimeData* mime_data = new QMimeData;
 	mime_data->setData(DRAG_DROP_FORMAT, item_data);
 
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mime_data);
 	drag->setHotSpot(location);
-	drag->setPixmap(pixmap);
+	drag->setPixmap(current_info->get_pixmap());
 
 	drag->exec(Qt::MoveAction | Qt::CopyAction);
 	repaint();

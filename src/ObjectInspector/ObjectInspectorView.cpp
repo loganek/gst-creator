@@ -38,10 +38,8 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	element->reference();
 	GstBlock* block = new GstBlock(element, this);
 
-	QPixmap pixmap = QPixmap::grabWidget(block);
-
 	int val = reinterpret_cast<int>(block);
-	dataStream << pixmap << current_location << current_text << val;
+	dataStream << current_location << val;
 
 	QMimeData *mimeData = new QMimeData;
 	mimeData->setData(DRAG_DROP_FORMAT, itemData);
@@ -49,7 +47,7 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mimeData);
 	drag->setHotSpot(current_location);
-	drag->setPixmap(QPixmap::grabWidget(block));
+	drag->setPixmap(block->grab());
 	//delete block;
 
 	int row = currentIndex().row();
