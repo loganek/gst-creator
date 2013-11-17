@@ -14,8 +14,8 @@ GstBlock::GstBlock(const RefPtr<Element>& element, QWidget* parent)
 : QFrame(parent),
   model(element)
 {
-	setMinimumWidth(150);
-	setMinimumHeight(50);
+	setMinimumWidth(get_width());
+	setMinimumHeight(get_height());
 
 	QHBoxLayout* lay = new QHBoxLayout(this);
 	name_label = new QLabel();

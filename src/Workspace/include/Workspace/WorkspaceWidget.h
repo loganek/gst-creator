@@ -8,10 +8,11 @@
 #ifndef WORKSPACEWIDGET_H_
 #define WORKSPACEWIDGET_H_
 
-#include "GstBlockInfo.h"
 #include <QWidget>
 #include <QMimeData>
 #include <gstreamermm.h>
+#include "GstBlockInfo.h"
+#include "Commands/Command.h"
 
 class WorkspaceWidget : public QWidget
 {
@@ -44,6 +45,9 @@ public:
 
 Q_SIGNALS:
 	void current_element_changed(const Glib::RefPtr<Gst::Element>& element);
+
+public Q_SLOTS:
+	void model_changed(std::shared_ptr<Command> cmd);
 };
 
 

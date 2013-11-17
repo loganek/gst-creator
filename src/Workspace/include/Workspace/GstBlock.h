@@ -36,6 +36,9 @@ public:
 	void update_element_view();
 
 	Glib::RefPtr<Gst::Element> get_model(){ return model; }
+
+	static int get_width() { return 150; }
+	static int get_height() { return 50; }
 };
 
 #endif /* GSTBLOCK_H_ */

@@ -6,6 +6,7 @@
  */
 
 #include "LoggerView.h"
+#include "utils/EnumUtils.h"
 
 LoggerView::LoggerView(QWidget* parent)
 : QWidget(parent)
@@ -22,11 +23,11 @@ LoggerView::LoggerView(QWidget* parent)
 LoggerView::~LoggerView()
 {}
 
-void LoggerView::add_log(const QStringList& item)
+void LoggerView::add_log(std::shared_ptr<Command> cmd)
 {
 	QStringList row = {  };
-	row.append(item);
+	row.append("");
 	table->insertRow(table->rowCount());
 	table->setItem(table->rowCount()-1, 0, new QTableWidgetItem(QDate::currentDate().toString("d-m-Y h:m:s")));
-	table->setItem(table->rowCount()-1, 1, new QTableWidgetItem(item[0]));
+	table->setItem(table->rowCount()-1, 1, new QTableWidgetItem(EnumUtils<CommandType>::enum_to_string(cmd->get_type()).c_str()));
 }

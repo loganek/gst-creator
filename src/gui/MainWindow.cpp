@@ -32,7 +32,8 @@ void MainWindow::add_workspace_canvas()
 	WorkspaceWidget* workspace = new WorkspaceWidget(model);
 	QSplitter* spl = new QSplitter();
 
-	QObject::connect(console, &ConsoleView::commandAdded, logger, &LoggerView::add_log);
+	QObject::connect(console, &ConsoleView::command_added, logger, &LoggerView::add_log);
+	QObject::connect(console, &ConsoleView::command_added, workspace, &WorkspaceWidget::model_changed);
 	console->set_model(model);
 
 	QObject::connect(workspace, &WorkspaceWidget::current_element_changed, this, &MainWindow::current_element_info);

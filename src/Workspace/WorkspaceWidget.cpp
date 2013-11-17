@@ -68,7 +68,7 @@ void WorkspaceWidget::dragLeaveEvent(QDragLeaveEvent* event)
 
 QRect generate_rectangle(const QPoint& location)
 {
-	return QRect(location.x(), location.y(), 150, 50);
+	return QRect(location.x(), location.y(), GstBlock::get_width(), GstBlock::get_height());
 }
 QString WorkspaceWidget::get_new_name(const QString& name)
 {
@@ -185,4 +185,22 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 	repaint();
 
 	Q_EMIT current_element_changed(current_info->get_block()->get_model());
+}
+
+void WorkspaceWidget::model_changed(std::shared_ptr<Command> cmd)
+{
+	switch (cmd->get_type())
+	{
+	case CommandType::ADD:
+	{
+		Glib::RefPtr<Gst::Object> ob = ob.cast_static(std::static_pointer_cast<AddCommand>(cmd)->get_object());
+		GstBlockInfo* info = new GstBlockInfo(new GstBlock(Glib::RefPtr<Gst::Element>::cast_static(ob)),
+				QPoint(10, 10), QRect(0, 0, GstBlock::get_width(), GstBlock::get_height()));
+		blocks.push_back(info);
+		repaint();
+	}
+	break;
+	case CommandType::PROPERTY:
+		break;
+	}
 }
