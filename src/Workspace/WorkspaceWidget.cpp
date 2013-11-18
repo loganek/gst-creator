@@ -103,6 +103,33 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 	if (line_drag)
 	{
 		line_drag = false;
+
+		GstBlockInfo* my_info = nullptr;
+
+		for (GstBlockInfo* info : blocks)
+		{
+			if (info->get_rect().contains(event->pos()))
+			{
+				my_info = info;
+				break;
+			}
+		}
+
+		this->setFocus();
+
+		if (my_info == nullptr)
+			return;
+
+		QPoint cur_pt = event->pos() - QPoint(my_info->get_rect().x(), my_info->get_rect().y());
+		GstPadWidget* pad = my_info->get_block()->find_pad(cur_pt);
+		if (pad != nullptr && first_pad != nullptr)
+		{
+			qDebug() << "JEAH " << pad->get_pad()->get_name().c_str();
+			ConnectCommand cmd(first_pad->get_pad(), pad->get_pad());
+			cmd.run_command();
+			first_pad = nullptr;
+		}
+
 		return;
 	}
 
