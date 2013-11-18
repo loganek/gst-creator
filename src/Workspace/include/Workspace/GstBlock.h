@@ -13,6 +13,8 @@
 #include <vector>
 #include "GstPadWidget.h"
 
+class GstBlockInfo;
+
 class GstBlock : public QFrame
 {
 	Q_OBJECT
@@ -23,6 +25,8 @@ private:
 	QLayout* sink_layout;
 	QLayout* src_layout;
 	QLayout* main_layout;
+
+	GstBlockInfo* info_parent;
 
 	QLabel* name_label;
 
@@ -43,10 +47,14 @@ public:
 	void update_element_view();
 	GstPadWidget* find_pad(QPoint pt);
 
+	QPoint get_pad_point(GstPadWidget* pad);
+
 	Glib::RefPtr<Gst::Element> get_model(){ return model; }
 
 	int get_width() { return grab().width();}
 	int get_height() { return grab().height();}
+
+	void set_info_parent(GstBlockInfo* info_parent);
 };
 
 #endif /* GSTBLOCK_H_ */

@@ -28,7 +28,9 @@ public:
 	  block(block),
 	  location(location),
 	  rect(rect)
-	{}
+	{
+		block->set_info_parent(this);
+	}
 
 	virtual ~GstBlockInfo(){}
 

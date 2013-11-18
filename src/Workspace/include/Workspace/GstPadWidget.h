@@ -22,6 +22,8 @@ public:
 	virtual ~GstPadWidget(){}
 
 	Glib::RefPtr<Gst::Pad> get_pad();
+
+	QPoint get_absolute_position();
 };
 
 #endif /* GSTPADWIDGET_H_ */

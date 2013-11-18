@@ -15,7 +15,10 @@
 WorkspaceWidget::WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent)
 : QWidget(parent),
   model(model),
-  current_info(nullptr)
+  current_info(nullptr),
+  first_pad(nullptr),
+  second_pad(nullptr),
+  line_drag(false)
 {
 	setAcceptDrops(true);
 }
@@ -47,15 +50,11 @@ void WorkspaceWidget::dragEnterEvent(QDragEnterEvent* event)
 	event->accept();
 }
 
-bool draw = false;
-QPoint start;
-QPoint stop;
-
 void WorkspaceWidget::dragMoveEvent(QDragMoveEvent* event)
 {
-	if (draw)
+	if (line_drag)
 	{
-		stop = event->pos();
+		curr_line_pos = event->pos();
 		event->accept();
 		repaint();
 
@@ -101,9 +100,9 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 		return;
 	}
 
-	if (draw)
+	if (line_drag)
 	{
-		draw = false;
+		line_drag = false;
 		return;
 	}
 
@@ -161,7 +160,10 @@ void WorkspaceWidget::paintEvent(QPaintEvent* event)
 {
 	QPainter painter;
 	painter.begin(this);
-	painter.drawLine(QLine(start, stop));
+
+	if (line_drag)
+		painter.drawLine(QLine(first_pad->get_absolute_position(), curr_line_pos));
+
 	for (auto info : blocks)
 		painter.drawPixmap(info->get_rect(), info->get_pixmap());
 }
@@ -201,8 +203,8 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 	drag->setMimeData(mime_data);
 	if (pad != nullptr)
 	{
-		start = event->pos();
-		draw = true;
+		first_pad = pad;
+		line_drag = true;
 		qDebug() << "Pad not null";
 	}
 	else{

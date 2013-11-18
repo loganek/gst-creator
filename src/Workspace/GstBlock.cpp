@@ -7,6 +7,7 @@
 
 #include "GstBlock.h"
 #include "GstPadWidget.h"
+#include "GstBlockInfo.h"
 #include <algorithm>
 
 using namespace Gst;
@@ -14,7 +15,8 @@ using Glib::RefPtr;
 
 GstBlock::GstBlock(const RefPtr<Element>& element, QWidget* parent)
 : QFrame(parent),
-  model(element)
+  model(element),
+  info_parent(nullptr)
 {
 	setMinimumWidth(150);
 	setMinimumHeight(50);
@@ -126,4 +128,44 @@ int GstBlock::get_sink_cnt()
 int GstBlock::get_src_cnt()
 {
 	return pads.size() - get_sink_cnt();
+}
+
+QPoint GstBlock::get_pad_point(GstPadWidget* pad)
+{
+	int sinks = 0, srcs = 0;
+	QPoint ret_point;
+
+	if (info_parent != nullptr)
+		ret_point = QPoint(info_parent->get_rect().x(), info_parent->get_rect().y());
+
+	for (auto ipad : pads)
+	{
+		if (ipad->get_pad()->get_direction() == PAD_SINK)
+		{
+			if (ipad->get_pad() == pad->get_pad())
+			{
+				ret_point += QPoint(0, sinks * grab().height() / get_sink_cnt() + 15);
+				break;
+			}
+
+			sinks++;
+		}
+		else if (ipad->get_pad()->get_direction() == PAD_SRC)
+		{
+			if (ipad->get_pad() == pad->get_pad())
+			{
+				ret_point += QPoint(grab().width(), srcs * grab().height() / get_src_cnt() + 15);
+				break;
+			}
+
+			srcs++;
+		}
+	}
+
+	return ret_point;
+}
+
+void GstBlock::set_info_parent(GstBlockInfo* info_parent)
+{
+	this->info_parent = info_parent;
 }
