@@ -47,8 +47,21 @@ void WorkspaceWidget::dragEnterEvent(QDragEnterEvent* event)
 	event->accept();
 }
 
+bool draw = false;
+QPoint start;
+QPoint stop;
+
 void WorkspaceWidget::dragMoveEvent(QDragMoveEvent* event)
 {
+	if (draw)
+	{
+		stop = event->pos();
+		event->accept();
+		repaint();
+
+		return;
+	}
+
 	if (!check_mime_data(event->mimeData()))
 	{
 		event->ignore();
@@ -85,6 +98,12 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 	if (!check_mime_data(event->mimeData()))
 	{
 		event->ignore();
+		return;
+	}
+
+	if (draw)
+	{
+		draw = false;
 		return;
 	}
 
@@ -142,18 +161,13 @@ void WorkspaceWidget::paintEvent(QPaintEvent* event)
 {
 	QPainter painter;
 	painter.begin(this);
-
+	painter.drawLine(QLine(start, stop));
 	for (auto info : blocks)
-	{
 		painter.drawPixmap(info->get_rect(), info->get_pixmap());
-		painter.drawLine(QLine(info->get_rect().x(), info->get_rect().y(), 0, 0));
-	}
 }
 
 void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 {
-	//QRect rectangle = generate_rectangle(event->pos());
-
 	current_info = nullptr;
 
 	for (GstBlockInfo* info : blocks)
@@ -166,6 +180,11 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 
 	if (current_info == nullptr)
 		return;
+
+	GstBlock* block = current_info->get_block();
+	GstPadWidget* pad = block->find_pad(event->pos() - QPoint(current_info->get_rect().x(), current_info->get_rect().y()));
+
+
 
 	QPoint position(current_info->get_rect().x(), current_info->get_rect().y());
 	QPoint location = event->pos() - position;
@@ -180,14 +199,20 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mime_data);
+	if (pad != nullptr)
+	{
+		start = event->pos();
+		draw = true;
+		qDebug() << "Pad not null";
+	}
+	else{
 	drag->setHotSpot(location);
 	drag->setPixmap(current_info->get_pixmap());
+	}
 	drag->exec(Qt::MoveAction | Qt::CopyAction);
 
 	repaint();
 
-	GstBlock* block = current_info->get_block();
-	block->find_pad(event->pos() - QPoint(current_info->get_rect().x(), current_info->get_rect().y()));
 	Q_EMIT current_element_changed(current_info->get_block()->get_model());
 }
 
