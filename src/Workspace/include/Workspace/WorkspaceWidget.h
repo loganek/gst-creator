@@ -10,10 +10,12 @@
 
 #include "GstBlockInfo.h"
 #include "Commands/Command.h"
+#include "GstConnection.h"
 #include "GstPadWidget.h"
 #include <QWidget>
 #include <QMimeData>
 #include <gstreamermm.h>
+#include <vector>
 
 class WorkspaceWidget : public QWidget
 {
@@ -36,6 +38,8 @@ private:
 	QPoint curr_line_pos;
 
 	Glib::RefPtr<Gst::Pipeline> model;
+
+	std::vector<GstConnection*> connections;
 
 protected:
 	void dragEnterEvent(QDragEnterEvent* event);

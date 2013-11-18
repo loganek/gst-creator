@@ -124,9 +124,9 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 		GstPadWidget* pad = my_info->get_block()->find_pad(cur_pt);
 		if (pad != nullptr && first_pad != nullptr)
 		{
-			qDebug() << "JEAH " << pad->get_pad()->get_name().c_str();
 			ConnectCommand cmd(first_pad->get_pad(), pad->get_pad());
 			cmd.run_command();
+			connections.push_back(new GstConnection(first_pad, pad));
 			first_pad = nullptr;
 		}
 
@@ -189,7 +189,10 @@ void WorkspaceWidget::paintEvent(QPaintEvent* event)
 	painter.begin(this);
 
 	if (line_drag)
-		painter.drawLine(QLine(first_pad->get_absolute_position(), curr_line_pos));
+		GstConnection::draw_arrow(painter, first_pad->get_absolute_position(), curr_line_pos);
+
+	for (auto connection : connections)
+		connection->draw_arrow(painter);
 
 	for (auto info : blocks)
 		painter.drawPixmap(info->get_rect(), info->get_pixmap());
@@ -232,7 +235,6 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 	{
 		first_pad = pad;
 		line_drag = true;
-		qDebug() << "Pad not null";
 	}
 	else{
 	drag->setHotSpot(location);
