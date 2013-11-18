@@ -115,5 +115,8 @@ Druga grupa gniazd, to takie, które pojawiają się tylko wtedy, kiedy wystąpi
   \label{fig:requestPadsDemux}
 \end{figure}
 Ostatnia grupa, to gniazda, pojawiające się na żądanie użytkownika. Można wyobrazić sobie odwrotną sytuację do opisywanej w poprzednim akapicie. Użytkownik wstawia element muxera, który łączy kilka strumieni. W zależności od tego, ile strumieni użytkownik będzie chciał połączyć, tyle żądań o pad wejściowy będzie musiał zgłosić.
+\subsubsection{Połączenia}
+\paragraph{}
+Połączenia pomiędzy dwoma elementami odbywają się przez tzw. \textit{negocjacje}. Każde gniazdo elementu posiada właściwość określającą, jakiego typu dane akceptuje dane gniazdo. Właściwości te nazywane są możliwościami(ang. \textit{capabilities}, \textit{caps}). Proces negocjacji ma na celu odnalezienie wspólnego formatu danych, jaki może zostać zaakceptowany przez odybwa gniazda(gniazdo wejściowe oraz wyjściowe), które użytkownik chce ze sobą połączyć. Jeśli negocjacje zakończą się niepowodzeniem(to znaczy, nie uda się znaleźć wspólnego formatu), połączenie nie zostanie wykonane.
 
 \end{document}. 
