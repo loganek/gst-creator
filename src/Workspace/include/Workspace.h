@@ -11,5 +11,6 @@
 #include "Workspace/WorkspaceWidget.h"
 #include "Workspace/WorkspaceController.h"
 #include "Workspace/GstBlock.h"
+#include "Workspace/GstPadWidget.h"
 
 #endif /* WORKSPACE_H_ */

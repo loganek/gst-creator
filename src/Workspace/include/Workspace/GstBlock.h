@@ -10,6 +10,8 @@
 
 #include <QtWidgets>
 #include <gstreamermm.h>
+#include <vector>
+#include "GstPadWidget.h"
 
 class GstBlock : public QFrame
 {
@@ -24,21 +26,27 @@ private:
 
 	QLabel* name_label;
 
+	std::vector<GstPadWidget*> pads;
+
 	void update_pads();
 	void add_pad(const Glib::RefPtr<Gst::Pad>& pad);
 	void clear_element_view();
 	void paintEvent(QPaintEvent * event);
+
+	int get_sink_cnt();
+	int get_src_cnt();
 
 public:
 	explicit GstBlock(const Glib::RefPtr<Gst::Element>& element_model, QWidget* parent = 0);
 	virtual ~GstBlock(){}
 
 	void update_element_view();
+	GstPadWidget* find_pad(QPoint pt);
 
 	Glib::RefPtr<Gst::Element> get_model(){ return model; }
 
-	static int get_width() { return 150; }
-	static int get_height() { return 50; }
+	int get_width() { return grab().width();}
+	int get_height() { return grab().height();}
 };
 
 #endif /* GSTBLOCK_H_ */

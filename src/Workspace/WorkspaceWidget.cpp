@@ -66,9 +66,9 @@ void WorkspaceWidget::dragLeaveEvent(QDragLeaveEvent* event)
 	repaint();
 }
 
-QRect generate_rectangle(const QPoint& location)
+QRect generate_rectangle(const QPoint& location, GstBlock* block)
 {
-	return QRect(location.x(), location.y(), GstBlock::get_width(), GstBlock::get_height());
+	return QRect(location.x(), location.y(), block->get_width(), block->get_height());
 }
 QString WorkspaceWidget::get_new_name(const QString& name)
 {
@@ -98,8 +98,7 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 
 	data_stream >> location >> val;
 	GstBlock* element = reinterpret_cast<GstBlock*>(val); // fixme ugly code
-
-	QRect rectangle = generate_rectangle(event->pos() - location);
+	QRect rectangle = generate_rectangle(event->pos() - location, element);
 
 	if (blocks.size() > 0)
 	{
@@ -145,18 +144,21 @@ void WorkspaceWidget::paintEvent(QPaintEvent* event)
 	painter.begin(this);
 
 	for (auto info : blocks)
+	{
 		painter.drawPixmap(info->get_rect(), info->get_pixmap());
+		painter.drawLine(QLine(info->get_rect().x(), info->get_rect().y(), 0, 0));
+	}
 }
 
 void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 {
-	QRect rectangle = generate_rectangle(event->pos());
+	//QRect rectangle = generate_rectangle(event->pos());
 
 	current_info = nullptr;
 
 	for (GstBlockInfo* info : blocks)
 	{
-		if (info->get_rect().contains(rectangle.x(),rectangle.y()))
+		if (info->get_rect().contains(event->pos()))
 			current_info = info;
 	}
 
@@ -184,6 +186,8 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 
 	repaint();
 
+	GstBlock* block = current_info->get_block();
+	block->find_pad(event->pos() - QPoint(current_info->get_rect().x(), current_info->get_rect().y()));
 	Q_EMIT current_element_changed(current_info->get_block()->get_model());
 }
 
@@ -195,7 +199,7 @@ void WorkspaceWidget::model_changed(std::shared_ptr<Command> cmd)
 	{
 		Glib::RefPtr<Gst::Object> ob = ob.cast_static(std::static_pointer_cast<AddCommand>(cmd)->get_object());
 		GstBlockInfo* info = new GstBlockInfo(new GstBlock(Glib::RefPtr<Gst::Element>::cast_static(ob)),
-				QPoint(10, 10), QRect(0, 0, GstBlock::get_width(), GstBlock::get_height()));
+				QPoint(10, 10), QRect(0, 0, info->get_block()->get_width(), info->get_block()->get_height()));
 		blocks.push_back(info);
 		repaint();
 	}
