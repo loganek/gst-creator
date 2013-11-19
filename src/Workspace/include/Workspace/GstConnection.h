@@ -22,8 +22,9 @@ public:
 	GstPadWidget* get_first_pad();
 	GstPadWidget* get_second_pad();
 
-	static void draw_arrow(QPainter& painter, const QPoint& start, const QPoint& end);
+	static void draw_arrow(QPainter& painter, const QPoint& start, const QPoint& end, bool redline = false);
 	void draw_arrow(QPainter& painter);
+	bool may_exists();
 };
 
 #endif /* GSTCONNECTION_H_ */

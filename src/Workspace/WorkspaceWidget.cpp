@@ -49,13 +49,39 @@ void WorkspaceWidget::dragEnterEvent(QDragEnterEvent* event)
 	set_style_sheet(active_style_sheet);
 	event->accept();
 }
-
+bool redline = false;
 void WorkspaceWidget::dragMoveEvent(QDragMoveEvent* event)
 {
 	if (line_drag)
 	{
+		redline = false;
 		curr_line_pos = event->pos();
+
+		GstBlockInfo* my_info = nullptr;
+
+		for (GstBlockInfo* info : blocks)
+		{
+			if (info->get_rect().contains(event->pos()))
+			{
+				my_info = info;
+				break;
+			}
+		}
+
 		event->accept();
+
+		if (my_info != nullptr)
+		{
+			QPoint cur_pt = event->pos() - QPoint(my_info->get_rect().x(), my_info->get_rect().y());
+			GstPadWidget* pad_w = my_info->get_block()->find_pad(cur_pt);
+
+			if (pad_w != nullptr && pad_w->get_pad() != first_pad->get_pad())
+			{
+				GstConnection con (first_pad, pad_w);
+				if (con.may_exists())
+					redline = true;
+			}
+		}
 		repaint();
 
 		return;
@@ -122,12 +148,18 @@ void WorkspaceWidget::dropEvent(QDropEvent* event)
 
 		QPoint cur_pt = event->pos() - QPoint(my_info->get_rect().x(), my_info->get_rect().y());
 		GstPadWidget* pad = my_info->get_block()->find_pad(cur_pt);
-		if (pad != nullptr && first_pad != nullptr)
+		if (pad != nullptr && first_pad != nullptr && pad->get_pad()->get_direction() == Gst::PAD_SINK)
 		{
-			ConnectCommand cmd(first_pad->get_pad(), pad->get_pad());
-			cmd.run_command();
-			connections.push_back(new GstConnection(first_pad, pad));
-			first_pad = nullptr;
+			GstConnection* con = new GstConnection(first_pad, pad);
+			if (con->may_exists())
+			{
+				ConnectCommand cmd(first_pad->get_pad(), pad->get_pad());
+				cmd.run_command();
+				connections.push_back(con);
+				first_pad = nullptr;
+			}
+			else
+				delete con;
 		}
 
 		return;
@@ -189,7 +221,7 @@ void WorkspaceWidget::paintEvent(QPaintEvent* event)
 	painter.begin(this);
 
 	if (line_drag)
-		GstConnection::draw_arrow(painter, first_pad->get_absolute_position(), curr_line_pos);
+		GstConnection::draw_arrow(painter, first_pad->get_absolute_position(), curr_line_pos, redline);
 
 	for (auto connection : connections)
 		connection->draw_arrow(painter);
@@ -231,7 +263,7 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mime_data);
-	if (pad != nullptr)
+	if (pad != nullptr && pad->get_pad()->get_direction() == Gst::PAD_SRC)
 	{
 		first_pad = pad;
 		line_drag = true;

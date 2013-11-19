@@ -11,7 +11,8 @@
 GstPadWidget::GstPadWidget(const Glib::RefPtr<Gst::Pad>& pad, QWidget* parent)
 : pad(pad),
   QLabel(pad->get_name().c_str(), parent)
-{}
+{
+}
 
 Glib::RefPtr<Gst::Pad> GstPadWidget::get_pad()
 {
