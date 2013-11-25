@@ -81,7 +81,7 @@ vector<string> ConnectCommand::get_suggestions(const vector<string>& args, const
 		else if ((args.size() == 2 || args.size() == 4) && type == ObjectType::ELEMENT)
 			return GstUtils::get_elements_from_bin_string(model, false);
 		else if ((args.size() == 2 || args.size() == 4) && type == ObjectType::PAD)
-			return vector<string>(); // TODO
+			return GstUtils::get_pads_from_bin_string(model);
 		else if (args.size() == 3)
 			return {"WITH"};
 	}

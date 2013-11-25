@@ -125,16 +125,14 @@ AddCommand* AddCommand::generate_add_pad_command(const vector<string>& args, con
 		syntax_error("invalid arguments count. Expected 5 or 6, but " +
 				to_string(args.size()) + " found.");
 
-	if (args[1] != "using")
+	if (!StringUtils::are_equal_case_no_sense(args[1], "to"))
 		syntax_error("expected `using` but " + args[1] + " found.");
 
-	int shift = args.size() == 5 ? 0 : 1;
+	if (!StringUtils::are_equal_case_no_sense(args[3], "using"))
+		syntax_error("expected `to` but " + args[3] + " found.");
 
-	if (!StringUtils::are_equal_case_no_sense(args[3 + shift], "to"))
-		syntax_error("expected `to` but " + args[3+shift] + " found.");
-
-	RefPtr<Element> parent = GstUtils::find_element(args[4 + shift], model);
-	RefPtr<PadTemplate> tpl = parent->get_pad_template(args[2]);
+	RefPtr<Element> parent = GstUtils::find_element(args[2], model);
+	RefPtr<PadTemplate> tpl = parent->get_pad_template(args[4]);
 
 	if (!tpl)
 		runtime_error("unknown pad template: " + args[2]);
@@ -142,7 +140,7 @@ AddCommand* AddCommand::generate_add_pad_command(const vector<string>& args, con
 	RefPtr<Object> object = Pad::create(tpl);
 
 	if (args.size() == 6)
-		object->set_name(args[3]);
+		object->set_name(args[5]);
 
 	return new AddCommand(ObjectType::PAD, parent, object);
 }
@@ -159,12 +157,16 @@ vector<string> AddCommand::get_suggestions(const vector<string>& args, const Ref
 			return EnumUtils<ObjectType>::get_string_values();
 		else if (args.size() == 2 && type == ObjectType::ELEMENT)
 			return GstUtils::get_avaliable_elements_string();
-		else if (args.size() == 2 && type == ObjectType::PAD)
-			return {"USING"};
-		else if ((((args.size() == 3 || args.size() == 4) && type == ObjectType::ELEMENT) ||
-				((args.size() == 4 || args.size() == 5) && type == ObjectType::PAD))
-				&& !StringUtils::are_equal_case_no_sense(args[args.size()-2], "TO"))
+		else if (((args.size() == 3 || args.size() == 4) && type == ObjectType::ELEMENT
+				&& !StringUtils::are_equal_case_no_sense(args[args.size()-2], "TO")) ||
+				(args.size() == 2 && type == ObjectType::PAD))
 			return {"TO"};
+		else if (args.size() == 3 && type == ObjectType::PAD)
+			return GstUtils::get_elements_from_bin_string(model, false);
+		else if (args.size() == 4 && type == ObjectType::PAD)
+			return {"USING"};
+		else if (args.size() == 5 && type == ObjectType::PAD)
+					return GstUtils::get_avaliable_pad_templates_string(GstUtils::find_element(args[2], model));
 		else if ((args.size() == 4 || args.size() == 5) && type == ObjectType::ELEMENT)
 					return GstUtils::get_elements_from_bin_string(model, true);
 		else if ((args.size() == 5 || args.size() == 6) && type == ObjectType::PAD)

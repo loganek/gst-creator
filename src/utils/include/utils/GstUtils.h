@@ -20,6 +20,9 @@ public:
 	static std::vector<std::string> get_avaliable_elements_string();
 	static std::vector<std::string> get_elements_from_bin_string(const Glib::RefPtr<Gst::Bin>& bin, bool must_bin, const std::string& prefix = "");
 	static std::vector<std::string> get_properties_string(const Glib::RefPtr<Gst::Element>& element);
+	static std::vector<std::string> get_avaliable_pad_templates_string(const Glib::RefPtr<Gst::Element>& element);
+	static std::vector<std::string> get_pads_from_bin_string(const Glib::RefPtr<Gst::Bin>& bin, const std::string& prefix = "");
+	static std::vector<std::string> get_pads_from_element_string(const Glib::RefPtr<Gst::Element>& element);
 };
 
 #endif /* GSTUTILS_H_ */

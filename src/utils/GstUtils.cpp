@@ -86,6 +86,54 @@ std::vector<std::string> GstUtils::get_elements_from_bin_string(const RefPtr<Bin
 	return values;
 }
 
+std::vector<std::string> GstUtils::get_pads_from_element_string(const RefPtr<Element>& element)
+{
+	std::vector<std::string> values;
+
+	if (!element)
+		return values;
+
+	typedef Iterator<Pad> PadIter;
+	PadIter iter = element->iterate_pads();
+
+	while(iter.next())
+	{
+		values.push_back(iter->get_name().c_str());
+	}
+
+	return values;
+}
+
+std::vector<std::string> GstUtils::get_pads_from_bin_string(const RefPtr<Bin>& bin, const std::string& prefix)
+{
+	std::vector<std::string> values;
+
+	Iterator<Element> iterator = bin->iterate_elements();
+
+	while (iterator.next())
+	{
+		if (GST_IS_BIN(iterator->gobj()))
+		{
+			RefPtr<Bin> internal_bin = internal_bin.cast_static(*iterator);
+			std::vector<std::string> internal_values =
+					get_pads_from_bin_string(internal_bin, iterator->get_name().c_str() + std::string(":"));
+
+			for (auto& p : internal_values) p = prefix + p;
+			values.insert(values.end(), internal_values.begin(), internal_values.end());
+
+			std::vector<std::string> pads = get_pads_from_element_string(*iterator);
+			for (auto& p : pads) p = prefix +  iterator->get_name().c_str() + std::string(":") + p;
+			values.insert(values.end(), pads.begin(), pads.end());
+		}
+
+		std::vector<std::string> pads = get_pads_from_element_string(*iterator);
+		for (auto& p : pads) p = prefix +  iterator->get_name().c_str() + std::string(":") + p;
+		values.insert(values.end(), pads.begin(), pads.end());
+	}
+
+	return values;
+}
+
 std::vector<std::string> GstUtils::get_properties_string(const RefPtr<Element>& element)
 {
 	std::vector<std::string> values;
@@ -95,6 +143,23 @@ std::vector<std::string> GstUtils::get_properties_string(const RefPtr<Element>& 
 
 	for (int i = 0; i < property_count; i++)
 		values.push_back(property_specs[i]->name);
+
+	return values;
+}
+
+std::vector<std::string> GstUtils::get_avaliable_pad_templates_string(const RefPtr<Element>& element)
+{
+	std::vector<std::string> values;
+
+	if (!element)
+		return values;
+
+	std::vector<StaticPadTemplate> pad_templates = element->get_factory()->get_static_pad_templates();
+
+
+	for(std::vector<StaticPadTemplate>::iterator iter = pad_templates.begin();
+			iter != pad_templates.end(); ++iter )
+		values.push_back(iter->get_name_template().c_str());
 
 	return values;
 }

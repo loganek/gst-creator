@@ -294,7 +294,7 @@ GstBlockInfo* WorkspaceWidget::find_block(const std::string& name)
 
 void WorkspaceWidget::model_changed(std::shared_ptr<Command> cmd)
 {
-	switch (cmd->get_type())
+	/*switch (cmd->get_type())
 	{
 	case CommandType::ADD:
 	{
@@ -341,5 +341,5 @@ void WorkspaceWidget::model_changed(std::shared_ptr<Command> cmd)
 		repaint();
 		break;
 	}
-	}
+	}*/
 }
