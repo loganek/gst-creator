@@ -8,7 +8,6 @@
 #include "ConsoleView.h"
 #include "utils/EnumUtils.h"
 #include "utils/StringUtils.h"
-#include <memory>
 
 ConsoleView::ConsoleView(QWidget* parent)
 : QWidget(parent),
@@ -119,7 +118,7 @@ void ConsoleView::execute_command()
 	{
 		std::shared_ptr<Command> cmd(parser->parse(edit->text().toUtf8().constData()));
 		cmd->run_command();
-		Q_EMIT commandAdded({edit->text()});
+		Q_EMIT command_added(cmd);
 		edit->clear();
 	}
 	catch (const std::runtime_error& err)

@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <QtWidgets>
 #include <gstreamermm.h>
+#include <memory>
 
 class ConsoleView : public QWidget
 {
@@ -36,7 +37,7 @@ private Q_SLOTS:
 
 
 Q_SIGNALS:
-	void commandAdded(const QStringList& item);
+	void command_added(std::shared_ptr<Command> command);
 
 public:
 	explicit ConsoleView(QWidget* parent = 0);

@@ -26,10 +26,11 @@ private Q_SLOTS:
 
 private:
 	void add_workspace_canvas();
-
 	Ui::MainWindow *ui;
 	ObjectInspectorView plugins_tree;
-	WorkspaceWidget canvas;
+
+private Q_SLOTS:
+	void current_element_info(const Glib::RefPtr<Gst::Element>& element);
 };
 
 #endif // MAINWINDOW_H
