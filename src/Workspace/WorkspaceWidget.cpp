@@ -18,7 +18,8 @@ WorkspaceWidget::WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidg
   current_info(nullptr),
   first_pad(nullptr),
   second_pad(nullptr),
-  line_drag(false)
+  line_drag(false),
+  greenline(false)
 {
 	setAcceptDrops(true);
 }
@@ -49,12 +50,12 @@ void WorkspaceWidget::dragEnterEvent(QDragEnterEvent* event)
 	set_style_sheet(active_style_sheet);
 	event->accept();
 }
-bool redline = false;
+
 void WorkspaceWidget::dragMoveEvent(QDragMoveEvent* event)
 {
 	if (line_drag)
 	{
-		redline = false;
+		greenline = false;
 		curr_line_pos = event->pos();
 
 		GstBlockInfo* my_info = nullptr;
@@ -79,7 +80,7 @@ void WorkspaceWidget::dragMoveEvent(QDragMoveEvent* event)
 			{
 				GstConnection con (first_pad, pad_w);
 				if (con.may_exists())
-					redline = true;
+					greenline = true;
 			}
 		}
 		repaint();
@@ -221,7 +222,8 @@ void WorkspaceWidget::paintEvent(QPaintEvent* event)
 	painter.begin(this);
 
 	if (line_drag)
-		GstConnection::draw_arrow(painter, first_pad->get_absolute_position(), curr_line_pos, redline);
+		GstConnection::draw_arrow(painter, first_pad->get_absolute_position(), curr_line_pos,
+				greenline ? ConnectState::OK_CONNECTION : ConnectState::BAD_CONNECTION);
 
 	for (auto connection : connections)
 		connection->draw_arrow(painter);
@@ -269,14 +271,25 @@ void WorkspaceWidget::mousePressEvent(QMouseEvent* event)
 		line_drag = true;
 	}
 	else{
-	drag->setHotSpot(location);
-	drag->setPixmap(current_info->get_pixmap());
+		drag->setHotSpot(location);
+		drag->setPixmap(current_info->get_pixmap());
 	}
 	drag->exec(Qt::MoveAction | Qt::CopyAction);
 
 	repaint();
 
 	Q_EMIT current_element_changed(current_info->get_block()->get_model());
+}
+
+GstBlockInfo* WorkspaceWidget::find_block(const std::string& name)
+{
+	for (auto block: blocks)
+	{
+		if (block->get_name() == name.c_str())
+			return block;
+	}
+
+	return nullptr;
 }
 
 void WorkspaceWidget::model_changed(std::shared_ptr<Command> cmd)
@@ -286,13 +299,47 @@ void WorkspaceWidget::model_changed(std::shared_ptr<Command> cmd)
 	case CommandType::ADD:
 	{
 		Glib::RefPtr<Gst::Object> ob = ob.cast_static(std::static_pointer_cast<AddCommand>(cmd)->get_object());
-		GstBlockInfo* info = new GstBlockInfo(new GstBlock(Glib::RefPtr<Gst::Element>::cast_static(ob)),
-				QPoint(10, 10), QRect(0, 0, info->get_block()->get_width(), info->get_block()->get_height()));
+		GstBlock* block = new GstBlock(Glib::RefPtr<Gst::Element>::cast_static(ob));
+		GstBlockInfo* info = new GstBlockInfo(block,
+				QPoint(10, 10), QRect(0, 0, block->get_width(), block->get_height()));
 		blocks.push_back(info);
 		repaint();
 	}
 	break;
 	case CommandType::PROPERTY:
 		break;
+	case CommandType::CONNECT:
+	{
+		std::shared_ptr<ConnectCommand> concmd =
+				std::static_pointer_cast<ConnectCommand>(cmd);
+		GstConnection* con;
+
+		if (concmd->get_type() == ObjectType::PAD)
+		{
+			Glib::RefPtr<Gst::Pad> src_pad = src_pad.cast_static(concmd->get_src());
+			Glib::RefPtr<Gst::Pad> sink_pad = sink_pad.cast_static(concmd->get_dst());
+
+			GstBlockInfo* src_block = find_block(src_pad->get_parent()->get_name().c_str());
+			GstBlockInfo* sink_block = find_block(sink_pad->get_parent()->get_name().c_str());
+
+			if (src_block == nullptr || sink_block == nullptr)
+				return;
+
+			GstPadWidget* src_pad_widget =
+					src_block->get_block()->find_pad(concmd->get_src()->get_name().c_str());
+			GstPadWidget* sink_pad_widget =
+					sink_block->get_block()->find_pad(concmd->get_dst()->get_name().c_str());
+
+			if (sink_pad_widget == nullptr || src_pad_widget == nullptr)
+							return;
+
+			con = new GstConnection(src_pad_widget, sink_pad_widget);
+		}
+		else
+			return;
+		connections.push_back(con);
+		repaint();
+		break;
+	}
 	}
 }

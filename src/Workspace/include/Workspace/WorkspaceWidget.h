@@ -24,6 +24,7 @@ private:
 	constexpr static const char* active_style_sheet = "QFrame{ border: 1px solid red; border-radius: 4px; padding: 2px;}";
 	constexpr static const char* passive_style_sheet = "QFrame{ border: 1px solid black; border-radius: 4px; padding: 2px;}";
 
+	bool greenline;
 	bool line_drag;
 	GstPadWidget* first_pad;
 	GstPadWidget* second_pad;
@@ -31,6 +32,7 @@ private:
 	bool check_mime_data(const QMimeData* mime_data) const;
 	void set_style_sheet(const char* style_sheet);
 	QString get_new_name(const QString& name);
+	GstBlockInfo* find_block(const std::string& name);
 
 	QPixmap pixmap;
 	GstBlockInfo* current_info;

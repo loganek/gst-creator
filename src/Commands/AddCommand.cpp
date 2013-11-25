@@ -28,6 +28,23 @@ AddCommand::~AddCommand()
 {
 }
 
+void AddCommand::new_pad_added(const RefPtr<Pad>& pad)
+{
+	// todo
+}
+void AddCommand::pad_removed(const RefPtr<Pad>& pad)
+{
+	// todo
+}
+void AddCommand::pad_linked(const RefPtr<Pad>& pad)
+{
+	// todo
+}
+void AddCommand::pad_unlinked(const RefPtr<Pad>& pad)
+{
+	// todo
+}
+
 void AddCommand::run_command()
 {
 	if (type == ObjectType::PAD)
@@ -35,6 +52,8 @@ void AddCommand::run_command()
 		if (GST_IS_PAD(object->gobj()))
 		{
 			RefPtr<Pad> pad = pad.cast_static(object);
+			pad->signal_linked().connect(sigc::mem_fun(this, &AddCommand::pad_linked));
+			pad->signal_linked().connect(sigc::mem_fun(this, &AddCommand::pad_unlinked));
 			parent->add_pad(pad);
 		}
 		else
@@ -47,6 +66,8 @@ void AddCommand::run_command()
 			RefPtr<Pipeline> pipeline = pipeline.cast_static(parent);
 			RefPtr<Element> element = element.cast_static(object);
 			pipeline->add(element);
+			element->signal_pad_added().connect(sigc::mem_fun(this ,&AddCommand::new_pad_added));
+			element->signal_pad_removed().connect(sigc::mem_fun(this ,&AddCommand::pad_removed));
 		}
 		else
 			throw runtime_error("cannot run command: invalid parent or object type");

@@ -46,6 +46,7 @@ public:
 
 	void update_element_view();
 	GstPadWidget* find_pad(QPoint pt);
+	GstPadWidget* find_pad(const std::string& name);
 
 	QPoint get_pad_point(GstPadWidget* pad);
 

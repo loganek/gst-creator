@@ -20,6 +20,9 @@ private:
 public:
 	ConnectCommand(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Object>& dst);
 
+	ObjectType get_type() { return type; }
+	Glib::RefPtr<Gst::Object> get_src() { return src; }
+	Glib::RefPtr<Gst::Object> get_dst() { return dst; }
 	static ConnectCommand* from_args(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
 	static std::vector<std::string> get_suggestions(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
 	void run_command();

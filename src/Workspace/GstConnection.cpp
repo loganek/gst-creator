@@ -35,7 +35,7 @@ void GstConnection::draw_arrow(QPainter& painter)
 	draw_arrow(painter, start, end);
 }
 
-void GstConnection::draw_arrow(QPainter& painter, const QPoint& start, const QPoint& end, bool redline)
+void GstConnection::draw_arrow(QPainter& painter, const QPoint& start, const QPoint& end, ConnectState state)
 {
 	double len = 10, rads = 35 * M_PI/180;
 	double angle = atan2 (end.y() - start.y(), end.x() - start.x()) + M_PI;
@@ -45,10 +45,22 @@ void GstConnection::draw_arrow(QPainter& painter, const QPoint& start, const QPo
 	QPoint arr2(end.x() + len * cos(angle + rads),
 			end.y() + len * sin(angle + rads));
 
-	if (redline)
-		painter.setPen(QPen(Qt::red, 2));
-	else
-		painter.setPen(QPen(Qt::black, 1));
+	Qt::GlobalColor color;
+	switch (state)
+	{
+	case ConnectState::OK_CONNECTION:
+		color = Qt::green;
+		break;
+	case ConnectState::BAD_CONNECTION:
+		color = Qt::red;
+		break;
+	default:
+		color = Qt::black;
+		break;
+	}
+
+	painter.setPen(QPen(color, 2));
+
 	painter.drawLine(QLine(start, end));
 	painter.drawLine(QLine(arr1, end));
 	painter.drawLine(QLine(arr2, end));

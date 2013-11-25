@@ -31,6 +31,10 @@ public:
 	static std::vector<std::string> get_suggestions(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
 
 	void run_command();
+	void new_pad_added(const Glib::RefPtr<Gst::Pad>& pad);
+	void pad_removed(const Glib::RefPtr<Gst::Pad>& pad);
+	void pad_linked(const Glib::RefPtr<Gst::Pad>& pad);
+	void pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad);
 
 	Glib::RefPtr<Gst::Object> get_object() { return object; }
 };

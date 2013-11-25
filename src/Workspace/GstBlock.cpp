@@ -169,3 +169,14 @@ void GstBlock::set_info_parent(GstBlockInfo* info_parent)
 {
 	this->info_parent = info_parent;
 }
+
+GstPadWidget* GstBlock::find_pad(const std::string& name)
+{
+	for (auto pad : pads)
+	{
+		if ( pad->get_pad()->get_name().c_str() == name )
+			return pad;
+	}
+
+	return nullptr;
+}
