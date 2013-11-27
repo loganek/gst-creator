@@ -31,6 +31,15 @@ RefPtr<Pad> GstUtils::find_pad(std::string text, const RefPtr<Pipeline>& model)
 	return element->get_static_pad(pad_name.c_str());
 }
 
+RefPtr<PadTemplate> GstUtils::find_pad_template(std::string text, const RefPtr<Pipeline>& model)
+{
+	unsigned pos = text.find_last_of(":");
+	RefPtr<Element> element = find_element(text.substr(0, pos), model);
+	std::string pad_template_name = text.substr(pos + 1);
+
+	return element->get_pad_template(pad_template_name.c_str());
+}
+
 bool GstUtils::is_numeric_type(GType type)
 {
 	return (type == G_TYPE_ULONG) || (type == G_TYPE_LONG)
@@ -147,7 +156,7 @@ std::vector<std::string> GstUtils::get_properties_string(const RefPtr<Element>& 
 	return values;
 }
 
-std::vector<std::string> GstUtils::get_avaliable_pad_templates_string(const RefPtr<Element>& element)
+std::vector<std::string> GstUtils::get_avaliable_pad_templates_string(const RefPtr<Element>& element, bool recursive, const std::string& prefix)
 {
 	std::vector<std::string> values;
 
@@ -160,6 +169,22 @@ std::vector<std::string> GstUtils::get_avaliable_pad_templates_string(const RefP
 	for(std::vector<StaticPadTemplate>::iterator iter = pad_templates.begin();
 			iter != pad_templates.end(); ++iter )
 		values.push_back(iter->get_name_template().c_str());
+
+	if (recursive && GST_IS_BIN(element->gobj()))
+	{
+		RefPtr<Bin> bin = bin.cast_static(element);
+
+		auto iterator = bin->iterate_elements();
+
+		while (iterator.next())
+		{
+			if (GST_IS_BIN(iterator->gobj()))
+			{
+				auto ret = get_avaliable_pad_templates_string(*iterator, true, iterator->get_name().c_str() + std::string(":"));
+				values.insert(values.end(), ret.begin(), ret.end());
+			}
+		}
+	}
 
 	return values;
 }
