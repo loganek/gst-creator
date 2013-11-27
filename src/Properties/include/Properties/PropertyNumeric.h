@@ -22,11 +22,15 @@ private:
 protected:
 	virtual void build_widget();
 	virtual void init();
+	void read_var();
 public:
 	PropertyNumeric(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
 			T value);
+	PropertyNumeric(GParamSpec* param_spec,
+			const Glib::RefPtr<Gst::Element>& element);
 	void set_value();
+	std::string get_str_value() const;
 	void update_value()
 	{
 		set_value();
@@ -42,7 +46,15 @@ PropertyNumeric<T>::PropertyNumeric(GParamSpec* param_spec,
 		: Property(param_spec, element),
 		  value(value),
 		  value_edit(nullptr)
-		{}
+		  {}
+template<typename T>
+PropertyNumeric<T>::PropertyNumeric(GParamSpec* param_spec,
+		const Glib::RefPtr<Gst::Element>& element)
+		: Property(param_spec, element),
+		  value_edit(nullptr)
+		  {
+	read_var();
+		  }
 
 template<typename T>
 void PropertyNumeric<T>::set_value()
@@ -68,18 +80,30 @@ void PropertyNumeric<T>::build_widget()
 template<typename T>
 void PropertyNumeric<T>::init()
 {
-	element->get_property(param_spec->name, value);
+	read_var();
 	value_edit->setText(std::to_string(value).c_str());
 }
 
+template<typename T>
+void PropertyNumeric<T>::read_var()
+{
+	element->get_property(param_spec->name, value);
+}
+
+template<typename T>
+std::string PropertyNumeric<T>::get_str_value() const
+{
+	return std::to_string(value);
+}
+
 #define GET_MIN_MAX_FUNC(TYPE, Type, type) \
-template<> \
-void PropertyNumeric<type>::get_min_max(type& min, type& max) \
-{ \
+		template<> \
+		void PropertyNumeric<type>::get_min_max(type& min, type& max) \
+		{ \
 	GParamSpec##Type *pvalue = G_PARAM_SPEC_##TYPE(param_spec); \
 	min = pvalue->minimum; \
 	max = pvalue->maximum; \
-} \
+		} \
 
 GET_MIN_MAX_FUNC(DOUBLE, Double, double)
 GET_MIN_MAX_FUNC(FLOAT, Float, float)

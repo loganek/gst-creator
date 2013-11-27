@@ -16,6 +16,14 @@ PropertyBoolean::PropertyBoolean(GParamSpec* param_spec,
 {
 }
 
+PropertyBoolean::PropertyBoolean(GParamSpec* param_spec,
+		const Glib::RefPtr<Gst::Element>& element)
+: Property(param_spec, element),
+  checkbox(nullptr)
+{
+	read_var();
+}
+
 void PropertyBoolean::set_value()
 {
 	element->property(param_spec->name, value);
@@ -32,7 +40,17 @@ void PropertyBoolean::build_widget()
 
 void PropertyBoolean::init()
 {
-	element->get_property<bool>(param_spec->name, value);
+	read_var();
 	checkbox->setChecked(value);
 
+}
+
+void PropertyBoolean::read_var()
+{
+	element->get_property<bool>(param_spec->name, value);
+}
+
+std::string PropertyBoolean::get_str_value() const
+{
+	return std::to_string(value);
 }

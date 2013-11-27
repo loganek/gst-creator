@@ -20,15 +20,19 @@ private:
 protected:
 	virtual void build_widget();
 	virtual void init();
+	void read_var();
 
-private Q_SLOTS:
+	private Q_SLOTS:
 	void update_position(int pos);
-public:
+	public:
 	PropertyEnum(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
 			const std::string& value);
+	PropertyEnum(GParamSpec* param_spec,
+			const Glib::RefPtr<Gst::Element>& element);
 
 	void set_value();
+	std::string get_str_value() const;
 };
 
 #endif /* PROPERTYENUM_H_ */

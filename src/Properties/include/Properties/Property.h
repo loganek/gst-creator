@@ -31,6 +31,7 @@ public:
 	virtual ~Property();
 	QWidget* get_widget();
 	virtual void set_value() = 0;
+	virtual std::string get_str_value() const = 0;
 
 	static Property* build_property(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,

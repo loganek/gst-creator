@@ -50,19 +50,25 @@ Property* Property::build_property(GParamSpec* param_spec,
 	if (GstUtils::is_numeric_type(value_type))
 		return build_numeric_property(param_spec, element, value_type, str_value);
 	else if( G_IS_PARAM_SPEC_ENUM (param_spec))
-		return new PropertyEnum(param_spec, element, str_value);
+		return str_value.empty() ? new PropertyEnum(param_spec, element) :
+				new PropertyEnum(param_spec, element, str_value);
 	else if (!strcmp("GstCaps", g_type_name(value_type)))
-		return new PropertyCaps(param_spec, element,
-				Caps::create_from_string(str_value.c_str()));
+		return str_value.empty() ? new PropertyCaps(param_spec, element,
+				Caps::create_from_string(str_value.c_str())):
+				new PropertyCaps(param_spec, element,
+						Caps::create_from_string(str_value.c_str()));
 	else
 	{
 		switch (value_type)
 		{
 		case G_TYPE_BOOLEAN:
-			return new PropertyBoolean(param_spec, element,
-					StringUtils::str_to_numeric<bool>(str_value));
+			return str_value.empty() ?
+					new PropertyBoolean(param_spec, element):
+					new PropertyBoolean(param_spec, element,
+							StringUtils::str_to_numeric<bool>(str_value));
 		case G_TYPE_STRING:
-			return new PropertyString(param_spec, element, str_value);
+			return str_value.empty() ? new PropertyString(param_spec, element) :
+					new PropertyString(param_spec, element, str_value);
 		default:
 			return nullptr;
 		}
@@ -73,8 +79,10 @@ Property* Property::build_numeric_property(GParamSpec* param_spec,
 		const RefPtr<Element>& element, GType type, const std::string& value)
 {
 #define NUM_CASE(g_type, type) case g_type: \
-		return new PropertyNumeric<type>(param_spec, element, \
-				StringUtils::str_to_numeric<type>(value));
+		return value.empty() ? \
+				new PropertyNumeric<type>(param_spec, element): \
+				new PropertyNumeric<type>(param_spec, element, \
+						StringUtils::str_to_numeric<type>(value));
 
 	switch (type)
 	{

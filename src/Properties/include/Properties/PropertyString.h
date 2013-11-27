@@ -18,19 +18,23 @@ private:
 
 	QLineEdit* edit;
 
-public Q_SLOTS:
+	public Q_SLOTS:
 	void update_value(const QString& new_value);
 
-protected:
+	protected:
 	virtual void build_widget();
 	virtual void init();
+	void read_var();
 
 public:
 	PropertyString(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
 			const std::string& value);
+	PropertyString(GParamSpec* param_spec,
+			const Glib::RefPtr<Gst::Element>& element);
 
 	void set_value();
+	std::string get_str_value() const;
 };
 
 #endif /* PROPERTYSTRING_H_ */

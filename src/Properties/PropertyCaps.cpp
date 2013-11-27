@@ -15,6 +15,13 @@ PropertyCaps::PropertyCaps(GParamSpec* param_spec,
 {
 }
 
+PropertyCaps::PropertyCaps(GParamSpec* param_spec,
+		const Glib::RefPtr<Gst::Element>& element)
+: Property(param_spec, element)
+{
+	read_var();
+}
+
 void PropertyCaps::set_value()
 {
 	element->property(param_spec->name, value);
@@ -36,7 +43,18 @@ void PropertyCaps::build_widget()
 
 void PropertyCaps::init()
 {
+	read_var();
+	caps_edit->setText(tmp_value.c_str());
+}
+
+void PropertyCaps::read_var()
+{
 	element->get_property(param_spec->name, value);
 	tmp_value = value->to_string();
-	caps_edit->setText(tmp_value.c_str());
+}
+
+
+std::string PropertyCaps::get_str_value() const
+{
+	return value->to_string().c_str();
 }

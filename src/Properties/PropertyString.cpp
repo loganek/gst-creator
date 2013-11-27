@@ -16,6 +16,14 @@ PropertyString::PropertyString(GParamSpec* param_spec,
 {
 }
 
+PropertyString::PropertyString(GParamSpec* param_spec,
+		const Glib::RefPtr<Gst::Element>& element)
+: Property(param_spec, element),
+  edit(nullptr)
+{
+	read_var();
+}
+
 void PropertyString::set_value()
 {
 	element->property<Glib::ustring>(param_spec->name, value.c_str());
@@ -34,13 +42,23 @@ void PropertyString::build_widget()
 
 void PropertyString::init()
 {
-	Glib::ustring text;
-	element->get_property(param_spec->name, text);
-	edit->setText(text.c_str());
-	value = text.c_str();
+	read_var();
+	edit->setText(value.c_str());
 }
 
 void PropertyString::update_value(const QString& new_value)
 {
 	value = new_value.toUtf8().constData();
+}
+
+std::string PropertyString::get_str_value() const
+{
+	return value;
+}
+
+void PropertyString::read_var()
+{
+	Glib::ustring text;
+	element->get_property(param_spec->name, text);
+	value = text.c_str();
 }

@@ -19,11 +19,15 @@ private:
 protected:
 	virtual void build_widget();
 	virtual void init();
+	void read_var();
 public:
 	PropertyBoolean(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
 			bool value);
+	PropertyBoolean(GParamSpec* param_spec,
+			const Glib::RefPtr<Gst::Element>& element);
 
+	std::string get_str_value() const;
 	void set_value();
 };
 
