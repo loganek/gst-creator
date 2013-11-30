@@ -19,6 +19,7 @@ add_subdirectory(Commands)
 add_subdirectory(Logger)
 add_subdirectory(Properties)
 add_subdirectory(controller)
+add_subdirectory(qnelibrary)
 
 add_executable(gst-creator main.cpp)
 
