@@ -4,5 +4,5 @@ add_library(gui
 	MainWindow.cpp
 	${UIS_HDRS})
 
-target_link_libraries(gui Console Workspace ObjectInspector Logger)
+target_link_libraries(gui Console Workspace ObjectInspector Logger controller)
 qt5_use_modules(gui Widgets)

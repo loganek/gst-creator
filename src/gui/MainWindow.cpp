@@ -2,13 +2,17 @@
 #include "ui_MainWindow.h"
 #include "Console/ConsoleView.h"
 #include "Logger/LoggerView.h"
+#include "controller/FileController.h"
+#include "ObjectInspector/ObjectInspectorModel.h"
+#include "ObjectInspector/ObjectInspectorFilter.h"
 #include "Workspace/WorkspaceController.h"
 #include <QtWidgets/qmessagebox.h>
 #include <gstreamermm.h>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(FileController* file_controller, QWidget *parent)
 : QMainWindow(parent),
-ui(new Ui::MainWindow)
+  file_controller(file_controller),
+  ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
 	ui->objectInspectorFrame->layout()->addWidget(&plugins_tree);
@@ -16,6 +20,14 @@ ui(new Ui::MainWindow)
 	add_workspace_canvas();
 
 	setAcceptDrops(false);
+
+	ObjectInspectorFilter* filter = new ObjectInspectorFilter();
+	filter->setSourceModel(new ObjectInspectorModel());
+
+	connect(ui->factoryFilterEdit, SIGNAL(textChanged(QString)),
+			filter, SLOT(setFilterFixedString(QString)));
+
+	plugins_tree.setModel(filter);
 }
 
 void MainWindow::add_workspace_canvas()
@@ -27,14 +39,12 @@ void MainWindow::add_workspace_canvas()
 	ConsoleView* console = new ConsoleView();
 	LoggerView* logger = new LoggerView();
 
-	Glib::RefPtr<Gst::Pipeline> model = Gst::Pipeline::create(); // TODO model should be created in the other place
-
-	WorkspaceWidget* workspace = new WorkspaceWidget(model);
+	WorkspaceWidget* workspace = new WorkspaceWidget(file_controller->get_model());
 	QSplitter* spl = new QSplitter();
 
 	QObject::connect(console, &ConsoleView::command_added, logger, &LoggerView::add_log);
 	QObject::connect(console, &ConsoleView::command_added, workspace, &WorkspaceWidget::model_changed);
-	console->set_model(model);
+	console->set_model(file_controller->get_model());
 
 	QObject::connect(workspace, &WorkspaceWidget::current_element_changed, this, &MainWindow::current_element_info);
 
@@ -53,20 +63,23 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-void MainWindow::set_model(QAbstractItemModel* model)
-{
-	connect(ui->factoryFilterEdit, SIGNAL(textChanged(QString)),
-			model, SLOT(setFilterFixedString(QString)));
-
-	plugins_tree.setModel(model);
-}
-
 void MainWindow::on_actionAbout_triggered(bool checked)
 {
 	QMessageBox::about(this, "About GstCreator",
 			"Author:\tMarcin Kolny\n"
 			"E-mail:\tmarcin.kolny[at]gmail.com\n"
 			"License:\tGPL");
+}
+
+void MainWindow::on_actionSave_As_triggered(bool checked)
+{
+	QString filename = QFileDialog::getSaveFileName(this, "Save Project", QDir::currentPath(),
+			"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
+
+	if (filename.isNull())
+		return;
+
+	file_controller->save_model(filename.toUtf8().constData());
 }
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)

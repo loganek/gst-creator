@@ -1,17 +1,14 @@
 #include "gui/MainWindow.h"
-#include "ObjectInspector/ObjectInspectorModel.h"
-#include "ObjectInspector/ObjectInspectorFilter.h"
+#include "controller/FileController.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
 	Gst::init(argc, argv);
 	QApplication a(argc, argv);
-	MainWindow w;
-
-	ObjectInspectorFilter* filter = new ObjectInspectorFilter();
-	filter->setSourceModel(new ObjectInspectorModel());
-	w.set_model(filter);
+	Glib::RefPtr<Gst::Pipeline> model = Gst::Pipeline::create("main-pipeline");
+	FileController file_controller(model);
+	MainWindow w(&file_controller);
 
 	w.show();
 

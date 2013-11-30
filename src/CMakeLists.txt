@@ -18,6 +18,7 @@ add_subdirectory(Console)
 add_subdirectory(Commands)
 add_subdirectory(Logger)
 add_subdirectory(Properties)
+add_subdirectory(controller)
 
 add_executable(gst-creator main.cpp)
 
