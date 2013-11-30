@@ -12,6 +12,7 @@
 #include "Commands/Command.h"
 #include "GstConnection.h"
 #include "GstPadWidget.h"
+#include "qnelibrary.h"
 #include <QWidget>
 #include <QMimeData>
 #include <gstreamermm.h>
@@ -34,6 +35,8 @@ private:
 	QString get_new_name(const QString& name);
 	GstBlockInfo* find_block(const std::string& name);
 
+	QGraphicsItem* item_at(const QPointF &pos);
+	QGraphicsView* view;
 	QPixmap pixmap;
 	GstBlockInfo* current_info;
 	std::vector<GstBlockInfo*> blocks;
@@ -42,6 +45,10 @@ private:
 	Glib::RefPtr<Gst::Pipeline> model;
 
 	std::vector<GstConnection*> connections;
+
+	QGraphicsScene* scene;
+	QNEConnection* conn;
+	bool eventFilter(QObject *o, QEvent *e);
 
 protected:
 	void dragEnterEvent(QDragEnterEvent* event);
@@ -54,6 +61,8 @@ protected:
 public:
 	explicit WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent = 0);
 	virtual ~WorkspaceWidget();
+
+	void resizeEvent(QResizeEvent * event);
 
 Q_SIGNALS:
 	void current_element_changed(const Glib::RefPtr<Gst::Element>& element);

@@ -19,13 +19,38 @@ WorkspaceWidget::WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidg
   first_pad(nullptr),
   second_pad(nullptr),
   line_drag(false),
-  greenline(false)
+  greenline(false),
+  conn(nullptr)
 {
 	setAcceptDrops(true);
+	scene = new QGraphicsScene();
+	scene->installEventFilter(this);
+	view = new QGraphicsView(scene, this);
+	view->setRenderHint(QPainter::Antialiasing, true);
+	this->installEventFilter(this);
+
+
+	QNEBlock *b = new QNEBlock(0);
+	scene->addItem(b);
+	b->addPort("test", 0, QNEPort::NamePort);
+	b->addPort("TestBlock", 0, QNEPort::TypePort);
+	b->addInputPort("in1");
+	b->addInputPort("in2");
+	b->addInputPort("in3");
+	b->addOutputPort("out1");
+	b->addOutputPort("out2");
+	b->addOutputPort("out3");
+}
+
+void WorkspaceWidget::resizeEvent(QResizeEvent * event)
+{
+	view->resize(event->size());
 }
 
 WorkspaceWidget::~WorkspaceWidget()
 {
+	delete view;
+	delete scene;
 }
 
 bool WorkspaceWidget::check_mime_data(const QMimeData* mime_data) const
@@ -343,3 +368,99 @@ void WorkspaceWidget::model_changed(std::shared_ptr<Command> cmd)
 	}
 	}*/
 }
+
+
+QGraphicsItem* WorkspaceWidget::item_at(const QPointF &pos)
+{
+	QList<QGraphicsItem*> items = scene->items(QRectF(pos - QPointF(1,1), QSize(3,3)));
+
+	Q_FOREACH(QGraphicsItem *item, items)
+	if (item->type() > QGraphicsItem::UserType)
+		return item;
+
+	return nullptr;
+}
+
+bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
+{
+	QGraphicsSceneMouseEvent *me = (QGraphicsSceneMouseEvent*) e;
+
+	switch ((int) e->type())
+	{
+	case QEvent::GraphicsSceneMousePress:
+	{
+		switch ((int) me->button())
+		{
+		case Qt::LeftButton:
+		{
+			QGraphicsItem *item = item_at(me->scenePos());
+			if (item && item->type() == QNEPort::Type)
+			{
+				conn = new QNEConnection(0);
+				scene->addItem(conn);
+				conn->setPort1((QNEPort*) item);
+				conn->setPos1(item->scenePos());
+				conn->setPos2(me->scenePos());
+				conn->updatePath();
+
+				return true;
+			} else if (item && item->type() == QNEBlock::Type)
+			{
+				/* if (selBlock)
+					selBlock->setSelected(); */
+				// selBlock = (QNEBlock*) item;
+			}
+			break;
+		}
+		case Qt::RightButton:
+		{
+			QGraphicsItem *item = item_at(me->scenePos());
+			if (item && (item->type() == QNEConnection::Type || item->type() == QNEBlock::Type))
+				delete item;
+			// if (selBlock == (QNEBlock*) item)
+			// selBlock = 0;
+			break;
+		}
+		}
+	}
+	case QEvent::GraphicsSceneMouseMove:
+	{
+		if (conn)
+		{
+			conn->setPos2(me->scenePos());
+			conn->updatePath();
+			return true;
+		}
+		break;
+	}
+	case QEvent::GraphicsSceneMouseRelease:
+	{
+		if (conn && me->button() == Qt::LeftButton)
+		{
+			QGraphicsItem *item = item_at(me->scenePos());
+			if (item && item->type() == QNEPort::Type)
+			{
+				QNEPort *port1 = conn->port1();
+				QNEPort *port2 = (QNEPort*) item;
+
+				if (port1->block() != port2->block() && port1->isOutput() != port2->isOutput() && !port1->isConnected(port2))
+				{
+					conn->setPos2(port2->scenePos());
+					conn->setPort2(port2);
+					conn->updatePath();
+					conn = 0;
+					return true;
+				}
+			}
+
+			delete conn;
+			conn = 0;
+			return true;
+		}
+		break;
+	}
+	}
+	return QObject::eventFilter(o, e);
+}
+
+

@@ -26,6 +26,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/Logger/include
 	${PROJECT_SOURCE_DIR}/Properties/include
 	${PROJECT_SOURCE_DIR}/controller/include
+	${PROJECT_SOURCE_DIR}/qnelibrary/include
 	${PROJECT_SOURCE_DIR}
 )
 
