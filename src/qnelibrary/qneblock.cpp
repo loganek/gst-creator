@@ -47,17 +47,17 @@ QNEBlock::QNEBlock(QGraphicsItem *parent) : QGraphicsPathItem(parent)
 	height = vertMargin;
 }
 
-QNEPort* QNEBlock::addPort(const QString &name, bool isOutput, int flags, int ptr)
+QNEPort* QNEBlock::addPort(const Glib::RefPtr<Gst::Object>& model, bool isOutput, int flags, int ptr)
 {
-	QNEPort *port = new QNEPort(this);
-	port->setName(name);
+	QNEPort *port = new QNEPort(model, this);
+	port->setName(model->get_name().c_str());
 	port->setIsOutput(isOutput);
 	port->setNEBlock(this);
 	port->setPortFlags(flags);
 	port->setPtr(ptr);
 
 	QFontMetrics fm(scene()->font());
-	int w = fm.width(name);
+	int w = fm.width(model->get_name().c_str());
 	int h = fm.height();
 	// port->setPos(0, height + h/2);
 	if (w > width - horzMargin)
@@ -84,26 +84,14 @@ QNEPort* QNEBlock::addPort(const QString &name, bool isOutput, int flags, int pt
 	return port;
 }
 
-void QNEBlock::addInputPort(const QString &name)
+void QNEBlock::addInputPort(const Glib::RefPtr<Gst::Object>& model)
 {
-	addPort(name, false);
+	addPort(model, false);
 }
 
-void QNEBlock::addOutputPort(const QString &name)
+void QNEBlock::addOutputPort(const Glib::RefPtr<Gst::Object>& model)
 {
-	addPort(name, true);
-}
-
-void QNEBlock::addInputPorts(const QStringList &names)
-{
-	Q_FOREACH(QString n, names)
-		addInputPort(n);
-}
-
-void QNEBlock::addOutputPorts(const QStringList &names)
-{
-	Q_FOREACH(QString n, names)
-		addOutputPort(n);
+	addPort(model, true);
 }
 
 void QNEBlock::save(QDataStream &ds)
@@ -153,7 +141,7 @@ void QNEBlock::load(QDataStream &ds, QMap<quint64, QNEPort*> &portMap)
 		ds >> name;
 		ds >> output;
 		ds >> flags;
-		portMap[ptr] = addPort(name, output, flags, ptr);
+		// portMap[ptr] = addPort(name, output, flags, ptr); fixme is this function needed?
 	}
 }
 
@@ -185,7 +173,7 @@ QNEBlock* QNEBlock::clone()
 		if (port_->type() == QNEPort::Type)
 		{
 			QNEPort *port = (QNEPort*) port_;
-			b->addPort(port->portName(), port->isOutput(), port->portFlags(), port->ptr());
+			b->addPort(port->get_model(), port->isOutput(), port->portFlags(), port->ptr());
 		}
 	}
 

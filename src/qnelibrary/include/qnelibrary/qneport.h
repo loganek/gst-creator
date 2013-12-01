@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #ifndef QNEPORT_H
 #define QNEPORT_H
 
+#include <gstreamermm.h>
 #include <QGraphicsPathItem>
 
 class QNEBlock;
@@ -37,7 +38,7 @@ public:
 	enum { Type = QGraphicsItem::UserType + 1 };
 	enum { NamePort = 1, TypePort = 2 };
 
-    QNEPort(QGraphicsItem *parent = 0);
+    QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent = 0);
 	~QNEPort();
 
 	void setNEBlock(QNEBlock*);
@@ -60,6 +61,8 @@ public:
 
 	bool isConnected(QNEPort*);
 
+	Glib::RefPtr<Gst::Object> get_model() { return model; }
+
 protected:
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
@@ -73,6 +76,7 @@ private:
 	QVector<QNEConnection*> m_connections;
 	int m_portFlags;
 	quint64 m_ptr;
+	Glib::RefPtr<Gst::Object> model;
 };
 
 #endif // QNEPORT_H

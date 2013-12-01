@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #ifndef QNEBLOCK_H
 #define QNEBLOCK_H
 
+#include <gstreamermm.h>
 #include <QGraphicsPathItem>
 
 class QNEPort;
@@ -37,11 +38,9 @@ public:
 
     QNEBlock(QGraphicsItem *parent = 0);
 
-	QNEPort* addPort(const QString &name, bool isOutput, int flags = 0, int ptr = 0);
-	void addInputPort(const QString &name);
-	void addOutputPort(const QString &name);
-	void addInputPorts(const QStringList &names);
-	void addOutputPorts(const QStringList &names);
+	QNEPort* addPort(const Glib::RefPtr<Gst::Object>& model, bool isOutput, int flags = 0, int ptr = 0);
+	void addInputPort(const Glib::RefPtr<Gst::Object>& model);
+	void addOutputPort(const Glib::RefPtr<Gst::Object>& model);
 	void save(QDataStream&);
 	void load(QDataStream&, QMap<quint64, QNEPort*> &portMap);
 	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

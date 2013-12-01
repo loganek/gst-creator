@@ -240,6 +240,15 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 
 				if (port1->block() != port2->block() && port1->isOutput() != port2->isOutput() && !port1->isConnected(port2))
 				{
+					ConnectCommand* cmd;
+					if (port1->isOutput())
+						cmd = new ConnectCommand(port1->get_model(), port2->get_model());
+					else
+						cmd = new ConnectCommand(port2->get_model(), port1->get_model());
+
+					cmd->run_command();
+					delete cmd;
+
 					conn->setPos2(port2->scenePos());
 					conn->setPort2(port2);
 					conn->updatePath();
@@ -285,16 +294,16 @@ void WorkspaceWidget::new_element_added(const Glib::RefPtr<Gst::Element>& elemen
 {
 	QNEBlock *b = new QNEBlock(0);
 	scene->addItem(b);
-	b->addPort(element->get_name().c_str(), 0, QNEPort::NamePort);
+	b->addPort(element, 0, QNEPort::NamePort);
 
 	auto pad_iterator = element->iterate_pads();
 
 	while (pad_iterator.next())
 	{
 		if (pad_iterator->get_direction() == Gst::PAD_SINK)
-			b->addInputPort(pad_iterator->get_name().c_str());
+			b->addInputPort(*pad_iterator);
 		else if (pad_iterator->get_direction() == Gst::PAD_SRC)
-			b->addOutputPort(pad_iterator->get_name().c_str());
+			b->addOutputPort(*pad_iterator);
 	}
 
 	b->setPos(last_point);

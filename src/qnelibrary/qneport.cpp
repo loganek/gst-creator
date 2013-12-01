@@ -32,8 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "qneconnection.h"
 
-QNEPort::QNEPort(QGraphicsItem *parent):
-    QGraphicsPathItem(parent)
+QNEPort::QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent):
+    QGraphicsPathItem(parent),
+    model(model)
 {
 	label = new QGraphicsTextItem(this);
 
