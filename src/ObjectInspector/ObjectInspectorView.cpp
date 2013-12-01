@@ -38,8 +38,7 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	element->reference();
 	GstBlock* block = new GstBlock(element, this);
 
-	int val = reinterpret_cast<int>(block);
-	data_stream << current_location << val;
+	data_stream << current_location << current_text;
 
 	QMimeData *mime_data = new QMimeData;
 	mime_data->setData(DRAG_DROP_FORMAT, itemData);

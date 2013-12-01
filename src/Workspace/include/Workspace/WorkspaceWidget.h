@@ -31,32 +31,16 @@ private:
 	GstPadWidget* second_pad;
 
 	bool check_mime_data(const QMimeData* mime_data) const;
-	void set_style_sheet(const char* style_sheet);
 	QString get_new_name(const QString& name);
-	GstBlockInfo* find_block(const std::string& name);
 
 	QGraphicsItem* item_at(const QPointF &pos);
 	QGraphicsView* view;
-	QPixmap pixmap;
-	GstBlockInfo* current_info;
-	std::vector<GstBlockInfo*> blocks;
-	QPoint curr_line_pos;
 
 	Glib::RefPtr<Gst::Pipeline> model;
-
-	std::vector<GstConnection*> connections;
 
 	QGraphicsScene* scene;
 	QNEConnection* conn;
 	bool eventFilter(QObject *o, QEvent *e);
-
-protected:
-	void dragEnterEvent(QDragEnterEvent* event);
-	void dragMoveEvent(QDragMoveEvent* event);
-	void dragLeaveEvent(QDragLeaveEvent* event);
-	void dropEvent(QDropEvent* event);
-	void paintEvent(QPaintEvent* event);
-	void mousePressEvent(QMouseEvent* event);
 
 public:
 	explicit WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent = 0);
@@ -64,11 +48,11 @@ public:
 
 	void resizeEvent(QResizeEvent * event);
 
+	void new_element_added(const Glib::RefPtr<Gst::Element>& element);
+
 Q_SIGNALS:
 	void current_element_changed(const Glib::RefPtr<Gst::Element>& element);
 
-public Q_SLOTS:
-	void model_changed(std::shared_ptr<Command> cmd);
 };
 
 

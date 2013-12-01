@@ -43,7 +43,6 @@ void MainWindow::add_workspace_canvas()
 	QSplitter* spl = new QSplitter();
 
 	QObject::connect(console, &ConsoleView::command_added, logger, &LoggerView::add_log);
-	QObject::connect(console, &ConsoleView::command_added, workspace, &WorkspaceWidget::model_changed);
 	console->set_model(file_controller->get_model());
 
 	QObject::connect(workspace, &WorkspaceWidget::current_element_changed, this, &MainWindow::current_element_info);
@@ -56,6 +55,11 @@ void MainWindow::add_workspace_canvas()
 	frameLayout->addWidget(console);
 	frameLayout->addWidget(logger);
 	ui->rightFrame->layout()->addWidget(spl);
+
+	file_controller->get_model()->signal_element_added().connect([workspace](const Glib::RefPtr<Gst::Element>& e)
+				{
+					workspace->new_element_added(e);
+				});
 }
 
 MainWindow::~MainWindow()
