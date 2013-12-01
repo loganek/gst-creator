@@ -45,7 +45,7 @@ void AddCommand::pad_unlinked(const RefPtr<Pad>& pad)
 	// todo
 }
 
-void AddCommand::run_command()
+void AddCommand::run_command(CommandListener* listener)
 {
 	if (type == ObjectType::PAD)
 	{
@@ -66,8 +66,23 @@ void AddCommand::run_command()
 			RefPtr<Pipeline> pipeline = pipeline.cast_static(parent);
 			RefPtr<Element> element = element.cast_static(object);
 			pipeline->add(element);
-			element->signal_pad_added().connect(sigc::mem_fun(this ,&AddCommand::new_pad_added));
-			element->signal_pad_removed().connect(sigc::mem_fun(this ,&AddCommand::pad_removed));
+			element->signal_pad_added().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
+				if (listener != nullptr)
+					listener->pad_added(pad);
+
+				pad->signal_linked().connect([&pad, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
+					if (listener != nullptr)
+						listener->pad_linked(pad, sec_pad);
+				});
+				pad->signal_unlinked().connect([&pad, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
+					if (listener != nullptr)
+						listener->pad_unlinked(pad);
+				});
+			});
+			element->signal_pad_removed().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
+				if (listener != nullptr)
+					listener->pad_removed(pad);
+			});
 		}
 		else
 			throw runtime_error("cannot run command: invalid parent or object type");

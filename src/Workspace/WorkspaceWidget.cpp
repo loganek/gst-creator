@@ -282,7 +282,7 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 		QString new_name = get_new_name(element->get_name().c_str());
 		element->set_name(new_name.toUtf8().constData());
 		AddCommand cmd(ObjectType::ELEMENT, model, element);
-		cmd.run_command();
+		cmd.run_command(this);
 		last_point = me->scenePos();
 		return true;
 	}
@@ -292,7 +292,7 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 
 void WorkspaceWidget::new_element_added(const Glib::RefPtr<Gst::Element>& element)
 {
-	QNEBlock *b = new QNEBlock(0);
+	QNEBlock *b = new QNEBlock(element, 0);
 	scene->addItem(b);
 	b->addPort(element, 0, QNEPort::NamePort);
 
@@ -307,4 +307,108 @@ void WorkspaceWidget::new_element_added(const Glib::RefPtr<Gst::Element>& elemen
 	}
 
 	b->setPos(last_point);
+}
+
+QNEBlock* WorkspaceWidget::find_block(const Glib::RefPtr<Gst::Element>& element)
+{
+	QList<QGraphicsItem*> items = scene->items();
+
+	for (auto item : items)
+	{
+		if (item && item->type() == QNEBlock::Type)
+		{
+			QNEBlock* block = static_cast<QNEBlock*>(item);
+
+			if (block && block->get_model() == element)
+				return block;
+		}
+	}
+
+	return nullptr;
+}
+
+void WorkspaceWidget::pad_added(const Glib::RefPtr<Gst::Pad>& pad)
+{
+	QNEBlock* block = find_block(pad->get_parent_element());
+
+	if (block == nullptr)
+		return;
+
+	if (pad->get_direction() == Gst::PAD_SINK)
+		block->addInputPort(pad);
+	else if (pad->get_direction() == Gst::PAD_SRC)
+		block->addOutputPort(pad);
+}
+
+void WorkspaceWidget::pad_linked(const Glib::RefPtr<Gst::Pad>& first, const Glib::RefPtr<Gst::Pad>& second)
+{
+	QNEBlock* first_block = find_block(first->get_parent_element()),
+			*second_block = find_block(second->get_parent_element());
+	QNEPort* first_port = nullptr, *second_port = nullptr;
+
+	if (first_block == nullptr || second_block == nullptr)
+		return;
+
+	first_port = first_block->find_port(first);
+	second_port = second_block->find_port(second);
+
+	if (first_port == nullptr || second_port == nullptr)
+		return;
+
+	QNEConnection* connection = new QNEConnection(0);
+	scene->addItem(connection);
+	connection->setPos2(second_port->scenePos());
+	connection->setPort2(second_port);
+	connection->setPos1(first_port->scenePos());
+	connection->setPort1(first_port);
+	connection->updatePath();
+}
+
+void WorkspaceWidget::pad_removed(const Glib::RefPtr<Gst::Pad>& pad)
+{
+	QNEBlock* block = find_block(pad->get_parent_element());
+
+	if (block == nullptr)
+		return;
+
+	QNEPort* port = block->find_port(pad);
+
+	if (port == nullptr)
+		return;
+
+	delete port;
+}
+
+void WorkspaceWidget::pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad)
+{
+	if (!pad->get_peer())
+		return;
+
+	QNEBlock* second_block = find_block(pad->get_parent_element());
+	QNEPort* second_port = nullptr;
+
+	if (second_block == nullptr)
+		return;
+
+	second_port = second_block->find_port(pad);
+
+	if (second_port == nullptr)
+		return;
+
+	QList<QGraphicsItem*> items = scene->items();
+
+	for (auto item : items)
+	{
+		if (item && item->type() == QNEConnection::Type)
+		{
+			QNEConnection* con = static_cast<QNEConnection*>(item);
+			if (con->port1() && con->port2() &&
+					(con->port2()->get_model() == second_port->get_model() ||
+							con->port1()->get_model() == second_port->get_model()))
+			{
+				delete con;
+				break;
+			}
+		}
+	}
 }

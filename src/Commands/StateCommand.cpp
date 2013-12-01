@@ -28,7 +28,7 @@ StateCommand* StateCommand::from_args(const std::vector<std::string>& vect, cons
 	return new StateCommand(state, model);
 }
 
-void StateCommand::run_command()
+void StateCommand::run_command(CommandListener* listener)
 {
 	Gst::State gst_state;
 

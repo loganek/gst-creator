@@ -37,7 +37,7 @@ PropertyCommand::~PropertyCommand()
 	delete property;
 }
 
-void PropertyCommand::run_command()
+void PropertyCommand::run_command(CommandListener* listener)
 {
 	if (run_window)
 	{

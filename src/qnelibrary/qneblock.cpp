@@ -3,12 +3,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of STANISLAW ADASZEWSKI nor the
+ * Neither the name of STANISLAW ADASZEWSKI nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "qneport.h"
 
-QNEBlock::QNEBlock(QGraphicsItem *parent) : QGraphicsPathItem(parent)
+QNEBlock::QNEBlock(const Glib::RefPtr<Gst::Element>& model, QGraphicsItem *parent)
+: QGraphicsPathItem(parent),
+  model(model)
 {
 	QPainterPath p;
 	p.addRoundedRect(-50, -15, 100, 30, 5, 5);
@@ -69,7 +71,7 @@ QNEPort* QNEBlock::addPort(const Glib::RefPtr<Gst::Object>& model, bool isOutput
 	setPath(p);
 
 	int y = -height / 2 + vertMargin + port->radius();
-    Q_FOREACH(QGraphicsItem *port_, childItems()) {
+	Q_FOREACH(QGraphicsItem *port_, childItems()) {
 		if (port_->type() != QNEPort::Type)
 			continue;
 
@@ -100,7 +102,7 @@ void QNEBlock::save(QDataStream &ds)
 
 	int count(0);
 
-    Q_FOREACH(QGraphicsItem *port_, childItems())
+	Q_FOREACH(QGraphicsItem *port_, childItems())
 	{
 		if (port_->type() != QNEPort::Type)
 			continue;
@@ -110,7 +112,7 @@ void QNEBlock::save(QDataStream &ds)
 
 	ds << count;
 
-    Q_FOREACH(QGraphicsItem *port_, childItems())
+	Q_FOREACH(QGraphicsItem *port_, childItems())
 	{
 		if (port_->type() != QNEPort::Type)
 			continue;
@@ -150,23 +152,23 @@ void QNEBlock::load(QDataStream &ds, QMap<quint64, QNEPort*> &portMap)
 void QNEBlock::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	Q_UNUSED(option)
-	Q_UNUSED(widget)
+			Q_UNUSED(widget)
 
-	if (isSelected()) {
-		painter->setPen(QPen(Qt::darkYellow));
-		painter->setBrush(Qt::yellow);
-	} else {
-		painter->setPen(QPen(Qt::darkGreen));
-		painter->setBrush(Qt::green);
-	}
+			if (isSelected()) {
+				painter->setPen(QPen(Qt::darkYellow));
+				painter->setBrush(Qt::yellow);
+			} else {
+				painter->setPen(QPen(Qt::darkGreen));
+				painter->setBrush(Qt::green);
+			}
 
 	painter->drawPath(path());
 }
 
 QNEBlock* QNEBlock::clone()
 {
-    QNEBlock *b = new QNEBlock(0);
-    this->scene()->addItem(b);
+	QNEBlock *b = new QNEBlock(model, 0);
+	this->scene()->addItem(b);
 
 	Q_FOREACH(QGraphicsItem *port_, childItems())
 	{
@@ -194,8 +196,21 @@ QVector<QNEPort*> QNEBlock::ports()
 QVariant QNEBlock::itemChange(GraphicsItemChange change, const QVariant &value)
 {
 
-    Q_UNUSED(change);
+	Q_UNUSED(change);
 
 	return value;
 }
 
+QNEPort* QNEBlock::find_port(const Glib::RefPtr<Gst::Pad>& model)
+{
+	auto items = childItems();
+	for (auto item : items)
+		if (item && item->type() == QNEPort::Type)
+		{
+			QNEPort* port = static_cast<QNEPort*>(item);
+			if (port->get_model() == model)
+				return port;
+		}
+
+	return nullptr;
+}

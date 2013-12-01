@@ -52,7 +52,7 @@ DisconnectCommand* DisconnectCommand::from_args(const vector<string>& args, cons
 	}
 }
 
-void DisconnectCommand::run_command()
+void DisconnectCommand::run_command(CommandListener* listener)
 {
 	if (type == ObjectType::ELEMENT)
 	{

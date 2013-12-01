@@ -25,7 +25,7 @@ RemoveCommand::~RemoveCommand()
 {
 }
 
-void RemoveCommand::run_command()
+void RemoveCommand::run_command(CommandListener* listener)
 {
 	RefPtr<Object> parent = object->get_parent();
 

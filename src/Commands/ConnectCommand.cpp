@@ -140,7 +140,7 @@ ConnectCommand* ConnectCommand::from_args(const vector<string>& args, const Glib
 	}
 }
 
-void ConnectCommand::run_command()
+void ConnectCommand::run_command(CommandListener* listener)
 {
 	if (type == ObjectType::ELEMENT)
 	{

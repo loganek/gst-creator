@@ -13,12 +13,13 @@
 #include "GstConnection.h"
 #include "GstPadWidget.h"
 #include "qnelibrary.h"
+#include "Commands/CommandListener.h"
 #include <QWidget>
 #include <QMimeData>
 #include <gstreamermm.h>
 #include <vector>
 
-class WorkspaceWidget : public QWidget
+class WorkspaceWidget : public QWidget, public CommandListener
 {
 	Q_OBJECT
 private:
@@ -42,6 +43,8 @@ private:
 	QNEConnection* conn;
 	bool eventFilter(QObject *o, QEvent *e);
 
+	QNEBlock* find_block(const Glib::RefPtr<Gst::Element>& element);
+
 public:
 	explicit WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent = 0);
 	virtual ~WorkspaceWidget();
@@ -49,10 +52,13 @@ public:
 	void resizeEvent(QResizeEvent * event);
 
 	void new_element_added(const Glib::RefPtr<Gst::Element>& element);
+	void pad_added(const Glib::RefPtr<Gst::Pad>& pad);
+	void pad_linked(const Glib::RefPtr<Gst::Pad>& first, const Glib::RefPtr<Gst::Pad>& second);
+	void pad_removed(const Glib::RefPtr<Gst::Pad>& pad);
+	void pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad);
 
 Q_SIGNALS:
 	void current_element_changed(const Glib::RefPtr<Gst::Element>& element);
-
 };
 
 

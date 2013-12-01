@@ -15,5 +15,6 @@
 #include "Commands/DisconnectCommand.h"
 #include "Commands/PropertyCommand.h"
 #include "Commands/RemoveCommand.h"
+#include "Commands/CommandListener.h"
 
 #endif /* COMMANDS_H_ */

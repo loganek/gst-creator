@@ -9,6 +9,7 @@
 #define COMMAND_H_
 
 #include "utils/StringUtils.h"
+#include "CommandListener.h"
 #include <stdexcept>
 #include <vector>
 #include <gstreamermm.h>
@@ -64,7 +65,7 @@ public:
 		return type;
 	}
 
-	virtual void run_command() = 0;
+	virtual void run_command(CommandListener* listener = nullptr) = 0;
 
 	static void syntax_error(const std::string& error)
 	{
