@@ -211,7 +211,7 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 				delete cmd;
 			}
 
-			if (item && (item->type() == QNEBlock::Type))
+			else if (item && (item->type() == QNEBlock::Type))
 			{
 				QNEBlock* block = static_cast<QNEBlock*>(item);
 				RemoveCommand cmd(ObjectType::ELEMENT, block->get_model());
@@ -364,6 +364,8 @@ void WorkspaceWidget::pad_added(const Glib::RefPtr<Gst::Pad>& pad)
 
 void WorkspaceWidget::pad_linked(const Glib::RefPtr<Gst::Pad>& pad)
 {
+	if (pad->get_direction() == Gst::PAD_SINK)
+		return;
 	QNEBlock* first_block = find_block(pad->get_peer()->get_parent_element()),
 			*second_block = find_block(pad->get_parent_element());
 	QNEPort* first_port = nullptr, *second_port = nullptr;
@@ -403,18 +405,15 @@ void WorkspaceWidget::pad_removed(const Glib::RefPtr<Gst::Pad>& pad)
 
 void WorkspaceWidget::pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad)
 {
-	if (!pad->get_peer())
+	QNEBlock* block = find_block(pad->get_parent_element());
+	QNEPort* port = nullptr;
+
+	if (block == nullptr)
 		return;
 
-	QNEBlock* second_block = find_block(pad->get_parent_element());
-	QNEPort* second_port = nullptr;
+	port = block->find_port(pad);
 
-	if (second_block == nullptr)
-		return;
-
-	second_port = second_block->find_port(pad);
-
-	if (second_port == nullptr)
+	if (port == nullptr)
 		return;
 
 	QList<QGraphicsItem*> items = scene->items();
@@ -425,10 +424,10 @@ void WorkspaceWidget::pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad)
 		{
 			QNEConnection* con = static_cast<QNEConnection*>(item);
 			if (con->port1() && con->port2() &&
-					(con->port2()->get_model() == second_port->get_model() ||
-							con->port1()->get_model() == second_port->get_model()))
+					(con->port2()->get_model() == port->get_model() ||
+							con->port1()->get_model() == port->get_model()))
 			{
-				delete con;
+				delete item;
 				break;
 			}
 		}
