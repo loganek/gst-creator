@@ -38,7 +38,7 @@ public:
 	enum { Type = QGraphicsItem::UserType + 1 };
 	enum { NamePort = 1, TypePort = 2 };
 
-    QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent = 0);
+	QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent = 0);
 	~QNEPort();
 
 	void setNEBlock(QNEBlock*);
@@ -61,12 +61,13 @@ public:
 
 	bool isConnected(QNEPort*);
 
-	Glib::RefPtr<Gst::Object> get_model() { return model; }
-
+	Glib::RefPtr<Gst::Object> get_object_model() { return model; }
+	bool is_template_model() { return GST_IS_PAD_TEMPLATE(model->gobj()); }
 protected:
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
+
 	QNEBlock *m_block;
 	QString name;
 	bool isOutput_;

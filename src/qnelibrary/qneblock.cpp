@@ -152,15 +152,15 @@ void QNEBlock::load(QDataStream &ds, QMap<quint64, QNEPort*> &portMap)
 void QNEBlock::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 	Q_UNUSED(option)
-			Q_UNUSED(widget)
+							Q_UNUSED(widget)
 
-			if (isSelected()) {
-				painter->setPen(QPen(Qt::darkYellow));
-				painter->setBrush(Qt::yellow);
-			} else {
-				painter->setPen(QPen(Qt::darkGreen));
-				painter->setBrush(Qt::green);
-			}
+							if (isSelected()) {
+								painter->setPen(QPen(Qt::darkYellow));
+								painter->setBrush(Qt::yellow);
+							} else {
+								painter->setPen(QPen(Qt::darkGreen));
+								painter->setBrush(Qt::green);
+							}
 
 	painter->drawPath(path());
 }
@@ -175,7 +175,7 @@ QNEBlock* QNEBlock::clone()
 		if (port_->type() == QNEPort::Type)
 		{
 			QNEPort *port = (QNEPort*) port_;
-			b->addPort(port->get_model(), port->isOutput(), port->portFlags(), port->ptr());
+			b->addPort(port->get_object_model(), port->isOutput(), port->portFlags(), port->ptr());
 		}
 	}
 
@@ -208,7 +208,7 @@ QNEPort* QNEBlock::find_port(const Glib::RefPtr<Gst::Pad>& model)
 		if (item && item->type() == QNEPort::Type)
 		{
 			QNEPort* port = static_cast<QNEPort*>(item);
-			if (port->get_model() == model)
+			if (port->get_object_model() == model)
 				return port;
 		}
 

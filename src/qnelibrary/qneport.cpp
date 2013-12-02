@@ -3,12 +3,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of STANISLAW ADASZEWSKI nor the
+ * Neither the name of STANISLAW ADASZEWSKI nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "qneconnection.h"
 
-QNEPort::QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent):
-    QGraphicsPathItem(parent),
-    model(model)
+QNEPort::QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent)
+: QGraphicsPathItem(parent),
+  model(model)
 {
 	label = new QGraphicsTextItem(this);
 
@@ -56,7 +56,7 @@ QNEPort::QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent):
 QNEPort::~QNEPort()
 {
 	Q_FOREACH(QNEConnection *conn, m_connections)
-		delete conn;
+						delete conn;
 }
 
 void QNEPort::setNEBlock(QNEBlock *b)
@@ -135,8 +135,8 @@ void QNEPort::setPtr(quint64 p)
 bool QNEPort::isConnected(QNEPort *other)
 {
 	Q_FOREACH(QNEConnection *conn, m_connections)
-		if (conn->port1() == other || conn->port2() == other)
-			return true;
+						if (conn->port1() == other || conn->port2() == other)
+							return true;
 
 	return false;
 }
@@ -146,10 +146,10 @@ QVariant QNEPort::itemChange(GraphicsItemChange change, const QVariant &value)
 	if (change == ItemScenePositionHasChanged)
 	{
 		Q_FOREACH(QNEConnection *conn, m_connections)
-		{
+						{
 			conn->updatePosFromPorts();
 			conn->updatePath();
-		}
+						}
 	}
 	return value;
 }
