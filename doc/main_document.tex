@@ -9,6 +9,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{floatrow}
+\usepackage{listings}
+\usepackage{color}
 \linespread{1.5}
 \title{Narzędzie wspomagające tworzenie ciągów przetwarzania wideo w oparciu o bibliotekę GStreamer}
 \author{Marcin Kolny}
@@ -49,6 +51,25 @@
   \end{titlepage}
 }
 \begin{document}
+\definecolor{cppred}{rgb}{0.6,0,0} % strings
+\definecolor{cppgreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{cpppurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{cppblue}{rgb}{0.25,0.35,0.75} % doxygen
+\definecolor{lightgrey}{rgb}{0.9,0.9,0.9}
+\lstset{language=C++,
+basicstyle=\ttfamily,
+keywordstyle=\color{cpppurple}\bfseries,
+stringstyle=\color{cppred},
+commentstyle=\color{cppgreen},
+morecomment=[s][\color{cppblue}]{/**}{*/},
+numbers=left,
+backgroundcolor=\color{lightgrey},
+numberstyle=\tiny\color{black},
+stepnumber=1,
+numbersep=10pt,
+tabsize=4,
+showspaces=false,
+showstringspaces=false}
 \maketitle
 \tableofcontents
 \cleardoublepage
@@ -116,11 +137,50 @@ Ostatnia grupa, to gniazda, pojawiające się na żądanie użytkownika. Można 
 
 \textbf{Połączenia} (ang. \textit{links}) pomiędzy dwoma elementami odbywają się przez tzw. \textit{negocjacje}. Każde gniazdo elementu posiada właściwość określającą, jakiego typu dane akceptuje dane gniazdo. Właściwości te nazywane są możliwościami (ang. \textit{capabilities}, \textit{caps}). Proces negocjacji ma na celu odnalezienie wspólnego formatu danych, jaki może zostać zaakceptowany przez odybwa gniazda (gniazdo wejściowe oraz wyjściowe), które użytkownik chce ze sobą połączyć. Jeśli negocjacje zakończą się niepowodzeniem (to znaczy, nie uda się znaleźć wspólnego formatu), połączenie nie zostanie wykonane.
 
+\subsubsection{Adapter C++ - gstreamermm}
+\paragraph{}
+Adapter (ang. \textit{wrapper}) jest wzorcem projektowym, który ma na celu uwspólnienie interfejsu pomiędzy dwoma blokami kodu źródłowego. Biblioteka GStreamer została napisana w języku ANSI C, dla tego, aby umożliwić programistom innych języków korzystanie z biblioteki, nie mieszając różnych języków, powstało kilka adapterów dla innych języków programowania (np. C++ czy C\#).
+
+\textbf{gstreamermm} to projekt, którego celem jest stworzenie biblioteki-adaptera w języku C++ dla biblioteki GStreamer. Projekt rozwijany jest na licencji LGPL, dla tego każdy może uzyskać dostęp do kodu źródłowego biblioteki, a także w dowolny sposób modyfikować źródła.
+
+Biblioteka gstreamermm należy do rodziny projektów pochodzących od \textbf{gtkmm}. Projekty te opierają się głównie o generowanie kodu źródłowego w języku C++ na podstawie źródeł napisanych w języku ANSI C. Wszystkie projekty korzystają ze wspólnych generatorów kodu.
+
+Kod źródłowy biblioteki jest w większości \textit{autogenerowany} na podstawie źródeł projektu GStreamer w trójetapowym procesie. Rysunek ~\ref{fig:mmGenerateProcess} prezentuje wszystkie trzy kroki procesu generacji kodu źródłowego.
+\begin{figure}[H]
+  \includegraphics[width=100mm]{img/mm-generate-process.png}
+  \caption{Schemat procesu generacji kodu źródłowego biblioteki gstreamermm}
+  \label{fig:mmGenerateProcess}
+\end{figure}
+\begin{enumerate}
+ \setlength{\itemsep}{0em}
+  \item Pierwszym etapem generacji kodu jest przeszukanie źródeł biblioteki GStreamer, a następnie wygenerowanie plików definicji. Pliki definicji zawierają informacje na temat typów wyliczeniowych zdefiniowanych w bibliotece, funkcji, sygnałów, metod wirtualnych czy struktur danych. W przypadku wygenerowanie przez generator błędnej definicji, stosowane są pisane przez programistę tzw. \textit{łatki} (ang. \textit{patch}).
+  \item W kolejnym przebiegu, generator na podstawie plików definicji, generuje pliki \textit{.hg} oraz \textit{.ccg}. Zawartość plików przypomina składnią język C++, jednak zawiera wywołania makrodefinicji ułatwiających adaptowanie poszczególnych elementów biblioteki. Przykład użycia makrodefinicji przedstawiony został na listingu ~\ref{macroSampleUsage}.
+Listę dostępnych makr można znaleźć w dokumentacji projektu gnome \cite{devgnomepage}.
+    \begin{lstlisting}[caption=Przykład użycia makrodefinicji w pliku \textit{.hg}, label=macroSampleUsage]
+_WRAP_METHOD(bool load_preset(const Glib::ustring& name), 
+      gst_preset_load_preset)
+    \end{lstlisting}
+    W przypadku, gdy plik \textit{.hg} zostanie niepoprawnie wygenerowany, programista zmuszony jest do ręcznego napisania tego pliku. W tym wypadku nie stosuje się łatek, ponieważ w większości przypadków, błąd obejmuje większą część pliku, a nie pojedyncze linie.
+  \item Ostatni etap generacji kodu źródłowego, to przekształcenie plików \textit{.hg} oraz \textit{.ccg} w pliki źródłowe języka C++. Na przykład, pokazane na listingu ~\ref{macroSampleUsage} zostanie zastąpione kodem zaprezentowanym na listingu ~\ref{outMacroSampleUsage}.
+    \begin{lstlisting}[caption=Kod źródłowy wygenerowany na podstawie makrodefinicji, label=outMacroSampleUsage]
+bool load_preset(const Glib::ustring& name);
+...
+bool Preset::load_preset(const Glib::ustring& name)
+{
+  return gst_preset_load_preset(gobj(), name.c_str());
+}
+    \end{lstlisting}
+    Funkcja \textit{gst\_preset\_load\_preset} jako drugi argument, przyjmuje wartość typu \textit{gchar*}. Generator wiedział, w jaki sposób dokonać konwersji na ten typ z typu \textit{const Glib::ustring\&}. Baza wiedzy, dotycząca konwersji pomiędzy typami ANSI C a typami języka C++, znajduje się w osobnych plikach, pisanych przez programistę.
+W tym etapie, wygenerowany kod źródłowy jest zawsze poprawny. Programista może jedynie dopisać dodatkowe pliki. Przechowują one na ogół klasy usprawniające (ale nie rozszerzające funkcjonalność) pracę z biblioteką.
+\end{enumerate}
+
 \cleardoublepage
 \begin{thebibliography}{9}
 
 \bibitem{gstmainpage}
   http://gstreamer.freedesktop.org, 2013
+\bibitem{devgnomepage}
+  https://developer.gnome.org, 2013
 
 \end{thebibliography}
 \end{document}
