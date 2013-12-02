@@ -422,6 +422,8 @@ void WorkspaceWidget::pad_removed(const Glib::RefPtr<Gst::Pad>& pad)
 
 void WorkspaceWidget::pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad)
 {
+	if (pad->get_direction() == Gst::PAD_SINK)
+		return;
 	QNEBlock* block = find_block(pad->get_parent_element());
 	QNEPort* port = nullptr;
 

@@ -41,6 +41,14 @@ RefPtr<Object> AddCommand::run_command_ret(CommandListener* listener)
 		if (GST_IS_PAD(object->gobj()))
 		{
 			pad = pad.cast_static(object);
+			pad->signal_linked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
+				if (listener != nullptr)
+					listener->pad_linked(pad);
+			});
+			pad->signal_unlinked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
+				if (listener != nullptr)
+					listener->pad_unlinked(pad);
+			});
 			parent->add_pad(pad);
 		}
 		else if (GST_IS_PAD_TEMPLATE(object->gobj()))
@@ -49,15 +57,6 @@ RefPtr<Object> AddCommand::run_command_ret(CommandListener* listener)
 		}
 		else
 			throw runtime_error("cannot run command: object is not a pad");
-
-		pad->signal_linked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-			if (listener != nullptr)
-				listener->pad_linked(pad);
-		});
-		pad->signal_unlinked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-			if (listener != nullptr)
-				listener->pad_unlinked(pad);
-		});
 
 		return pad;
 	}
@@ -76,7 +75,7 @@ RefPtr<Object> AddCommand::run_command_ret(CommandListener* listener)
 					if (listener != nullptr)
 						listener->pad_linked(pad);
 				});
-				pad->signal_unlinked().connect([&pad, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
+				pad->signal_unlinked().connect([&listener](const Glib::RefPtr<Gst::Pad>& pad) {
 					if (listener != nullptr)
 						listener->pad_unlinked(pad);
 				});
