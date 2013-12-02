@@ -30,23 +30,36 @@ AddCommand::~AddCommand()
 
 void AddCommand::run_command(CommandListener* listener)
 {
+	run_command_ret(listener);
+}
+
+RefPtr<Object> AddCommand::run_command_ret(CommandListener* listener)
+{
 	if (type == ObjectType::PAD)
 	{
+		RefPtr<Pad> pad;
 		if (GST_IS_PAD(object->gobj()))
 		{
-			RefPtr<Pad> pad = pad.cast_static(object);
-			pad->signal_linked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-				if (listener != nullptr)
-					listener->pad_linked(pad);
-			});
-			pad->signal_unlinked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-				if (listener != nullptr)
-					listener->pad_unlinked(pad);
-			});
+			pad = pad.cast_static(object);
 			parent->add_pad(pad);
+		}
+		else if (GST_IS_PAD_TEMPLATE(object->gobj()))
+		{
+			pad = parent->request_pad(RefPtr<PadTemplate>::cast_static(object));
 		}
 		else
 			throw runtime_error("cannot run command: object is not a pad");
+
+		pad->signal_linked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
+			if (listener != nullptr)
+				listener->pad_linked(pad);
+		});
+		pad->signal_unlinked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
+			if (listener != nullptr)
+				listener->pad_unlinked(pad);
+		});
+
+		return pad;
 	}
 	else
 	{
@@ -85,7 +98,7 @@ void AddCommand::run_command(CommandListener* listener)
 						listener->pad_unlinked(sec_pad);
 				});
 			}
-
+			return element;
 		}
 		else
 			throw runtime_error("cannot run command: invalid parent or object type");

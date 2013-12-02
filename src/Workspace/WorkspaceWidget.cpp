@@ -263,15 +263,15 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 					Glib::RefPtr<Gst::Pad> sink_pad = sink_pad.cast_static(sink_port->get_object_model());
 					if (src_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == Gst::PAD_REQUEST)
 					{
-						src_pad = Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model()));
-						AddCommand add_cmd(ObjectType::PAD, src_port->block()->get_model(), src_pad);
-						add_cmd.run_command(this);
+						auto tpl = Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model());
+						AddCommand add_cmd(ObjectType::PAD, src_port->block()->get_model(), tpl);
+						src_pad = src_pad.cast_static(add_cmd.run_command_ret(this));
 					}
 					if (sink_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model())->get_presence() == Gst::PAD_REQUEST)
 					{
-						sink_pad = Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model()));
-						AddCommand add_cmd(ObjectType::PAD, sink_port->block()->get_model(), sink_pad);
-						add_cmd.run_command(this);
+						auto tpl = Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model());
+						AddCommand add_cmd(ObjectType::PAD, sink_port->block()->get_model(), tpl);
+						sink_pad = sink_pad.cast_static(add_cmd.run_command_ret(this));
 					}
 
 					ConnectCommand cmd(src_pad, sink_pad);

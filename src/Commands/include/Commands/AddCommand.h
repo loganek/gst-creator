@@ -31,6 +31,7 @@ public:
 	static std::vector<std::string> get_suggestions(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
 
 	void run_command(CommandListener* listener = nullptr);
+	Glib::RefPtr<Gst::Object> run_command_ret(CommandListener* listener = nullptr);
 
 	Glib::RefPtr<Gst::Object> get_object() { return object; }
 };
