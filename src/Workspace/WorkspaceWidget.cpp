@@ -199,8 +199,24 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 		case Qt::RightButton:
 		{
 			QGraphicsItem *item = item_at(me->scenePos());
-			if (item && (item->type() == QNEConnection::Type || item->type() == QNEBlock::Type))
-				delete item;
+			if (item && (item->type() == QNEConnection::Type))
+			{
+				QNEConnection* con = static_cast<QNEConnection*>(item);
+				DisconnectCommand* cmd;
+				if (con->port1()->isOutput())
+					cmd = new DisconnectCommand(con->port1()->get_model(), con->port2()->get_model());
+				else
+					cmd = new DisconnectCommand(con->port2()->get_model(), con->port1()->get_model());
+				cmd->run_command(this);
+				delete cmd;
+			}
+
+			if (item && (item->type() == QNEBlock::Type))
+			{
+				QNEBlock* block = static_cast<QNEBlock*>(item);
+				RemoveCommand cmd(ObjectType::ELEMENT, block->get_model());
+				cmd.run_command(this);
+			}
 			// if (selBlock == (QNEBlock*) item)
 			// selBlock = 0;
 			break;
@@ -246,7 +262,7 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 					else
 						cmd = new ConnectCommand(port2->get_model(), port1->get_model());
 
-					cmd->run_command();
+					cmd->run_command(this);
 					delete cmd;
 
 					conn->setPos2(port2->scenePos());
@@ -309,6 +325,12 @@ void WorkspaceWidget::new_element_added(const Glib::RefPtr<Gst::Element>& elemen
 	b->setPos(last_point);
 }
 
+void WorkspaceWidget::element_removed(const Glib::RefPtr<Gst::Element>& element)
+{
+	QNEBlock *b = find_block(element);
+	delete b;
+}
+
 QNEBlock* WorkspaceWidget::find_block(const Glib::RefPtr<Gst::Element>& element)
 {
 	QList<QGraphicsItem*> items = scene->items();
@@ -340,17 +362,17 @@ void WorkspaceWidget::pad_added(const Glib::RefPtr<Gst::Pad>& pad)
 		block->addOutputPort(pad);
 }
 
-void WorkspaceWidget::pad_linked(const Glib::RefPtr<Gst::Pad>& first, const Glib::RefPtr<Gst::Pad>& second)
+void WorkspaceWidget::pad_linked(const Glib::RefPtr<Gst::Pad>& pad)
 {
-	QNEBlock* first_block = find_block(first->get_parent_element()),
-			*second_block = find_block(second->get_parent_element());
+	QNEBlock* first_block = find_block(pad->get_peer()->get_parent_element()),
+			*second_block = find_block(pad->get_parent_element());
 	QNEPort* first_port = nullptr, *second_port = nullptr;
 
 	if (first_block == nullptr || second_block == nullptr)
 		return;
 
-	first_port = first_block->find_port(first);
-	second_port = second_block->find_port(second);
+	first_port = first_block->find_port(pad->get_peer());
+	second_port = second_block->find_port(pad);
 
 	if (first_port == nullptr || second_port == nullptr)
 		return;

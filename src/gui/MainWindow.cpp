@@ -36,10 +36,11 @@ void MainWindow::add_workspace_canvas()
 	QFrame* workspace_frame = new QFrame();
 	workspace_frame->setLayout(new QGridLayout());
 	QFrame *frame = new QFrame;
-	ConsoleView* console = new ConsoleView();
+	WorkspaceWidget* workspace = new WorkspaceWidget(file_controller->get_model());
+	ConsoleView* console = new ConsoleView(workspace);
 	LoggerView* logger = new LoggerView();
 
-	WorkspaceWidget* workspace = new WorkspaceWidget(file_controller->get_model());
+
 	QSplitter* spl = new QSplitter();
 
 	QObject::connect(console, &ConsoleView::command_added, logger, &LoggerView::add_log);
@@ -56,10 +57,13 @@ void MainWindow::add_workspace_canvas()
 	frameLayout->addWidget(logger);
 	ui->rightFrame->layout()->addWidget(spl);
 
-	file_controller->get_model()->signal_element_added().connect([workspace](const Glib::RefPtr<Gst::Element>& e)
-				{
-					workspace->new_element_added(e);
-				});
+	file_controller->get_model()->signal_element_added().connect([workspace](const Glib::RefPtr<Gst::Element>& e) {
+		workspace->new_element_added(e);
+	});
+
+	file_controller->get_model()->signal_element_removed().connect([workspace](const Glib::RefPtr<Gst::Element>& e) {
+		workspace->element_removed(e);
+	});
 }
 
 MainWindow::~MainWindow()

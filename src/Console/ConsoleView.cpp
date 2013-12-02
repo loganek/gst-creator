@@ -9,8 +9,9 @@
 #include "utils/EnumUtils.h"
 #include "utils/StringUtils.h"
 
-ConsoleView::ConsoleView(QWidget* parent)
+ConsoleView::ConsoleView(CommandListener* listener, QWidget* parent)
 : QWidget(parent),
+  listener(listener),
   parser(nullptr)
 {
 	edit = new QLineEdit();
@@ -117,7 +118,7 @@ void ConsoleView::execute_command()
 	try
 	{
 		std::shared_ptr<Command> cmd(parser->parse(edit->text().toUtf8().constData()));
-		cmd->run_command();
+		cmd->run_command(listener);
 		Q_EMIT command_added(cmd);
 		//edit->clear();
 	}

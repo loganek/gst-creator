@@ -21,7 +21,7 @@ private:
 	QLineEdit* edit;
 	QPushButton* button;
 	QTreeWidget* suggestions;
-
+	CommandListener* listener;
 	Glib::RefPtr<Gst::Pipeline> model;
 
 	CommandParser* parser;
@@ -40,7 +40,7 @@ Q_SIGNALS:
 	void command_added(std::shared_ptr<Command> command);
 
 public:
-	explicit ConsoleView(QWidget* parent = 0);
+	explicit ConsoleView(CommandListener* listener = nullptr, QWidget* parent = 0);
 	virtual ~ConsoleView();
 	void set_model(const Glib::RefPtr<Gst::Pipeline>& model);
 };

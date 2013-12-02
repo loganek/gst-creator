@@ -52,8 +52,9 @@ public:
 	void resizeEvent(QResizeEvent * event);
 
 	void new_element_added(const Glib::RefPtr<Gst::Element>& element);
+	void element_removed(const Glib::RefPtr<Gst::Element>& element);
 	void pad_added(const Glib::RefPtr<Gst::Pad>& pad);
-	void pad_linked(const Glib::RefPtr<Gst::Pad>& first, const Glib::RefPtr<Gst::Pad>& second);
+	void pad_linked(const Glib::RefPtr<Gst::Pad>& pad);
 	void pad_removed(const Glib::RefPtr<Gst::Pad>& pad);
 	void pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad);
 

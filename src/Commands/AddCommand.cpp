@@ -28,23 +28,6 @@ AddCommand::~AddCommand()
 {
 }
 
-void AddCommand::new_pad_added(const RefPtr<Pad>& pad)
-{
-	// todo
-}
-void AddCommand::pad_removed(const RefPtr<Pad>& pad)
-{
-	// todo
-}
-void AddCommand::pad_linked(const RefPtr<Pad>& pad)
-{
-	// todo
-}
-void AddCommand::pad_unlinked(const RefPtr<Pad>& pad)
-{
-	// todo
-}
-
 void AddCommand::run_command(CommandListener* listener)
 {
 	if (type == ObjectType::PAD)
@@ -52,8 +35,14 @@ void AddCommand::run_command(CommandListener* listener)
 		if (GST_IS_PAD(object->gobj()))
 		{
 			RefPtr<Pad> pad = pad.cast_static(object);
-			pad->signal_linked().connect(sigc::mem_fun(this, &AddCommand::pad_linked));
-			pad->signal_linked().connect(sigc::mem_fun(this, &AddCommand::pad_unlinked));
+			pad->signal_linked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
+				if (listener != nullptr)
+					listener->pad_linked(pad);
+			});
+			pad->signal_unlinked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
+				if (listener != nullptr)
+					listener->pad_unlinked(pad);
+			});
 			parent->add_pad(pad);
 		}
 		else
@@ -70,9 +59,9 @@ void AddCommand::run_command(CommandListener* listener)
 				if (listener != nullptr)
 					listener->pad_added(pad);
 
-				pad->signal_linked().connect([&pad, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
+				pad->signal_linked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
 					if (listener != nullptr)
-						listener->pad_linked(pad, sec_pad);
+						listener->pad_linked(pad);
 				});
 				pad->signal_unlinked().connect([&pad, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
 					if (listener != nullptr)
@@ -83,6 +72,20 @@ void AddCommand::run_command(CommandListener* listener)
 				if (listener != nullptr)
 					listener->pad_removed(pad);
 			});
+
+			auto iterator = element->iterate_pads();
+			while (iterator.next())
+			{
+				iterator->signal_linked().connect([&iterator, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
+					if (listener != nullptr)
+						listener->pad_linked(sec_pad);
+				});
+				iterator->signal_unlinked().connect([&iterator, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
+					if (listener != nullptr)
+						listener->pad_unlinked(sec_pad);
+				});
+			}
+
 		}
 		else
 			throw runtime_error("cannot run command: invalid parent or object type");
@@ -181,11 +184,11 @@ vector<string> AddCommand::get_suggestions(const vector<string>& args, const Ref
 		else if (args.size() == 4 && type == ObjectType::PAD)
 			return {"USING"};
 		else if (args.size() == 5 && type == ObjectType::PAD)
-					return GstUtils::get_avaliable_pad_templates_string(GstUtils::find_element(args[2], model));
+			return GstUtils::get_avaliable_pad_templates_string(GstUtils::find_element(args[2], model));
 		else if ((args.size() == 4 || args.size() == 5) && type == ObjectType::ELEMENT)
-					return GstUtils::get_elements_from_bin_string(model, true);
+			return GstUtils::get_elements_from_bin_string(model, true);
 		else if ((args.size() == 5 || args.size() == 6) && type == ObjectType::PAD)
-					return GstUtils::get_elements_from_bin_string(model, false);
+			return GstUtils::get_elements_from_bin_string(model, false);
 	}
 	catch (...) {}
 	return vector<string>();
