@@ -32,6 +32,7 @@ void ConnectCommand::element_pad_added(const RefPtr<Pad>& pad)
 {
 	// TODO what about state-play -> state-stop -> state-play?
 	// TODO check template pad
+
 	// check, is pad->pad connection defined
 	auto tpl = pad->get_pad_template();
 	for (auto it = future_connection_pads_map.begin(); it != future_connection_pads_map.end(); ++it)
@@ -41,7 +42,6 @@ void ConnectCommand::element_pad_added(const RefPtr<Pad>& pad)
 				pad->can_link(it->second))
 		{
 			pad->link(it->second);
-			future_connection_pads_map.erase(it);
 			return;
 		}
 	}
@@ -60,7 +60,6 @@ void ConnectCommand::element_pad_added(const RefPtr<Pad>& pad)
 				if (pad->can_link(*iter))
 				{
 					pad->link(*iter);
-					future_connection_elements_map.erase(it);
 					return;
 				}
 			}

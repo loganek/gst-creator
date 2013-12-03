@@ -36,7 +36,7 @@ class QNEBlock : public QGraphicsPathItem
 public:
 	enum { Type = QGraphicsItem::UserType + 3 };
 
-    QNEBlock(const Glib::RefPtr<Gst::Element>& model, QGraphicsItem *parent = 0);
+	QNEBlock(const Glib::RefPtr<Gst::Element>& model, QGraphicsItem *parent = 0);
 
 	QNEPort* addPort(const Glib::RefPtr<Gst::Object>& model, bool isOutput, int flags = 0, int ptr = 0);
 	void addInputPort(const Glib::RefPtr<Gst::Object>& model);
