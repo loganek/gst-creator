@@ -126,3 +126,22 @@ void QNEConnection::load(QDataStream &ds, const QMap<quint64, QNEPort*> &portMap
 	updatePosFromPorts();
 	updatePath();
 }
+
+void QNEConnection::connectColor(int status)
+{
+	Qt::GlobalColor color;
+
+	switch (status)
+	{
+	case 0:
+		color = Qt::red;
+		break;
+	case 1:
+		color = Qt::green;
+		break;
+	default:
+		color = Qt::black;
+	}
+
+	setPen(QPen(color, 2));
+}

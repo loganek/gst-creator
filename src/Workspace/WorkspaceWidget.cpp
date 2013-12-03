@@ -133,8 +133,24 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 		{
 			conn->setPos2(me->scenePos());
 			conn->updatePath();
+			QGraphicsItem *item = item_at(me->scenePos());
+			if (item && item != conn->port1() && item->type() == QNEPort::Type)
+			{
+				QNEPort *src_port = (conn->port1()->isOutput()) ? conn->port1() : (QNEPort*) item;
+				QNEPort *sink_port = (!conn->port1()->isOutput()) ? conn->port1() : (QNEPort*) item;
+
+				if (src_port->can_link(sink_port))
+					conn->connectColor(1);
+				else
+					conn->connectColor(0);
+
+			}
+			else
+				conn->connectColor(2);
+
 			return true;
 		}
+
 		break;
 	}
 	case QEvent::GraphicsSceneDragMove:

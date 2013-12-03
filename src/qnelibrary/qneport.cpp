@@ -46,7 +46,7 @@ QNEPort::QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent)
 	setPath(p);
 
 	setPen(QPen(Qt::darkRed));
-	setBrush(Qt::red);
+	setBrush(Qt::gray);
 
 	setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
 
@@ -56,7 +56,7 @@ QNEPort::QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent)
 QNEPort::~QNEPort()
 {
 	Q_FOREACH(QNEConnection *conn, m_connections)
-						delete conn;
+										delete conn;
 }
 
 void QNEPort::setNEBlock(QNEBlock *b)
@@ -135,8 +135,8 @@ void QNEPort::setPtr(quint64 p)
 bool QNEPort::isConnected(QNEPort *other)
 {
 	Q_FOREACH(QNEConnection *conn, m_connections)
-						if (conn->port1() == other || conn->port2() == other)
-							return true;
+										if (conn->port1() == other || conn->port2() == other)
+											return true;
 
 	return false;
 }
@@ -146,10 +146,36 @@ QVariant QNEPort::itemChange(GraphicsItemChange change, const QVariant &value)
 	if (change == ItemScenePositionHasChanged)
 	{
 		Q_FOREACH(QNEConnection *conn, m_connections)
-						{
+										{
 			conn->updatePosFromPorts();
 			conn->updatePath();
-						}
+										}
 	}
 	return value;
+}
+
+bool QNEPort::can_link(QNEPort* sink_port) const
+{
+	if (isOutput_ == sink_port->isOutput_)
+		return false;
+
+	if (!model || !sink_port->get_object_model())
+		return true;
+
+	if (GST_IS_PAD(model->gobj()) && GST_IS_PAD(sink_port->get_object_model()->gobj()))
+		return Glib::RefPtr<Gst::Pad>::cast_static(model)->can_link(
+				Glib::RefPtr<Gst::Pad>::cast_static(sink_port->get_object_model()));
+
+	if (GST_IS_PAD_TEMPLATE(model->gobj()) && GST_IS_PAD_TEMPLATE(sink_port->get_object_model()->gobj()))
+		return Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(model))->can_link(
+				Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model())));
+
+	if (GST_IS_PAD_TEMPLATE(model->gobj()) && GST_IS_PAD(sink_port->get_object_model()->gobj()))
+		return Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(model))->can_link(
+				Glib::RefPtr<Gst::Pad>::cast_static(sink_port->get_object_model()));
+
+	if (GST_IS_PAD(model->gobj()) && GST_IS_PAD_TEMPLATE(sink_port->get_object_model()->gobj()))
+		return Glib::RefPtr<Gst::Pad>::cast_static(model)->can_link(
+				Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model())));
+	return false;
 }

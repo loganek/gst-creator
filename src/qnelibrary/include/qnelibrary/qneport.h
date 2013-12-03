@@ -63,6 +63,8 @@ public:
 
 	Glib::RefPtr<Gst::Object> get_object_model() { return model; }
 	bool is_template_model() { return GST_IS_PAD_TEMPLATE(model->gobj()); }
+	bool can_link(QNEPort* sink_port) const;
+
 protected:
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
