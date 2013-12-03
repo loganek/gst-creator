@@ -5,9 +5,9 @@
  *      Author: Marcin Kolny
  */
 
-#include "ConnectCommand.h"
 #include "utils/EnumUtils.h"
 #include "utils/GstUtils.h"
+#include "CommandListener.h"
 #include <set>
 
 using namespace Gst;
@@ -122,6 +122,18 @@ ConnectCommand::ConnectCommand(const RefPtr<PadTemplate>& src, const RefPtr<Elem
 		syntax_error("unknown object type");
 }
 
+void ConnectCommand::remove_future_connection(const RefPtr<PadTemplate>& tpl, const RefPtr<Pad>& pad, CommandListener* listener)
+{
+	for (auto it = future_connection_pads_map.begin(); it != future_connection_pads_map.end(); ++it)
+	{
+		if (it->first.second == tpl && it->second == pad)
+		{
+			listener->future_connection_removed(*it);
+			future_connection_pads_map.erase(it);
+		}
+	}
+}
+
 ConnectCommand* ConnectCommand::from_args(const vector<string>& args, const Glib::RefPtr<Gst::Pipeline>& model)
 {
 	if (args.size() != 4 && args.size() != 5)
@@ -174,6 +186,7 @@ void ConnectCommand::run_command(CommandListener* listener)
 		{
 			RefPtr<PadTemplate> p_src = p_src.cast_static(src);
 			src_parent->signal_pad_added().connect(sigc::ptr_fun(&ConnectCommand::element_pad_added));
+			listener->future_connection_added(p_src, src_parent, RefPtr<Pad>::cast_static(dst));
 		}
 		else
 		{

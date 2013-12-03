@@ -9,10 +9,11 @@
 #define COMMAND_H_
 
 #include "utils/StringUtils.h"
-#include "CommandListener.h"
 #include <stdexcept>
 #include <vector>
 #include <gstreamermm.h>
+
+class CommandListener;
 
 enum class CommandType
 {

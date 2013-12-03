@@ -15,6 +15,10 @@
 
 class ConnectCommand : public Command
 {
+public:
+	typedef std::pair<Glib::RefPtr<Gst::Element>, Glib::RefPtr<Gst::PadTemplate>> template_parent;
+	typedef std::pair<template_parent, Glib::RefPtr<Gst::Pad>> future_connection_pads;
+	typedef std::pair<Glib::RefPtr<Gst::Element>, Glib::RefPtr<Gst::Element>> future_connection_elements;
 private:
 	Glib::RefPtr<Gst::Object> src;
 	Glib::RefPtr<Gst::Object> dst;
@@ -22,9 +26,6 @@ private:
 	bool future;
 	ObjectType type;
 
-	typedef std::pair<Glib::RefPtr<Gst::Element>, Glib::RefPtr<Gst::PadTemplate>> template_parent;
-	typedef std::pair<template_parent, Glib::RefPtr<Gst::Pad>> future_connection_pads;
-	typedef std::pair<Glib::RefPtr<Gst::Element>, Glib::RefPtr<Gst::Element>> future_connection_elements;
 	static std::set<future_connection_pads> future_connection_pads_map;
 	static std::set<future_connection_elements> future_connection_elements_map;
 
@@ -43,6 +44,7 @@ public:
 	void run_command(CommandListener* listener = nullptr);
 
 	static void element_pad_added(const Glib::RefPtr<Gst::Pad>& pad);
+	static void remove_future_connection(const Glib::RefPtr<Gst::PadTemplate>& tpl, const Glib::RefPtr<Gst::Pad>& pad, CommandListener* listener);
 };
 
 #endif /* CONNECTCOMMAND_H_ */

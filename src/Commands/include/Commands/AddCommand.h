@@ -9,6 +9,7 @@
 #define ADDCOMMAND_H_
 
 #include "Command.h"
+#include "CommandListener.h"
 #include <vector>
 #include <gstreamermm.h>
 

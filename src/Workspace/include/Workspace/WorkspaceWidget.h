@@ -57,6 +57,9 @@ public:
 	void pad_linked(const Glib::RefPtr<Gst::Pad>& pad);
 	void pad_removed(const Glib::RefPtr<Gst::Pad>& pad);
 	void pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad);
+	void future_connection_added(const Glib::RefPtr<Gst::PadTemplate>& src_tpl,
+			const Glib::RefPtr<Gst::Element>& parent, const Glib::RefPtr<Gst::Pad>& sink);
+	void future_connection_removed(const ConnectCommand::future_connection_pads& conn);
 
 Q_SIGNALS:
 	void current_element_changed(const Glib::RefPtr<Gst::Element>& element);

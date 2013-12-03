@@ -62,9 +62,18 @@ void DisconnectCommand::run_command(CommandListener* listener)
 	}
 	else
 	{
-		RefPtr<Pad> p_src = p_src.cast_static(src),
-				p_dst = p_dst.cast_static(dst);
-		p_src->unlink(p_dst);
+		RefPtr<Pad> p_dst = p_dst.cast_static(dst);
+
+		if (GST_IS_PAD_TEMPLATE(src->gobj()))
+		{
+			RefPtr<PadTemplate> p_src = p_src.cast_static(src);
+			ConnectCommand::remove_future_connection(p_src, p_dst, listener);
+		}
+		else
+		{
+			RefPtr<Pad> p_src = p_src.cast_static(src);
+			p_src->unlink(p_dst);
+		}
 	}
 }
 

@@ -8,7 +8,7 @@
 #ifndef DISCONNECTCOMMAND_H_
 #define DISCONNECTCOMMAND_H_
 
-#include "Command.h"
+#include "ConnectCommand.h"
 #include <gstreamermm.h>
 
 class DisconnectCommand : public Command

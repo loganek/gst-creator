@@ -49,7 +49,7 @@ public:
 
 	int type() const { return Type; }
 	Glib::RefPtr<Gst::Element> get_model() { return model; }
-	QNEPort* find_port(const Glib::RefPtr<Gst::Pad>& model);
+	QNEPort* find_port(const Glib::RefPtr<Gst::Object>& model);
 
 protected:
 	QVariant itemChange(GraphicsItemChange change, const QVariant &value);

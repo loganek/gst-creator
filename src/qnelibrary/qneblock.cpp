@@ -203,7 +203,7 @@ QVariant QNEBlock::itemChange(GraphicsItemChange change, const QVariant &value)
 	return value;
 }
 
-QNEPort* QNEBlock::find_port(const Glib::RefPtr<Gst::Pad>& model)
+QNEPort* QNEBlock::find_port(const Glib::RefPtr<Gst::Object>& model)
 {
 	auto items = childItems();
 	for (auto item : items)
