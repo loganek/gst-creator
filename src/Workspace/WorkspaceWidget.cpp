@@ -357,7 +357,7 @@ void WorkspaceWidget::pad_unlinked(const RefPtr<Pad>& pad)
 
 		QNEConnection* con = static_cast<QNEConnection*>(item);
 
-		if (con->port1() && con->port1()->get_object_model() == port->get_object_model())
+		if (con->port1() && con->port2()->get_object_model() == port->get_object_model())
 		{
 			delete item;
 			break;
