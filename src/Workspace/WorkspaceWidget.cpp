@@ -267,13 +267,19 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 						AddCommand add_cmd(ObjectType::PAD, src_port->block()->get_model(), tpl);
 						src_pad = src_pad.cast_static(add_cmd.run_command_ret(this));
 					}
-					if (sink_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model())->get_presence() == Gst::PAD_REQUEST)
+					else if (sink_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model())->get_presence() == Gst::PAD_REQUEST)
 					{
 						auto tpl = Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model());
 						AddCommand add_cmd(ObjectType::PAD, sink_port->block()->get_model(), tpl);
 						sink_pad = sink_pad.cast_static(add_cmd.run_command_ret(this));
 					}
-
+					if (src_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == Gst::PAD_SOMETIMES)
+					{
+						auto tpl = Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model());
+						ConnectCommand con_cmd(tpl, sink_pad, true);
+						con_cmd.run_command(this);
+						return true;
+					}
 					ConnectCommand cmd(src_pad, sink_pad);
 					cmd.run_command(this);
 
