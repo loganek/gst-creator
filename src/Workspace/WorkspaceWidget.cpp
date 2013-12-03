@@ -9,6 +9,7 @@
 #include "GstBlock.h"
 #include "common.h"
 #include "Commands.h"
+#include "utils/GstUtils.h"
 #include <QtGui>
 #include <QFrame>
 
@@ -55,103 +56,6 @@ QString WorkspaceWidget::get_new_name(const QString& name)
 	else
 		return QString();
 }
-/*
-void WorkspaceWidget::dropEvent(QDropEvent* event)
-{
-	if (!check_mime_data(event->mimeData()))
-	{
-		event->ignore();
-		return;
-	}
-
-	if (line_drag)
-	{
-		line_drag = false;
-
-		GstBlockInfo* my_info = nullptr;
-
-		for (GstBlockInfo* info : blocks)
-		{
-			if (info->get_rect().contains(event->pos()))
-			{
-				my_info = info;
-				break;
-			}
-		}
-
-		this->setFocus();
-
-		if (my_info == nullptr)
-			return;
-
-		QPoint cur_pt = event->pos() - QPoint(my_info->get_rect().x(), my_info->get_rect().y());
-		GstPadWidget* pad = my_info->get_block()->find_pad(cur_pt);
-		if (pad != nullptr && first_pad != nullptr && pad->get_pad()->get_direction() == Gst::PAD_SINK)
-		{
-			GstConnection* con = new GstConnection(first_pad, pad);
-			if (con->may_exists())
-			{
-				ConnectCommand cmd(first_pad->get_pad(), pad->get_pad());
-				cmd.run_command();
-				connections.push_back(con);
-				first_pad = nullptr;
-			}
-			else
-				delete con;
-		}
-
-		return;
-	}
-
-	set_style_sheet(passive_style_sheet);
-
-	bool present = false;
-	QByteArray item_data = event->mimeData()->data(DRAG_DROP_FORMAT);
-	QDataStream data_stream(&item_data, QIODevice::ReadOnly);
-	QPoint location;
-	int val;
-
-	data_stream >> location >> val;
-	GstBlock* element = reinterpret_cast<GstBlock*>(val); // fixme ugly code
-	QRect rectangle = generate_rectangle(event->pos() - location, element);
-
-	if (blocks.size() > 0)
-	{
-		for (auto block_info : blocks)
-		{
-			if (block_info->get_block()->get_model() == element->get_model())
-			{
-				present = true;
-				current_info = block_info;
-				current_info->set_rect(rectangle);
-				current_info->set_location(location);
-				Q_EMIT current_element_changed(current_info->get_block()->get_model());
-				break;
-			}
-		}
-	}
-
-	if (blocks.size() == 0 || (blocks.size() > 0 && !present))
-	{
-		QString new_name = get_new_name(element->get_model()->get_name().c_str());
-		element->get_model()->set_name(new_name.toUtf8().constData());
-		GstBlockInfo* info = new GstBlockInfo(element, location, rectangle);
-		blocks.push_back(info);
-		AddCommand cmd(ObjectType::ELEMENT, model, element->get_model());
-		cmd.run_command();
-	}
-
-	repaint();
-
-	if (event->source() == this)
-	{
-		event->setDropAction(Qt::MoveAction);
-		event->accept();
-	}
-	else
-		event->acceptProposedAction();
-}
- */
 
 QGraphicsItem* WorkspaceWidget::item_at(const QPointF &pos)
 {
@@ -259,6 +163,13 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 
 				if (src_port->block() != sink_port->block() && src_port->isOutput() != sink_port->isOutput() && !src_port->isConnected(sink_port))
 				{
+					if (!src_port->get_object_model() && !sink_port->get_object_model())
+					{
+						ConnectCommand cmd (src_port->block()->get_model(), sink_port->block()->get_model());
+						cmd.run_command(this);
+						return true;
+					}
+
 					Glib::RefPtr<Gst::Pad> src_pad = src_pad.cast_static(src_port->get_object_model());
 					Glib::RefPtr<Gst::Pad> sink_pad = sink_pad.cast_static(sink_port->get_object_model());
 					if (src_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == Gst::PAD_REQUEST)
@@ -326,6 +237,10 @@ void WorkspaceWidget::new_element_added(const Glib::RefPtr<Gst::Element>& elemen
 	QNEBlock *b = new QNEBlock(element, 0);
 	scene->addItem(b);
 	b->addPort(element, 0, QNEPort::NamePort);
+	if (!GstUtils::is_src_element(element))
+		b->addInputPort(Glib::RefPtr<Gst::Object>());
+	if (!GstUtils::is_sink_element(element))
+		b->addOutputPort(Glib::RefPtr<Gst::Object>());
 
 	auto pad_iterator = element->iterate_pads();
 

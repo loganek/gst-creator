@@ -52,14 +52,16 @@ QNEBlock::QNEBlock(const Glib::RefPtr<Gst::Element>& model, QGraphicsItem *paren
 QNEPort* QNEBlock::addPort(const Glib::RefPtr<Gst::Object>& model, bool isOutput, int flags, int ptr)
 {
 	QNEPort *port = new QNEPort(model, this);
-	port->setName(model->get_name().c_str());
+	Glib::ustring port_name = model ? model->get_name() : (
+			isOutput ? "ai_src" : "ai_sink");
+	port->setName(port_name.c_str());
 	port->setIsOutput(isOutput);
 	port->setNEBlock(this);
 	port->setPortFlags(flags);
 	port->setPtr(ptr);
 
 	QFontMetrics fm(scene()->font());
-	int w = fm.width(model->get_name().c_str());
+	int w = fm.width(port_name.c_str());
 	int h = fm.height();
 	// port->setPos(0, height + h/2);
 	if (w > width - horzMargin)
