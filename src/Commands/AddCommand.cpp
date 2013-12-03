@@ -14,6 +14,8 @@ using namespace Gst;
 using namespace std;
 using Glib::RefPtr;
 
+int CommandListener::refcount = 0;
+
 AddCommand::AddCommand(ObjectType type,
 		const RefPtr<Element>& parent,
 		const RefPtr<Object>& object)
@@ -42,11 +44,11 @@ RefPtr<Object> AddCommand::run_command_ret(CommandListener* listener)
 		{
 			pad = pad.cast_static(object);
 			pad->signal_linked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-				if (listener != nullptr)
+				if (listener != nullptr && CommandListener::get_refcount() > 0)
 					listener->pad_linked(pad);
 			});
 			pad->signal_unlinked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-				if (listener != nullptr)
+				if (listener != nullptr && CommandListener::get_refcount() > 0)
 					listener->pad_unlinked(pad);
 			});
 			parent->add_pad(pad);
@@ -68,20 +70,20 @@ RefPtr<Object> AddCommand::run_command_ret(CommandListener* listener)
 			RefPtr<Element> element = element.cast_static(object);
 			pipeline->add(element);
 			element->signal_pad_added().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-				if (listener != nullptr)
+				if (listener != nullptr && CommandListener::get_refcount() > 0)
 					listener->pad_added(pad);
 
 				pad->signal_linked().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-					if (listener != nullptr)
+					if (listener != nullptr && CommandListener::get_refcount() > 0)
 						listener->pad_linked(pad);
 				});
 				pad->signal_unlinked().connect([&listener](const Glib::RefPtr<Gst::Pad>& pad) {
-					if (listener != nullptr)
+					if (listener != nullptr && CommandListener::get_refcount() > 0)
 						listener->pad_unlinked(pad);
 				});
 			});
 			element->signal_pad_removed().connect([listener](const Glib::RefPtr<Gst::Pad>& pad) {
-				if (listener != nullptr)
+				if (listener != nullptr && CommandListener::get_refcount() > 0)
 					listener->pad_removed(pad);
 			});
 
@@ -89,11 +91,11 @@ RefPtr<Object> AddCommand::run_command_ret(CommandListener* listener)
 			while (iterator.next())
 			{
 				iterator->signal_linked().connect([&iterator, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
-					if (listener != nullptr)
+					if (listener != nullptr && CommandListener::get_refcount() > 0)
 						listener->pad_linked(sec_pad);
 				});
 				iterator->signal_unlinked().connect([&iterator, listener](const Glib::RefPtr<Gst::Pad>& sec_pad) {
-					if (listener != nullptr)
+					if (listener != nullptr && CommandListener::get_refcount() > 0)
 						listener->pad_unlinked(sec_pad);
 				});
 			}

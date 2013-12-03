@@ -25,15 +25,17 @@ WorkspaceWidget::WorkspaceWidget(const RefPtr<Pipeline>& model, QWidget* parent)
 	view = new QGraphicsView(scene, this);
 	view->setRenderHint(QPainter::Antialiasing, true);
 	this->installEventFilter(this);
+	CommandListener::refcount++;
+}
+
+WorkspaceWidget::~WorkspaceWidget()
+{
+	CommandListener::refcount--;
 }
 
 void WorkspaceWidget::resizeEvent(QResizeEvent * event)
 {
 	view->resize(event->size());
-}
-
-WorkspaceWidget::~WorkspaceWidget()
-{
 }
 
 bool WorkspaceWidget::check_mime_data(const QMimeData* mime_data) const
