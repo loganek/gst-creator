@@ -10,7 +10,6 @@
 #include <QByteArray>
 #include <QMimeData>
 #include <QMainWindow>
-#include "Workspace/GstBlock.h"
 #include "ObjectInspectorModel.h"
 #include "common.h"
 #include "FactoryInspector/FactoryInspectorView.h"
@@ -34,11 +33,7 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	QByteArray itemData;
 	QDataStream data_stream(&itemData, QIODevice::WriteOnly);
 
-	auto element = Gst::ElementFactory::create_element(current_text.toUtf8().constData());
-	element->reference();
-	GstBlock* block = new GstBlock(element, this);
-
-	data_stream << current_location << current_text;
+	data_stream << current_text;
 
 	QMimeData *mime_data = new QMimeData;
 	mime_data->setData(DRAG_DROP_FORMAT, itemData);
@@ -46,8 +41,7 @@ void ObjectInspectorView::startDrag(Qt::DropActions supportedActions)
 	QDrag *drag = new QDrag(this);
 	drag->setMimeData(mime_data);
 	drag->setHotSpot(current_location);
-	drag->setPixmap(block->grab());
-	//delete block;
+	drag->setPixmap(QLabel(current_text).grab());
 
 	int row = currentIndex().row();
 	QModelIndex index = model()->index(row,0);

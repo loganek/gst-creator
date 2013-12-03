@@ -8,16 +8,11 @@
 #ifndef WORKSPACEWIDGET_H_
 #define WORKSPACEWIDGET_H_
 
-#include "GstBlockInfo.h"
-#include "Commands/Command.h"
-#include "GstConnection.h"
-#include "GstPadWidget.h"
+#include "Commands.h"
 #include "qnelibrary.h"
-#include "Commands/CommandListener.h"
 #include <QWidget>
 #include <QMimeData>
 #include <gstreamermm.h>
-#include <vector>
 
 class WorkspaceWidget : public QWidget, public CommandListener
 {
@@ -26,24 +21,19 @@ private:
 	constexpr static const char* active_style_sheet = "QFrame{ border: 1px solid red; border-radius: 4px; padding: 2px;}";
 	constexpr static const char* passive_style_sheet = "QFrame{ border: 1px solid black; border-radius: 4px; padding: 2px;}";
 
-	bool greenline;
-	bool line_drag;
-	GstPadWidget* first_pad;
-	GstPadWidget* second_pad;
+	QGraphicsView* view;
+	QGraphicsScene* scene;
+	QNEConnection* current_connection;
+	Glib::RefPtr<Gst::Pipeline> model;
 
 	bool check_mime_data(const QMimeData* mime_data) const;
 	QString get_new_name(const QString& name);
-
 	QGraphicsItem* item_at(const QPointF &pos);
-	QGraphicsView* view;
-
-	Glib::RefPtr<Gst::Pipeline> model;
-
-	QGraphicsScene* scene;
-	QNEConnection* conn;
 	bool eventFilter(QObject *o, QEvent *e);
 
 	QNEBlock* find_block(const Glib::RefPtr<Gst::Element>& element);
+	QNEPort* find_port(const Glib::RefPtr<Gst::Pad>& pad);
+	QNEPort* find_port(const Glib::RefPtr<Gst::PadTemplate>& pad, const Glib::RefPtr<Gst::Element>& parent);
 
 public:
 	explicit WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent = 0);
@@ -64,6 +54,5 @@ public:
 Q_SIGNALS:
 	void current_element_changed(const Glib::RefPtr<Gst::Element>& element);
 };
-
 
 #endif /* WORKSPACEWIDGET_H_ */

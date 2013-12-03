@@ -28,6 +28,6 @@ void LoggerView::add_log(std::shared_ptr<Command> cmd)
 	QStringList row = {  };
 	row.append("");
 	table->insertRow(table->rowCount());
-	table->setItem(table->rowCount()-1, 0, new QTableWidgetItem(QDate::currentDate().toString("d-m-Y h:m:s")));
+	table->setItem(table->rowCount()-1, 0, new QTableWidgetItem(QDateTime::currentDateTime().toString()));
 	table->setItem(table->rowCount()-1, 1, new QTableWidgetItem(EnumUtils<CommandType>::enum_to_string(cmd->get_type()).c_str()));
 }

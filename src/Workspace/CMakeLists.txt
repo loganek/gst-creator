@@ -1,18 +1,9 @@
 set(WORKSPACE_HEADERS 
 	include/Workspace/WorkspaceWidget.h
-	include/Workspace/WorkspaceController.h
-	include/Workspace/GstBlock.h
-	include/Workspace/GstBlockInfo.h
-	include/Workspace/GstPadWidget.h
-	include/Workspace/GstConnection.h
 )
 
 add_library(Workspace
 	WorkspaceWidget.cpp
-	WorkspaceController.cpp
-	GstBlock.cpp
-	GstPadWidget.cpp
-	GstConnection.cpp
 	${WORKSPACE_HEADERS}
 )
 

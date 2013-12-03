@@ -5,7 +5,6 @@
 #include "controller/FileController.h"
 #include "ObjectInspector/ObjectInspectorModel.h"
 #include "ObjectInspector/ObjectInspectorFilter.h"
-#include "Workspace/WorkspaceController.h"
 #include <QtWidgets/qmessagebox.h>
 #include <gstreamermm.h>
 

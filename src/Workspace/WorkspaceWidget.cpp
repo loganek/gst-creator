@@ -6,21 +6,18 @@
  */
 
 #include "WorkspaceWidget.h"
-#include "GstBlock.h"
 #include "common.h"
-#include "Commands.h"
 #include "utils/GstUtils.h"
 #include <QtGui>
 #include <QFrame>
 
-WorkspaceWidget::WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent)
+using namespace Gst;
+using Glib::RefPtr;
+
+WorkspaceWidget::WorkspaceWidget(const RefPtr<Pipeline>& model, QWidget* parent)
 : QWidget(parent),
   model(model),
-  first_pad(nullptr),
-  second_pad(nullptr),
-  line_drag(false),
-  greenline(false),
-  conn(nullptr)
+  current_connection(nullptr)
 {
 	setAcceptDrops(true);
 	scene = new QGraphicsScene();
@@ -37,8 +34,6 @@ void WorkspaceWidget::resizeEvent(QResizeEvent * event)
 
 WorkspaceWidget::~WorkspaceWidget()
 {
-	delete view;
-	delete scene;
 }
 
 bool WorkspaceWidget::check_mime_data(const QMimeData* mime_data) const
@@ -81,38 +76,30 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 		case Qt::LeftButton:
 		{
 			QGraphicsItem *item = item_at(me->scenePos());
-			if (item && item->type() == QNEPort::Type)
-			{
-				conn = new QNEConnection(0);
-				scene->addItem(conn);
-				conn->setPort1((QNEPort*) item);
-				conn->setPos1(item->scenePos());
-				conn->setPos2(me->scenePos());
-				conn->updatePath();
+			if (!item || item->type() != QNEPort::Type)
+				break;
 
-				return true;
-			}
-			else if (item && item->type() == QNEBlock::Type)
-			{
-				/* if (selBlock)
-					selBlock->setSelected(); */
-				// selBlock = (QNEBlock*) item;
-			}
-			break;
+			current_connection = new QNEConnection(0);
+			scene->addItem(current_connection);
+			current_connection->setPort1((QNEPort*) item);
+			current_connection->setPos1(item->scenePos());
+			current_connection->setPos2(me->scenePos());
+			current_connection->updatePath();
+
+			return true;
 		}
 		case Qt::RightButton:
 		{
 			QGraphicsItem *item = item_at(me->scenePos());
+
 			if (item && (item->type() == QNEConnection::Type))
 			{
 				QNEConnection* con = static_cast<QNEConnection*>(item);
-				DisconnectCommand* cmd;
-				if (con->port1()->isOutput())
-					cmd = new DisconnectCommand(con->port1()->get_object_model(), con->port2()->get_object_model());
-				else
-					cmd = new DisconnectCommand(con->port2()->get_object_model(), con->port1()->get_object_model());
-				cmd->run_command(this);
-				delete cmd;
+				QNEPort* src_port = con->port1()->isOutput() ? con->port1() : con->port2();
+				QNEPort* sink_port = con->port1()->isOutput() ? con->port2() : con->port1();
+
+				DisconnectCommand cmd(src_port->get_object_model(), sink_port->get_object_model());
+				cmd.run_command(this);
 			}
 
 			else if (item && (item->type() == QNEBlock::Type))
@@ -121,37 +108,30 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 				RemoveCommand cmd(ObjectType::ELEMENT, block->get_model());
 				cmd.run_command(this);
 			}
-			// if (selBlock == (QNEBlock*) item)
-			// selBlock = 0;
 			break;
 		}
 		}
+		break;
 	}
 	case QEvent::GraphicsSceneMouseMove:
 	{
-		if (conn)
+		if (!current_connection)
+			break;
+
+		current_connection->setPos2(me->scenePos());
+		current_connection->updatePath();
+		QGraphicsItem *item = item_at(me->scenePos());
+		if (item && item != current_connection->port1() && item->type() == QNEPort::Type)
 		{
-			conn->setPos2(me->scenePos());
-			conn->updatePath();
-			QGraphicsItem *item = item_at(me->scenePos());
-			if (item && item != conn->port1() && item->type() == QNEPort::Type)
-			{
-				QNEPort *src_port = (conn->port1()->isOutput()) ? conn->port1() : (QNEPort*) item;
-				QNEPort *sink_port = (!conn->port1()->isOutput()) ? conn->port1() : (QNEPort*) item;
+			QNEPort *src_port = (current_connection->port1()->isOutput()) ? current_connection->port1() : (QNEPort*) item;
+			QNEPort *sink_port = (!current_connection->port1()->isOutput()) ? current_connection->port1() : (QNEPort*) item;
 
-				if (src_port->can_link(sink_port))
-					conn->connectColor(1);
-				else
-					conn->connectColor(0);
-
-			}
-			else
-				conn->connectColor(2);
-
-			return true;
+			current_connection->connectColor(src_port->can_link(sink_port));
 		}
+		else
+			current_connection->connectColor(2);
 
-		break;
+		return true;
 	}
 	case QEvent::GraphicsSceneDragMove:
 	{
@@ -166,64 +146,63 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 	}
 	case QEvent::GraphicsSceneMouseRelease:
 	{
-		if (conn && me->button() == Qt::LeftButton)
+		if (!current_connection || me->button() != Qt::LeftButton)
+			break;
+
+		QGraphicsItem *item = item_at(me->scenePos());
+		if (item && item->type() == QNEPort::Type)
 		{
-			QGraphicsItem *item = item_at(me->scenePos());
-			if (item && item->type() == QNEPort::Type)
+			QNEPort *src_port = (current_connection->port1()->isOutput()) ? current_connection->port1() : (QNEPort*) item;
+			QNEPort *sink_port = (!current_connection->port1()->isOutput()) ? current_connection->port1() : (QNEPort*) item;
+
+			delete current_connection;
+			current_connection = 0;
+
+			if (!src_port->can_link(sink_port))
+				return true;
+
+			if (src_port->block() != sink_port->block() && src_port->isOutput() != sink_port->isOutput() && !src_port->isConnected(sink_port))
 			{
-				QNEPort *src_port = (conn->port1()->isOutput()) ? conn->port1() : (QNEPort*) item;
-				QNEPort *sink_port = (!conn->port1()->isOutput()) ? conn->port1() : (QNEPort*) item;
-
-				delete conn;
-				conn = 0;
-
-				if (!src_port->can_link(sink_port))
-					return true;
-
-				if (src_port->block() != sink_port->block() && src_port->isOutput() != sink_port->isOutput() && !src_port->isConnected(sink_port))
+				if (!src_port->get_object_model() && !sink_port->get_object_model())
 				{
-					if (!src_port->get_object_model() && !sink_port->get_object_model())
-					{
-						ConnectCommand cmd (src_port->block()->get_model(), sink_port->block()->get_model());
-						cmd.run_command(this);
-						return true;
-					}
-
-					Glib::RefPtr<Gst::Pad> src_pad = src_pad.cast_static(src_port->get_object_model());
-					Glib::RefPtr<Gst::Pad> sink_pad = sink_pad.cast_static(sink_port->get_object_model());
-					if (src_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == Gst::PAD_REQUEST)
-					{
-						auto tpl = Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model());
-						AddCommand add_cmd(ObjectType::PAD, src_port->block()->get_model(), tpl);
-						src_pad = src_pad.cast_static(add_cmd.run_command_ret(this));
-					}
-					else if (sink_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model())->get_presence() == Gst::PAD_REQUEST)
-					{
-						auto tpl = Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model());
-						AddCommand add_cmd(ObjectType::PAD, sink_port->block()->get_model(), tpl);
-						sink_pad = sink_pad.cast_static(add_cmd.run_command_ret(this));
-					}
-					if (src_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == Gst::PAD_SOMETIMES)
-					{
-						auto pad_parent = src_port->block()->get_model();
-						auto tpl = Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model());
-						ConnectCommand con_cmd(tpl, pad_parent, sink_pad);
-						con_cmd.run_command(this);
-						return true;
-					}
-					ConnectCommand cmd(src_pad, sink_pad);
+					ConnectCommand cmd (src_port->block()->get_model(), sink_port->block()->get_model());
 					cmd.run_command(this);
-
-
 					return true;
 				}
-			}
 
-			delete conn;
-			conn = 0;
-			return true;
+				RefPtr<Pad> src_pad = src_pad.cast_static(src_port->get_object_model());
+				RefPtr<Pad> sink_pad = sink_pad.cast_static(sink_port->get_object_model());
+				if (src_port->is_template_model() && RefPtr<PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == PAD_REQUEST)
+				{
+					auto tpl = RefPtr<PadTemplate>::cast_static(src_port->get_object_model());
+					AddCommand add_cmd(ObjectType::PAD, src_port->block()->get_model(), tpl);
+					src_pad = src_pad.cast_static(add_cmd.run_command_ret(this));
+				}
+				else if (sink_port->is_template_model() && RefPtr<PadTemplate>::cast_static(sink_port->get_object_model())->get_presence() == PAD_REQUEST)
+				{
+					auto tpl = RefPtr<PadTemplate>::cast_static(sink_port->get_object_model());
+					AddCommand add_cmd(ObjectType::PAD, sink_port->block()->get_model(), tpl);
+					sink_pad = sink_pad.cast_static(add_cmd.run_command_ret(this));
+				}
+				if (src_port->is_template_model() && RefPtr<PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == PAD_SOMETIMES)
+				{
+					auto pad_parent = src_port->block()->get_model();
+					auto tpl = RefPtr<PadTemplate>::cast_static(src_port->get_object_model());
+					ConnectCommand con_cmd(tpl, pad_parent, sink_pad);
+					con_cmd.run_command(this);
+					return true;
+				}
+				ConnectCommand cmd(src_pad, sink_pad);
+				cmd.run_command(this);
+
+
+				return true;
+			}
 		}
-		break;
+
+		delete current_connection;
+		current_connection = 0;
+		return true;
 	}
 	case QEvent::GraphicsSceneDrop:
 	{
@@ -236,105 +215,112 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 
 		QByteArray item_data = ev->mimeData()->data(DRAG_DROP_FORMAT);
 		QDataStream data_stream(&item_data, QIODevice::ReadOnly);
-		QPoint location;
-		QString nn;
-		data_stream >> location >> nn;
+		QString name;
+		data_stream >> name;
 
-		auto element = Gst::ElementFactory::create_element(nn.toUtf8().constData());
-		QString new_name = get_new_name(element->get_name().c_str());
-		element->set_name(new_name.toUtf8().constData());
+		RefPtr<Element> element = ElementFactory::create_element(name.toUtf8().constData());
+		name = get_new_name(element->get_name().c_str());
+
+		if (name.isEmpty())
+			return true;
+
+		element->set_name(name.toUtf8().constData());
+		last_point = me->scenePos();
 		AddCommand cmd(ObjectType::ELEMENT, model, element);
 		cmd.run_command(this);
-		last_point = me->scenePos();
 		return true;
 	}
 	}
 	return QObject::eventFilter(o, e);
 }
 
-void WorkspaceWidget::new_element_added(const Glib::RefPtr<Gst::Element>& element)
+void WorkspaceWidget::new_element_added(const RefPtr<Element>& element)
 {
 	QNEBlock *b = new QNEBlock(element, 0);
 	scene->addItem(b);
 	b->addPort(element, 0, QNEPort::NamePort);
 	if (!GstUtils::is_src_element(element))
-		b->addInputPort(Glib::RefPtr<Gst::Object>());
+		b->addInputPort(RefPtr<Object>());
 	if (!GstUtils::is_sink_element(element))
-		b->addOutputPort(Glib::RefPtr<Gst::Object>());
+		b->addOutputPort(RefPtr<Object>());
 
 	auto pad_iterator = element->iterate_pads();
 
 	while (pad_iterator.next())
 	{
-		if (pad_iterator->get_direction() == Gst::PAD_SINK)
+		if (pad_iterator->get_direction() == PAD_SINK)
 			b->addInputPort(*pad_iterator);
-		else if (pad_iterator->get_direction() == Gst::PAD_SRC)
+		else if (pad_iterator->get_direction() == PAD_SRC)
 			b->addOutputPort(*pad_iterator);
 	}
 
-	std::vector<Gst::StaticPadTemplate> templates = element->get_factory()->get_static_pad_templates();
+	std::vector<StaticPadTemplate> templates = element->get_factory()->get_static_pad_templates();
 
 	for (auto tpl : templates)
 	{
-		if (tpl.get_presence() == Gst::PAD_SOMETIMES || tpl.get_presence() == Gst::PAD_REQUEST)
-			b->addPort(element->get_pad_template(tpl.get_name_template()), tpl.get_direction() == Gst::PAD_SRC);
+		if (tpl.get_presence() == PAD_SOMETIMES || tpl.get_presence() == PAD_REQUEST)
+			b->addPort(element->get_pad_template(tpl.get_name_template()), tpl.get_direction() == PAD_SRC);
 	}
 
 	b->setPos(last_point);
 }
 
-void WorkspaceWidget::element_removed(const Glib::RefPtr<Gst::Element>& element)
+void WorkspaceWidget::element_removed(const RefPtr<Element>& element)
 {
 	QNEBlock *b = find_block(element);
 	delete b;
 }
 
-QNEBlock* WorkspaceWidget::find_block(const Glib::RefPtr<Gst::Element>& element)
+QNEPort* WorkspaceWidget::find_port(const RefPtr<Pad>& pad)
 {
-	QList<QGraphicsItem*> items = scene->items();
+	QNEBlock* block = find_block(pad->get_parent_element());
+	return (!block) ? nullptr : block->find_port(pad);
+}
 
-	for (auto item : items)
+QNEPort* WorkspaceWidget::find_port(const RefPtr<PadTemplate>& pad_template, const RefPtr<Element>& parent)
+{
+	QNEBlock* block = find_block(parent);
+	return (!block) ? nullptr : block->find_port(pad_template);
+}
+
+QNEBlock* WorkspaceWidget::find_block(const RefPtr<Element>& element)
+{
+	for (auto item : scene->items())
 	{
-		if (item && item->type() == QNEBlock::Type)
-		{
-			QNEBlock* block = static_cast<QNEBlock*>(item);
+		if (!item || item->type() != QNEBlock::Type)
+			continue;
 
-			if (block && block->get_model() == element)
-				return block;
-		}
+		QNEBlock* block = static_cast<QNEBlock*>(item);
+
+		if (block && block->get_model() == element)
+			return block;
 	}
 
 	return nullptr;
 }
 
-void WorkspaceWidget::pad_added(const Glib::RefPtr<Gst::Pad>& pad)
+void WorkspaceWidget::pad_added(const RefPtr<Pad>& pad)
 {
 	QNEBlock* block = find_block(pad->get_parent_element());
 
 	if (block == nullptr)
 		return;
 
-	if (pad->get_direction() == Gst::PAD_SINK)
+	if (pad->get_direction() == PAD_SINK)
 		block->addInputPort(pad);
-	else if (pad->get_direction() == Gst::PAD_SRC)
+	else if (pad->get_direction() == PAD_SRC)
 		block->addOutputPort(pad);
 }
 
-void WorkspaceWidget::pad_linked(const Glib::RefPtr<Gst::Pad>& pad)
+void WorkspaceWidget::pad_linked(const RefPtr<Pad>& pad)
 {
-	if (pad->get_direction() == Gst::PAD_SINK)
-		return;
-	QNEBlock* first_block = find_block(pad->get_peer()->get_parent_element()),
-			*second_block = find_block(pad->get_parent_element());
-	QNEPort* first_port = nullptr, *second_port = nullptr;
-
-	if (first_block == nullptr || second_block == nullptr)
+	if (pad->get_direction() == PAD_SINK)
 		return;
 
-	first_port = first_block->find_port(pad->get_peer());
-	second_port = second_block->find_port(pad);
+	QNEPort* first_port = find_port(pad->get_peer()),
+			*second_port = find_port(pad);
 
-	if (first_port == nullptr || second_port == nullptr)
+	if (!first_port || !second_port)
 		return;
 
 	QNEConnection* connection = new QNEConnection(0);
@@ -346,65 +332,42 @@ void WorkspaceWidget::pad_linked(const Glib::RefPtr<Gst::Pad>& pad)
 	connection->updatePath();
 }
 
-void WorkspaceWidget::pad_removed(const Glib::RefPtr<Gst::Pad>& pad)
+void WorkspaceWidget::pad_removed(const RefPtr<Pad>& pad)
 {
-	QNEBlock* block = find_block(pad->get_parent_element());
-
-	if (block == nullptr)
-		return;
-
-	QNEPort* port = block->find_port(pad);
-
-	if (port == nullptr)
-		return;
-
+	QNEPort* port = find_port(pad);
 	delete port;
 }
 
-void WorkspaceWidget::pad_unlinked(const Glib::RefPtr<Gst::Pad>& pad)
+void WorkspaceWidget::pad_unlinked(const RefPtr<Pad>& pad)
 {
-	if (pad->get_direction() == Gst::PAD_SINK)
-		return;
-	QNEBlock* block = find_block(pad->get_parent_element());
-	QNEPort* port = nullptr;
-
-	if (block == nullptr)
+	if (pad->get_direction() == PAD_SINK)
 		return;
 
-	port = block->find_port(pad);
+	QNEPort* port = find_port(pad);
 
 	if (port == nullptr)
 		return;
 
-	QList<QGraphicsItem*> items = scene->items();
-
-	for (auto item : items)
+	for (auto item : scene->items())
 	{
-		if (item && item->type() == QNEConnection::Type)
+		if (!item || item->type() != QNEConnection::Type)
+			continue;
+
+		QNEConnection* con = static_cast<QNEConnection*>(item);
+
+		if (con->port1() && con->port1()->get_object_model() == port->get_object_model())
 		{
-			QNEConnection* con = static_cast<QNEConnection*>(item);
-			if (con->port1() && con->port2() &&
-					(con->port2()->get_object_model() == port->get_object_model() ||
-							con->port1()->get_object_model() == port->get_object_model()))
-			{
-				delete item;
-				break;
-			}
+			delete item;
+			break;
 		}
 	}
 }
 
-void WorkspaceWidget::future_connection_added(const Glib::RefPtr<Gst::PadTemplate>& src_tpl,
-		const Glib::RefPtr<Gst::Element>& parent, const Glib::RefPtr<Gst::Pad>& sink)
+void WorkspaceWidget::future_connection_added(const RefPtr<PadTemplate>& src_tpl,
+		const RefPtr<Element>& parent, const RefPtr<Pad>& sink)
 {
-	QNEBlock* src_block = find_block(parent);
-	QNEBlock* sink_block = find_block(sink->get_parent_element());
-
-	if (!src_block || !sink_block)
-		return;
-
-	QNEPort* src_port = src_block->find_port(src_tpl);
-	QNEPort* sink_port = sink_block->find_port(sink);
+	QNEPort* src_port = find_port(src_tpl, parent);
+	QNEPort* sink_port = find_port(sink);
 
 	if (!src_port || !sink_port)
 		return;
@@ -416,37 +379,28 @@ void WorkspaceWidget::future_connection_added(const Glib::RefPtr<Gst::PadTemplat
 	connection->setPort2(sink_port);
 	connection->setPos2(sink_port->scenePos());
 	connection->updatePath();
-
 }
 
 void WorkspaceWidget::future_connection_removed(const ConnectCommand::future_connection_pads& conn)
 {
-	QNEBlock* src_block = find_block(conn.first.first);
-	QNEBlock* sink_block = find_block(conn.second->get_parent_element());
-
-	if (!src_block || !sink_block)
-		return;
-
-	QNEPort* src_port = src_block->find_port(conn.first.second);
-	QNEPort* sink_port = sink_block->find_port(conn.second);
+	QNEPort* src_port = find_port(conn.first.second, conn.first.first);
+	QNEPort* sink_port = find_port(conn.second);
 
 	if (!src_port || !sink_port)
 		return;
 
-	QList<QGraphicsItem*> items = scene->items();
-
-	for (auto item : items)
+	for (auto item : scene->items())
 	{
-		if (item && item->type() == QNEConnection::Type)
+		if (!item || item->type() != QNEConnection::Type)
+			continue;
+
+		QNEConnection* con = static_cast<QNEConnection*>(item);
+		if (con->port1() && con->port2() &&
+				(con->port1()->get_object_model() == src_port->get_object_model() &&
+						con->port2()->get_object_model() == sink_port->get_object_model()))
 		{
-			QNEConnection* con = static_cast<QNEConnection*>(item);
-			if (con->port1() && con->port2() &&
-					(con->port1()->get_object_model() == src_port->get_object_model() &&
-							con->port2()->get_object_model() == sink_port->get_object_model()))
-			{
-				delete item;
-				break;
-			}
+			delete item;
+			break;
 		}
 	}
 }

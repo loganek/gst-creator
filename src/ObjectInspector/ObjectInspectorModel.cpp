@@ -122,20 +122,14 @@ void ObjectInspectorModel::setup_model_data()
 	delete root_item;
 	root_item = new ObjectInspectorItem("");
 
-	Glib::ListHandle<RefPtr<Plugin>> plugins = registry->get_plugin_list();
-
-	for (auto plugin : plugins)
-	{
+	for (RefPtr<Plugin> plugin : registry->get_plugin_list())
 		add_plugin_to_model(plugin);
-	}
 }
 
 void ObjectInspectorModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
 {
 	if (GST_OBJECT_FLAG_IS_SET (plugin->gobj(), GST_PLUGIN_FLAG_BLACKLISTED))
-	{
 		return;
-	}
 
 	RefPtr<Registry> registry = Registry::get();
 	PluginItem* plugin_item = new PluginItem(plugin, root_item);
@@ -156,6 +150,5 @@ void ObjectInspectorModel::add_plugin_to_model(const RefPtr<Plugin>& plugin)
 		ObjectInspectorItem* item = new ObjectInspectorItem(feature->get_name().c_str(), type, plugin_item);
 
 		plugin_item->append_child(item);
-
 	}
 }

@@ -11,6 +11,7 @@ PropertyCaps::PropertyCaps(GParamSpec* param_spec,
 		const Glib::RefPtr<Gst::Element>& element,
 		const Glib::RefPtr<Gst::Caps>& value)
 : Property(param_spec, element),
+  caps_edit(nullptr),
   value(value)
 {
 }

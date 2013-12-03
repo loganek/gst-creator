@@ -43,15 +43,11 @@ ObjectInspectorItem* ObjectInspectorItem::parent()
 
 int ObjectInspectorItem::row() const
 {
-	if (parent_item)
-	{
-		return std::find(parent_item->children.begin(),
-				parent_item->children.end(), this) - parent_item->children.begin();
-	}
-
-	return -1;
+	return (parent_item) ?
+			std::find(parent_item->children.begin(),
+				parent_item->children.end(), this) - parent_item->children.begin() :
+				-1;
 }
-
 
 std::string ObjectInspectorItem::get_name() const
 {

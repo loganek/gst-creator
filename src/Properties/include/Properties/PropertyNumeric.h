@@ -107,11 +107,12 @@ std::string PropertyNumeric<T>::get_str_value() const
 
 GET_MIN_MAX_FUNC(DOUBLE, Double, double)
 GET_MIN_MAX_FUNC(FLOAT, Float, float)
-GET_MIN_MAX_FUNC(ULONG, ULong, unsigned long)
-GET_MIN_MAX_FUNC(LONG, Long, long)
 GET_MIN_MAX_FUNC(INT, Int, int)
 GET_MIN_MAX_FUNC(UINT, UInt, unsigned int)
 GET_MIN_MAX_FUNC(INT64, Int64, gint64)
 GET_MIN_MAX_FUNC(UINT64, UInt64, guint64)
-
+#if !(__x86_64__ || __ppc64__)
+GET_MIN_MAX_FUNC(ULONG, ULong, unsigned long)
+GET_MIN_MAX_FUNC(LONG, Long, long)
+#endif
 #endif /* PROPERTYNUMERIC_H_ */

@@ -41,28 +41,7 @@ void PropertyCommand::run_command(CommandListener* listener)
 {
 	if (run_window)
 	{
-		QDialog* dlg = new QDialog();
-		dlg->setLayout(new QVBoxLayout());
-		dlg->layout()->addWidget(
-				Property::build_property_window(element));
-
-		class TmpClass : public QObject
-		{
-		public:
-			bool eventFilter(QObject *obj, QEvent *evt)
-			{
-				if(evt->type() == QEvent::KeyPress) {
-					QKeyEvent *keyEvent = static_cast<QKeyEvent*>(evt);
-					if(keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return )
-						return true;
-				}
-				return false;
-			}
-		}tmp_obj;
-		// TODO build custom Dialog class with disabled enters
-
-		dlg->installEventFilter(&tmp_obj);
-		dlg->exec();
+		Property::build_property_window(element)->show();
 	}
 	else if (property != nullptr)
 		property->set_value();
@@ -72,13 +51,13 @@ void PropertyCommand::run_command(CommandListener* listener)
 
 PropertyCommand* PropertyCommand::from_args(const vector<string>& args, const RefPtr<Pipeline>& model)
 {
+	if (args.size() != 3 && args.size() != 1)
+		syntax_error("invalid arguments count. Expected 1 or 3, but " + to_string(args.size()) + " found.");
+
 	RefPtr<Element> element = GstUtils::find_element(args[0], model);
 
 	if (!element)
 		throw runtime_error("cannot find element " + args[0]);
-
-	if (args.size() != 3 && args.size() != 1)
-		syntax_error("invalid arguments count. Expected 1 or 3, but " + to_string(args.size()) + " found.");
 
 	if (args.size() == 1)
 		return new PropertyCommand(element, "", "");
