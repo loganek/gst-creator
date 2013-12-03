@@ -23,21 +23,21 @@ void ConnectCommand::connect_future_elements(const RefPtr<Element>& src, const R
 	future_connection_elements_map.insert(future_connection_elements(src, sink));
 }
 
-void ConnectCommand::connect_future_pads(const RefPtr<PadTemplate>& src_pad, const RefPtr<Pad>& sink_pad)
+void ConnectCommand::connect_future_pads(const RefPtr<Element>& src_parent, const RefPtr<PadTemplate>& src_pad, const RefPtr<Pad>& sink_pad)
 {
-	future_connection_pads_map.insert(future_connection_pads(src_pad, sink_pad));
+	future_connection_pads_map.insert(future_connection_pads(template_parent(src_parent, src_pad), sink_pad));
 }
 
 void ConnectCommand::element_pad_added(const RefPtr<Pad>& pad)
 {
 	// TODO what about state-play -> state-stop -> state-play?
-
+	// TODO check template pad
 	// check, is pad->pad connection defined
 	auto tpl = pad->get_pad_template();
 	for (auto it = future_connection_pads_map.begin(); it != future_connection_pads_map.end(); ++it)
 	{
-		if (it->first->get_parent() == tpl->get_parent() &&
-				it->first->get_name() == tpl->get_name() &&
+		if (it->first.second->get_parent() == tpl->get_parent() &&
+				it->first.second->get_name() == tpl->get_name() &&
 				pad->can_link(it->second))
 		{
 			pad->link(it->second);
@@ -100,7 +100,23 @@ ConnectCommand::ConnectCommand(const RefPtr<Object>& src, const RefPtr<Object>& 
 	{
 		type = ObjectType::PAD;
 		if (future)
-			connect_future_pads(RefPtr<PadTemplate>::cast_static(src), RefPtr<Pad>::cast_static(dst));
+			syntax_error("invalid constructor used"); // fixme
+	}
+	else
+		syntax_error("unknown object type");
+}
+
+ConnectCommand::ConnectCommand(const RefPtr<PadTemplate>& src, const RefPtr<Element>& src_parent, const RefPtr<Pad>& dst)
+: src(src),
+  dst(dst),
+  Command(CommandType::CONNECT),
+  src_parent(src_parent),
+  future(true)
+{
+	if (GST_IS_PAD(src->gobj()) || GST_IS_PAD(dst->gobj()))
+	{
+		type = ObjectType::PAD;
+		connect_future_pads(src_parent, RefPtr<PadTemplate>::cast_static(src), RefPtr<Pad>::cast_static(dst));
 	}
 	else
 		syntax_error("unknown object type");
@@ -156,9 +172,8 @@ void ConnectCommand::run_command(CommandListener* listener)
 	{
 		if (future)
 		{
-			RefPtr<PadTemplate> p_src = p_src.cast_static(dst);
-			RefPtr<Element>::cast_static(p_src->get_parent())
-					->signal_pad_added().connect(sigc::ptr_fun(&ConnectCommand::element_pad_added));
+			RefPtr<PadTemplate> p_src = p_src.cast_static(src);
+			src_parent->signal_pad_added().connect(sigc::ptr_fun(&ConnectCommand::element_pad_added));
 		}
 		else
 		{

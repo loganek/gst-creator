@@ -156,26 +156,31 @@ QVariant QNEPort::itemChange(GraphicsItemChange change, const QVariant &value)
 
 bool QNEPort::can_link(QNEPort* sink_port) const
 {
+	auto sink_model = sink_port->get_object_model();
+
 	if (isOutput_ == sink_port->isOutput_)
 		return false;
 
-	if (!model || !sink_port->get_object_model())
+	if (!model && !sink_model)
 		return true;
 
-	if (GST_IS_PAD(model->gobj()) && GST_IS_PAD(sink_port->get_object_model()->gobj()))
+	if ((!model && sink_model) || (model && !sink_model))
+		return false;
+
+	if (GST_IS_PAD(model->gobj()) && GST_IS_PAD(sink_model->gobj()))
 		return Glib::RefPtr<Gst::Pad>::cast_static(model)->can_link(
-				Glib::RefPtr<Gst::Pad>::cast_static(sink_port->get_object_model()));
+				Glib::RefPtr<Gst::Pad>::cast_static(sink_model));
 
-	if (GST_IS_PAD_TEMPLATE(model->gobj()) && GST_IS_PAD_TEMPLATE(sink_port->get_object_model()->gobj()))
+	if (GST_IS_PAD_TEMPLATE(model->gobj()) && GST_IS_PAD_TEMPLATE(sink_model->gobj()))
 		return Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(model))->can_link(
-				Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model())));
+				Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_model)));
 
-	if (GST_IS_PAD_TEMPLATE(model->gobj()) && GST_IS_PAD(sink_port->get_object_model()->gobj()))
+	if (GST_IS_PAD_TEMPLATE(model->gobj()) && GST_IS_PAD(sink_model->gobj()))
 		return Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(model))->can_link(
-				Glib::RefPtr<Gst::Pad>::cast_static(sink_port->get_object_model()));
+				Glib::RefPtr<Gst::Pad>::cast_static(sink_model));
 
-	if (GST_IS_PAD(model->gobj()) && GST_IS_PAD_TEMPLATE(sink_port->get_object_model()->gobj()))
+	if (GST_IS_PAD(model->gobj()) && GST_IS_PAD_TEMPLATE(sink_model->gobj()))
 		return Glib::RefPtr<Gst::Pad>::cast_static(model)->can_link(
-				Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_port->get_object_model())));
+				Gst::Pad::create(Glib::RefPtr<Gst::PadTemplate>::cast_static(sink_model)));
 	return false;
 }

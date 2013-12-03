@@ -177,6 +177,9 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 				delete conn;
 				conn = 0;
 
+				if (!src_port->can_link(sink_port))
+					return true;
+
 				if (src_port->block() != sink_port->block() && src_port->isOutput() != sink_port->isOutput() && !src_port->isConnected(sink_port))
 				{
 					if (!src_port->get_object_model() && !sink_port->get_object_model())
@@ -202,8 +205,9 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 					}
 					if (src_port->is_template_model() && Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == Gst::PAD_SOMETIMES)
 					{
+						auto pad_parent = src_port->block()->get_model();
 						auto tpl = Glib::RefPtr<Gst::PadTemplate>::cast_static(src_port->get_object_model());
-						ConnectCommand con_cmd(tpl, sink_pad, true);
+						ConnectCommand con_cmd(tpl, pad_parent, sink_pad);
 						con_cmd.run_command(this);
 						return true;
 					}
