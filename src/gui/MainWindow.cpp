@@ -35,7 +35,7 @@ void MainWindow::add_workspace_canvas()
 	QFrame* workspace_frame = new QFrame();
 	workspace_frame->setLayout(new QGridLayout());
 	QFrame *frame = new QFrame;
-	WorkspaceWidget* workspace = new WorkspaceWidget(file_controller->get_model());
+	workspace = new WorkspaceWidget(file_controller->get_model());
 	ConsoleView* console = new ConsoleView(workspace);
 	LoggerView* logger = new LoggerView();
 
@@ -56,11 +56,11 @@ void MainWindow::add_workspace_canvas()
 	frameLayout->addWidget(logger);
 	ui->rightFrame->layout()->addWidget(spl);
 
-	file_controller->get_model()->signal_element_added().connect([workspace](const Glib::RefPtr<Gst::Element>& e) {
+	file_controller->get_model()->signal_element_added().connect([this](const Glib::RefPtr<Gst::Element>& e) {
 		workspace->new_element_added(e);
 	});
 
-	file_controller->get_model()->signal_element_removed().connect([workspace](const Glib::RefPtr<Gst::Element>& e) {
+	file_controller->get_model()->signal_element_removed().connect([this](const Glib::RefPtr<Gst::Element>& e) {
 		workspace->element_removed(e);
 	});
 }
@@ -87,6 +87,17 @@ void MainWindow::on_actionSave_As_triggered(bool checked)
 		return;
 
 	file_controller->save_model(filename.toUtf8().constData());
+}
+
+void MainWindow::on_actionLoad_triggered(bool checked)
+{
+	QString filename = QFileDialog::getOpenFileName(this, "Save Project", QDir::currentPath(),
+			"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
+
+	if (filename.isNull())
+		return;
+
+	file_controller->load_model(filename.toUtf8().constData(), workspace);
 }
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)

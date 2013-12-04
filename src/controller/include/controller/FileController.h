@@ -8,6 +8,7 @@
 #ifndef FILECONTROLLER_H_
 #define FILECONTROLLER_H_
 
+#include "Commands.h"
 #include <gstreamermm.h>
 #include <QtCore>
 
@@ -23,7 +24,7 @@ public:
 	Glib::RefPtr<Gst::Pipeline> get_model() const;
 
 	void save_model(const std::string& filename);
-	void load_model(const std::string& filename);
+	void load_model(const std::string& filename, CommandListener* listener);
 };
 
 #endif /* FILECONTROLLER_H_ */

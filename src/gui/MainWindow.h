@@ -25,10 +25,12 @@ public:
 private Q_SLOTS:
 	void on_actionAbout_triggered(bool checked);
 	void on_actionSave_As_triggered(bool checked);
+	void on_actionLoad_triggered(bool checked);
 
 private:
 	void add_workspace_canvas();
 	Ui::MainWindow *ui;
+	WorkspaceWidget* workspace;
 	ObjectInspectorView plugins_tree;
 	FileController* file_controller;
 

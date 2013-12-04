@@ -30,7 +30,6 @@ void ConnectCommand::connect_future_pads(const RefPtr<Element>& src_parent, cons
 
 void ConnectCommand::element_pad_added(const RefPtr<Pad>& pad)
 {
-	// TODO what about state-play -> state-stop -> state-play?
 	// TODO check template pad
 
 	// check, is pad->pad connection defined
