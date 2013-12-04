@@ -2,15 +2,15 @@
 #include "ui_MainWindow.h"
 #include "Console/ConsoleView.h"
 #include "Logger/LoggerView.h"
-#include "controller/FileController.h"
+#include "controller.h"
 #include "ObjectInspector/ObjectInspectorModel.h"
 #include "ObjectInspector/ObjectInspectorFilter.h"
 #include <QtWidgets/qmessagebox.h>
 #include <gstreamermm.h>
 
-MainWindow::MainWindow(FileController* file_controller, QWidget *parent)
+MainWindow::MainWindow(MainController* controller, QWidget *parent)
 : QMainWindow(parent),
-  file_controller(file_controller),
+  controller(controller),
   ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
@@ -35,7 +35,7 @@ void MainWindow::add_workspace_canvas()
 	QFrame* workspace_frame = new QFrame();
 	workspace_frame->setLayout(new QGridLayout());
 	QFrame *frame = new QFrame;
-	workspace = new WorkspaceWidget(file_controller->get_model());
+	workspace = new WorkspaceWidget(controller->get_model());
 	ConsoleView* console = new ConsoleView(workspace);
 	LoggerView* logger = new LoggerView();
 
@@ -43,7 +43,7 @@ void MainWindow::add_workspace_canvas()
 	QSplitter* spl = new QSplitter();
 
 	QObject::connect(console, &ConsoleView::command_added, logger, &LoggerView::add_log);
-	console->set_model(file_controller->get_model());
+	console->set_model(controller->get_model());
 
 	QObject::connect(workspace, &WorkspaceWidget::current_element_changed, this, &MainWindow::current_element_info);
 
@@ -56,11 +56,11 @@ void MainWindow::add_workspace_canvas()
 	frameLayout->addWidget(logger);
 	ui->rightFrame->layout()->addWidget(spl);
 
-	file_controller->get_model()->signal_element_added().connect([this](const Glib::RefPtr<Gst::Element>& e) {
+	controller->get_model()->signal_element_added().connect([this](const Glib::RefPtr<Gst::Element>& e) {
 		workspace->new_element_added(e);
 	});
 
-	file_controller->get_model()->signal_element_removed().connect([this](const Glib::RefPtr<Gst::Element>& e) {
+	controller->get_model()->signal_element_removed().connect([this](const Glib::RefPtr<Gst::Element>& e) {
 		workspace->element_removed(e);
 	});
 }
@@ -86,7 +86,7 @@ void MainWindow::on_actionSave_As_triggered(bool checked)
 	if (filename.isNull())
 		return;
 
-	file_controller->save_model(filename.toUtf8().constData());
+	FileWriter(filename.toUtf8().constData(), controller->get_model()).save_model();
 }
 
 void MainWindow::on_actionLoad_triggered(bool checked)
@@ -97,7 +97,7 @@ void MainWindow::on_actionLoad_triggered(bool checked)
 	if (filename.isNull())
 		return;
 
-	file_controller->load_model(filename.toUtf8().constData(), workspace);
+	FileLoader(filename.toUtf8().constData(), controller->get_model()).load_model(workspace);
 }
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)

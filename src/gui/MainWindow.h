@@ -12,14 +12,14 @@ namespace Ui {
 class MainWindow;
 }
 
-class FileController;
+class MainController;
 
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	explicit MainWindow(FileController* file_controller, QWidget *parent = 0);
+	explicit MainWindow(MainController* file_controller, QWidget *parent = 0);
 	~MainWindow();
 
 private Q_SLOTS:
@@ -32,7 +32,7 @@ private:
 	Ui::MainWindow *ui;
 	WorkspaceWidget* workspace;
 	ObjectInspectorView plugins_tree;
-	FileController* file_controller;
+	MainController* controller;
 
 private Q_SLOTS:
 	void current_element_info(const Glib::RefPtr<Gst::Element>& element);

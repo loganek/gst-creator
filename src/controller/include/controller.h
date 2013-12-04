@@ -8,6 +8,8 @@
 #ifndef CONTROLLER_H_
 #define CONTROLLER_H_
 
-#include "controller/FileController.h"
+#include "controller/FileWriter.h"
+#include "controller/FileLoader.h"
+#include "controller/MainController.h"
 
 #endif /* CONTROLLER_H_ */

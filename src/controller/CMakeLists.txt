@@ -1,9 +1,13 @@
 set(CONTROLLER_HEADERS 
-	include/controller/FileController.h
+	include/controller/FileWriter.h
+	include/controller/FileLoader.h
+	include/controller/MainController.h
 )
 
 add_library(controller
-	FileController.cpp
+	FileWriter.cpp
+	MainController.cpp
+	FileLoader.cpp
 	${CONTROLLER_HEADERS}
 )
 
