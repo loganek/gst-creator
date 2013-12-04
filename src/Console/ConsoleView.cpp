@@ -196,7 +196,7 @@ void ConsoleView::make_suggestion(const QString& text, bool autocomplete)
 	suggestions->adjustSize();
 	suggestions->setUpdatesEnabled(true);
 
-	int h = suggestions->sizeHintForRow(0) * std::min((unsigned)7, vals.size()) + 3;
+	int h = suggestions->sizeHintForRow(0) * std::min((size_t)7, vals.size()) + 3;
 	suggestions->resize(suggestions->width(), h);
 
 	suggestions->move(edit->mapToGlobal(QPoint(0, edit->height())));
