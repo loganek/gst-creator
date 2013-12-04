@@ -7,6 +7,7 @@
 
 #include "FileController.h"
 #include "Properties/Property.h"
+#include "utils/GstUtils.h"
 #include <QMessageBox>
 #include <stack>
 
@@ -93,6 +94,7 @@ void FileController::write_single_element(QXmlStreamWriter* writer, const Glib::
 		{
 			writer->writeStartElement("element");
 			writer->writeAttribute("factory", iterator->get_factory()->get_name().c_str());
+			writer->writeAttribute("name", iterator->get_name().c_str());
 			write_single_element(writer, *iterator);
 			writer->writeEndElement();
 		}
@@ -108,7 +110,7 @@ void FileController::load_model(const std::string& filename, CommandListener* li
 	while (iterator.next())
 		model->remove(*iterator);
 
-	QXmlStreamReader* reader = new QXmlStreamReader();
+	QXmlStreamReader reader;
 
 	int state = 0;
 
@@ -116,25 +118,31 @@ void FileController::load_model(const std::string& filename, CommandListener* li
 	if (!file.open(QIODevice::ReadOnly))
 		throw runtime_error("Cannot open file " + filename + " for writting");
 
-	reader->setDevice(&file);
+	reader.setDevice(&file);
 	RefPtr<Element> current_element;
 	stack<RefPtr<Element>> element_stack;
-	while (!reader->atEnd() && !reader->hasError())
+	map<Glib::ustring, Glib::ustring> connections;
+
+	while (!reader.atEnd() && !reader.hasError())
 	{
-		QXmlStreamReader::TokenType token = reader->readNext();
+		QXmlStreamReader::TokenType token = reader.readNext();
 
 		if (token == QXmlStreamReader::StartDocument)
 			continue;
 
 		if (token == QXmlStreamReader::StartElement)
 		{
-			if (reader->name() == "pipeline")
+			if (reader.name() == "pipeline")
 				current_element = model;
-			else if (reader->name() == "element")
+			else if (reader.name() == "element")
 			{
-				if (reader->attributes().hasAttribute("factory"))
+				if (reader.attributes().hasAttribute("factory"))
 				{
-					RefPtr<Element> new_element = ElementFactory::create_element(reader->attributes().value("factory").toUtf8().constData());
+
+					RefPtr<Element> new_element =
+							(reader.attributes().hasAttribute("name")) ?
+									ElementFactory::create_element(reader.attributes().value("factory").toUtf8().constData(), reader.attributes().value("name").toUtf8().constData()) :
+									ElementFactory::create_element(reader.attributes().value("factory").toUtf8().constData());
 					AddCommand cmd(ObjectType::ELEMENT, current_element, new_element);
 					cmd.run_command(listener);
 					element_stack.push(current_element);
@@ -142,40 +150,82 @@ void FileController::load_model(const std::string& filename, CommandListener* li
 				}
 
 			}
-			else if (reader->name() == "property")
+			else if (reader.name() == "property")
 			{
-				if (reader->attributes().hasAttribute("name"))
+				if (reader.attributes().hasAttribute("name"))
 				{
 					GParamSpec* spec = g_object_class_find_property(G_OBJECT_GET_CLASS(current_element->gobj()),
-							reader->attributes().value("name").toUtf8().constData());
+							reader.attributes().value("name").toUtf8().constData());
 					if (spec != nullptr)
 					{
-						reader->readNext();
-						qDebug() << "Laduje propa: " << reader->text().toString();
+						reader.readNext();
+						qDebug() << "Laduje propa: " << reader.text().toString();
 						string text;
-						if (reader->tokenType() == QXmlStreamReader::Characters)
-							text = reader->text().toString().toUtf8().constData();
+						if (reader.tokenType() == QXmlStreamReader::Characters)
+						{
+							text = reader.text().toString().toUtf8().constData();
+							Property* prop = Property::build_property(spec, current_element, text);
+							if (prop)
+								prop->set_value();
+						}
+					}
+				}
+			}
+			else if (reader.name() == "pad")
+			{
+				if (reader.attributes().hasAttribute("name") &&
+						reader.attributes().hasAttribute("template") &&
+						reader.attributes().hasAttribute("is_linked"))
+				{
+					bool is_linked = reader.attributes().value("is_linked") == "1";
+					Glib::ustring pad_name = reader.attributes().value("name").toUtf8().constData();
+					Glib::ustring pad_template = reader.attributes().value("template").toUtf8().constData();
+					RefPtr<PadTemplate> pad_tpl = current_element->get_pad_template(pad_template);
 
-						Property* prop = Property::build_property(spec, current_element, text);
-						if (prop)
-							prop->set_value();
+					if (!current_element->get_static_pad(pad_name)) // check, is pad static
+					{
+
+						AddCommand cmd(ObjectType::PAD, current_element,
+								Pad::create(pad_tpl, pad_name));
+						cmd.run_command(listener);
+					}
+
+					if (is_linked && pad_tpl->get_direction() == PAD_SRC)
+					{
+						reader.readNext();
+						if (reader.tokenType() == QXmlStreamReader::Characters)
+						{
+							Glib::ustring sink_pad_text = reader.text().toString().toUtf8().constData();
+							Glib::ustring current_name = current_element->get_name() + ":" + pad_name;
+							connections[current_name] = sink_pad_text;
+						}
 					}
 				}
 			}
 		}
 		else if (token == QXmlStreamReader::EndElement)
 		{
-			if (reader->name() == "element")
+			if (reader.name() == "element")
 			{
 				current_element = element_stack.top();
 				element_stack.pop();
 			}
 		}
 	}
-	if (reader->hasError())
-		qDebug() << reader->errorString();
+	if (reader.hasError())
+		qDebug() << reader.errorString();
 
-	delete reader;
+	for (auto con : connections)
+	{
+		RefPtr<Pad> src_pad = GstUtils::find_pad(con.first.c_str(), model);
+		RefPtr<Pad> sink_pad = GstUtils::find_pad(con.second.c_str(), model);
+
+		if (src_pad && sink_pad)
+		{
+			ConnectCommand cmd(src_pad, sink_pad);
+			cmd.run_command(listener);
+		}
+	}
 }
 
 
