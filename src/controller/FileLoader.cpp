@@ -163,5 +163,49 @@ void FileLoader::process_start_element()
 			connections[current_name] = sink_pad_text;
 		}
 	}
-}
+	else if (reader.name() == "future-connection")
+	{
+		Glib::ustring connection_type = get_attribute("type");
 
+		if (connection_type == "element")
+		{
+			Glib::ustring source = get_attribute("source"),
+					destination = get_attribute("destination");
+
+			if (source.empty() || destination.empty())
+				return;
+
+			RefPtr<Element> source_e = GstUtils::find_element(source.c_str(), model);
+			RefPtr<Element> destination_e = GstUtils::find_element(destination.c_str(), model);
+
+			if (!source_e || !destination_e)
+				return;
+
+			ConnectCommand cmd(source_e, destination_e, true);
+			cmd.run_command(listener);
+		}
+		else if (connection_type == "pad")
+		{
+			Glib::ustring template_parent = get_attribute("template-parent"),
+					tpl = get_attribute("template"),
+					destination = get_attribute("destination");
+
+			if (template_parent.empty() || tpl.empty() || destination.empty())
+				return;
+
+			RefPtr<Pad> dest_pad = GstUtils::find_pad(destination.c_str(), model);
+			RefPtr<Element> tpl_parent = GstUtils::find_element(template_parent.c_str(), model);
+
+			if (!dest_pad || !tpl_parent)
+				return;
+
+			RefPtr<PadTemplate> pad_tpl = tpl_parent->get_pad_template(tpl);
+
+			if (!pad_tpl)
+				return;
+
+			ConnectCommand cmd(pad_tpl, tpl_parent, dest_pad);
+			cmd.run_command(listener);
+		}
+	}
+}

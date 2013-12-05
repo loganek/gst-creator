@@ -20,6 +20,7 @@ private:
 	QFile* file;
 
 	void write_single_element(const Glib::RefPtr<Gst::Element>& element);
+	void write_future_connections();
 	void open_file();
 public:
 	FileWriter(const std::string& filename, const Glib::RefPtr<Gst::Pipeline>& model);

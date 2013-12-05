@@ -8,6 +8,7 @@
 #include "FileWriter.h"
 #include "Properties/Property.h"
 #include "utils/GstUtils.h"
+#include "Commands/ConnectCommand.h"
 
 using namespace std;
 using Glib::RefPtr;
@@ -43,6 +44,7 @@ void FileWriter::save_model()
 	writer.writeStartElement("pipeline");
 
 	write_single_element(model);
+	write_future_connections();
 
 	writer.writeEndElement();
 	writer.writeEndDocument();
@@ -82,7 +84,7 @@ void FileWriter::write_single_element(const Glib::RefPtr<Gst::Element>& element)
 		writer.writeEndElement();
 	}
 
-	if (GST_IS_BIN(element->gobj()))
+	if (GST_IS_BIN(element->gobj()) && element == model) // TODO deeper search in a next version
 	{
 		Glib::RefPtr<Gst::Bin> bin = bin.cast_static(element);
 		auto iterator = bin->iterate_elements();
@@ -99,5 +101,27 @@ void FileWriter::write_single_element(const Glib::RefPtr<Gst::Element>& element)
 		}
 		if (bin->get_num_children())
 			writer.writeEndElement();
+	}
+}
+
+void FileWriter::write_future_connections()
+{
+	for (auto connection_element : ConnectCommand::get_future_connections_element())
+	{
+		writer.writeStartElement("future-connection");
+		writer.writeAttribute("type", "element");
+		writer.writeAttribute("source", GstUtils::generate_element_path(connection_element.first, model).c_str());
+		writer.writeAttribute("destination", GstUtils::generate_element_path(connection_element.second, model).c_str());
+		writer.writeEndElement();
+	}
+
+	for (auto connection_pad : ConnectCommand::get_future_connections_pads())
+	{
+		writer.writeStartElement("future-connection");
+		writer.writeAttribute("type", "pad");
+		writer.writeAttribute("template-parent", GstUtils::generate_element_path(connection_pad.first.first, model).c_str());
+		writer.writeAttribute("template", connection_pad.first.second->get_name().c_str());
+		writer.writeAttribute("destination", GstUtils::generate_element_path(connection_pad.second, model).c_str());
+		writer.writeEndElement();
 	}
 }

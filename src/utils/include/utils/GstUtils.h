@@ -28,6 +28,7 @@ public:
 	static std::vector<std::string> get_pads_from_element_string(const Glib::RefPtr<Gst::Element>& element);
 	static bool is_sink_element(const Glib::RefPtr<Gst::Element>& element);
 	static bool is_src_element(const Glib::RefPtr<Gst::Element>& element);
+	static std::string generate_element_path(Glib::RefPtr<Gst::Object> obj, const Glib::RefPtr<Gst::Object>& max_parent = Glib::RefPtr<Gst::Object>());
 };
 
 #endif /* GSTUTILS_H_ */

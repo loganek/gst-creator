@@ -31,7 +31,7 @@ private:
 
 	static std::string future_keyword;
 	void connect_future_pads(const Glib::RefPtr<Gst::Element>& src_parent, const Glib::RefPtr<Gst::PadTemplate>& src_pad, const Glib::RefPtr<Gst::Pad>& sink_pad);
-	void connect_future_elements(const Glib::RefPtr<Gst::Element>& src_pad, const Glib::RefPtr<Gst::Element>& sink_pad);
+	void connect_future_elements(const Glib::RefPtr<Gst::Element>& src, const Glib::RefPtr<Gst::Element>& sink);
 public:
 	ConnectCommand(const Glib::RefPtr<Gst::Object>& src, const Glib::RefPtr<Gst::Object>& dst, bool future = false);
 	ConnectCommand(const Glib::RefPtr<Gst::PadTemplate>& src, const Glib::RefPtr<Gst::Element>& src_parent, const Glib::RefPtr<Gst::Pad>& dst);
@@ -45,6 +45,9 @@ public:
 
 	static void element_pad_added(const Glib::RefPtr<Gst::Pad>& pad);
 	static void remove_future_connection(const Glib::RefPtr<Gst::PadTemplate>& tpl, const Glib::RefPtr<Gst::Pad>& pad, CommandListener* listener);
+
+	static std::set<future_connection_elements> get_future_connections_element();
+	static std::set<future_connection_pads> get_future_connections_pads();
 };
 
 #endif /* CONNECTCOMMAND_H_ */

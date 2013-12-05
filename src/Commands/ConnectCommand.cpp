@@ -18,6 +18,16 @@ string ConnectCommand::future_keyword = "FUTURE";
 std::set<ConnectCommand::future_connection_pads> ConnectCommand::future_connection_pads_map;
 std::set<ConnectCommand::future_connection_elements> ConnectCommand::future_connection_elements_map;
 
+std::set<ConnectCommand::future_connection_elements> ConnectCommand::get_future_connections_element()
+{
+	return future_connection_elements_map;
+}
+
+std::set<ConnectCommand::future_connection_pads> ConnectCommand::get_future_connections_pads()
+{
+	return future_connection_pads_map;
+}
+
 void ConnectCommand::connect_future_elements(const RefPtr<Element>& src, const RefPtr<Element>& sink)
 {
 	future_connection_elements_map.insert(future_connection_elements(src, sink));

@@ -209,3 +209,23 @@ bool GstUtils::is_src_element(const RefPtr<Element>& element)
 {
 	return is_specified_dir_element(element, PAD_SRC);
 }
+
+std::string GstUtils::generate_element_path(RefPtr<Object> obj, const RefPtr<Object>& max_parent)
+{
+	std::string path;
+	bool first = true;
+
+	while (obj && obj != max_parent)
+	{
+		std::string tmp_path = obj->get_name().c_str();
+		obj = obj->get_parent();
+		if (!first)
+			tmp_path += ":";
+		else
+			first = false;
+
+		 path = tmp_path + path;
+	}
+
+	return path;
+}
