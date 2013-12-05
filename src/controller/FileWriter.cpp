@@ -77,7 +77,8 @@ void FileWriter::write_single_element(const Glib::RefPtr<Gst::Element>& element)
 	{
 		writer.writeStartElement("pad");
 		writer.writeAttribute("name", pads->get_name().c_str());
-		writer.writeAttribute("template", pads->get_pad_template()->get_name().c_str());
+		if (pads->get_pad_template())
+			writer.writeAttribute("template", pads->get_pad_template()->get_name().c_str());
 		writer.writeAttribute("is_linked", std::to_string(pads->is_linked()).c_str());
 		if (pads->is_linked())
 			writer.writeCharacters((pads->get_peer()->get_parent_element()->get_name() + ":" + pads->get_peer()->get_name()).c_str());
