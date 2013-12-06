@@ -104,3 +104,10 @@ void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)
 {
 	ui->currentElementLabel->setText(element->get_name().c_str());
 }
+
+void MainWindow::on_actionGenerate_Cpp_Code_triggered(bool checked)
+{
+	CodeGenerator generator(controller->get_model());
+
+	generator.generate_code("output.cpp");
+}

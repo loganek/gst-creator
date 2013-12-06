@@ -8,6 +8,7 @@ add_library(controller
 	FileWriter.cpp
 	MainController.cpp
 	FileLoader.cpp
+	CodeGenerator.cpp
 	${CONTROLLER_HEADERS}
 )
 

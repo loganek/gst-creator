@@ -11,5 +11,6 @@
 #include "controller/FileWriter.h"
 #include "controller/FileLoader.h"
 #include "controller/MainController.h"
+#include "controller/CodeGenerator.h"
 
 #endif /* CONTROLLER_H_ */

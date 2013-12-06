@@ -126,7 +126,20 @@
     <addaction name="actionSave_As"/>
     <addaction name="actionLoad"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <widget class="QMenu" name="menuCode_Generator">
+     <property name="title">
+      <string>Code Generator</string>
+     </property>
+     <addaction name="actionGenerate_Cpp_Code"/>
+    </widget>
+    <addaction name="menuCode_Generator"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -151,6 +164,11 @@
   <action name="actionLoad">
    <property name="text">
     <string>Load...</string>
+   </property>
+  </action>
+  <action name="actionGenerate_Cpp_Code">
+   <property name="text">
+    <string>Generate C++ Code...</string>
    </property>
   </action>
  </widget>
