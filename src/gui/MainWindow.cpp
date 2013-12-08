@@ -111,3 +111,13 @@ void MainWindow::on_actionGenerate_Cpp_Code_triggered(bool checked)
 
 	generator.generate_code("output.cpp");
 }
+
+void MainWindow::on_actionLoad_Plugin_triggered(bool checked)
+{
+
+}
+
+void MainWindow::on_actionAdd_Plugin_Path_triggered(bool checked)
+{
+
+}

@@ -18,6 +18,7 @@ include_directories(${GSTMM_INCLUDE_DIRS})
 link_directories(${GSTMM_LIBRARY_DIRS})
 
 include_directories(
+	${PROJECT_SOURCE_DIR}/gui/include
 	${PROJECT_SOURCE_DIR}/ObjectInspector/include
 	${PROJECT_SOURCE_DIR}/Workspace/include
 	${PROJECT_SOURCE_DIR}/Console/include

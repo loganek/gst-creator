@@ -27,6 +27,8 @@ private Q_SLOTS:
 	void on_actionSave_As_triggered(bool checked);
 	void on_actionLoad_triggered(bool checked);
 	void on_actionGenerate_Cpp_Code_triggered(bool checked);
+	void on_actionLoad_Plugin_triggered(bool checked);
+	void on_actionAdd_Plugin_Path_triggered(bool checked);
 
 private:
 	void add_workspace_canvas();

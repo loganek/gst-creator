@@ -125,6 +125,9 @@
     </property>
     <addaction name="actionSave_As"/>
     <addaction name="actionLoad"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoad_Plugin"/>
+    <addaction name="actionAdd_Plugin_Path"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -137,6 +140,7 @@
      <addaction name="actionGenerate_Cpp_Code"/>
     </widget>
     <addaction name="menuCode_Generator"/>
+    <addaction name="actionPlugin_Wizzard"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -169,6 +173,26 @@
   <action name="actionGenerate_Cpp_Code">
    <property name="text">
     <string>Generate C++ Code...</string>
+   </property>
+  </action>
+  <action name="actionPlugin_Wizzard">
+   <property name="text">
+    <string>Plugin Wizzard...</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>-</string>
+   </property>
+  </action>
+  <action name="actionLoad_Plugin">
+   <property name="text">
+    <string>Load Plugin...</string>
+   </property>
+  </action>
+  <action name="actionAdd_Plugin_Path">
+   <property name="text">
+    <string>Add Plugin Path...</string>
    </property>
   </action>
  </widget>
