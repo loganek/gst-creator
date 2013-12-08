@@ -119,7 +119,7 @@ void MainWindow::on_actionGenerate_Cpp_Code_triggered(bool checked)
 
 void MainWindow::on_actionLoad_Plugin_triggered(bool checked)
 {
-	QString filename = QFileDialog::getOpenFileName(this, "Save Project", QDir::currentPath(),
+	QString filename = QFileDialog::getOpenFileName(this, "Load Plugin", QDir::currentPath(),
 			"Shared Libraries (*.so);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
 	if (filename.isNull())
@@ -133,5 +133,14 @@ void MainWindow::on_actionLoad_Plugin_triggered(bool checked)
 
 void MainWindow::on_actionAdd_Plugin_Path_triggered(bool checked)
 {
+	QString filename = QFileDialog::getExistingDirectory(this, "Load Plugin Path",
+			".", QFileDialog::DontUseNativeDialog);
 
+	if (filename.isNull())
+		return;
+
+	Glib::RefPtr<Gst::Registry> registry = Gst::Registry::get();
+
+	if (registry->scan_path(filename.toUtf8().constData()))
+		reload_plugins();
 }
