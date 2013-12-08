@@ -7,6 +7,7 @@
 
 #include "CodeGenerator.h"
 #include <iostream>
+#include "Commands/ConnectCommand.h"
 
 using namespace std;
 using namespace Gst;
@@ -34,7 +35,8 @@ void CodeGenerator::generate_all()
 	generate_get_pipeline();
 	generate_create_pipeline();
 	generate_init_elements();
-	generate_link_static_pads();
+	generate_static_links();
+	generate_dynamic_links();
 	generate_main();
 }
 
@@ -56,7 +58,7 @@ void CodeGenerator::generate_class()
 {
 	output << "class Creator" << endl << "{" << endl;
 	output << "private:" << endl;
-	output << "Glib::RefPtr<Gst::Pipeline> pipeline;" << endl;
+	output << "\tGlib::RefPtr<Gst::Pipeline> pipeline;" << endl;
 
 	auto iterator = model->iterate_elements();
 
@@ -66,7 +68,8 @@ void CodeGenerator::generate_class()
 				<< iterator->get_name() << ";" << endl;
 	}
 	output << endl << "\tvoid init_elements();" << endl;
-	output << "\tvoid link_static_pads();" << endl;
+	output << "\tvoid static_links();" << endl;
+	output << "\tvoid dynamic_links();" << endl;
 	output << "\tvoid create_pipeline();" << endl;
 	output << endl << "public:" << endl;
 	output << "\tvirtual ~Creator(){}" << endl;
@@ -88,15 +91,16 @@ void CodeGenerator::generate_create_pipeline()
 {
 	output << "void Creator::create_pipeline()" << endl << "{" << endl;
 	output << "\tinit_elements();" << endl;
-	output << "\tlink_static_pads();" << endl;
+	output << "\tstatic_links();" << endl;
+	output << "\tdynamic_links();" << endl;
 	output << "}" << endl;
 }
 
 void CodeGenerator::generate_init_elements()
 {
 	output << "void Creator::init_elements()" << endl << "{" << endl;
-	output << "pipeline = Gst::Pipeline::create(\""
-			<< model->get_name() << "\");";
+	output << "\tpipeline = Gst::Pipeline::create(\""
+			<< model->get_name() << "\");" << endl;
 
 	auto iterator = model->iterate_elements();
 
@@ -125,9 +129,9 @@ void CodeGenerator::generate_init_elements()
 	output << "}" << endl;
 }
 
-void CodeGenerator::generate_link_static_pads()
+void CodeGenerator::generate_static_links()
 {
-	output << "void Creator::link_static_pads()" << endl << "{" << endl;
+	output << "void Creator::static_links()" << endl << "{" << endl;
 
 	auto iterator = model->iterate_elements();
 
@@ -149,3 +153,31 @@ void CodeGenerator::generate_link_static_pads()
 
 	output << "}" << endl;
 }
+
+void CodeGenerator::generate_dynamic_links()
+{
+	output << "void Creator::dynamic_links()" << endl << "{" << endl;
+
+	auto future_connections = ConnectCommand::get_future_connections_pads();
+
+	for (auto connection : future_connections)
+	{
+		output << "\t" << connection.first.first->get_name()
+				<< "->signal_pad_added().connect("
+				<< "[this](const Glib::RefPtr<Gst::Pad>& pad){" << endl
+				<< "\t\tif (" << connection.second->get_parent_element()->get_name()
+				<< "->get_static_pad(\"" << connection.second->get_name() << "\")"
+				<< "->is_linked()) " << endl << "\t\t\treturn;" << endl
+				<< "\t\tif (pad->get_pad_template()->get_name() == \""
+				<< connection.first.second->get_name() << "\")"
+				<< endl << "\t\t\tpad->link("
+				<< connection.second->get_parent_element()->get_name()
+				<< "->get_static_pad(\"" << connection.second->get_name()
+				<< "\"));" << endl << "\t});" << endl << endl;
+
+	}
+
+	output << "}" << endl;
+}
+
+
