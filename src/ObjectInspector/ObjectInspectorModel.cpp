@@ -17,6 +17,7 @@ ObjectInspectorModel::ObjectInspectorModel(QObject *parent)
 : QAbstractItemModel(parent),
   root_item(nullptr)
 {
+
 	setup_model_data();
 }
 

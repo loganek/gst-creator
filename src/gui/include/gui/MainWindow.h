@@ -37,6 +37,8 @@ private:
 	ObjectInspectorView plugins_tree;
 	MainController* controller;
 
+	void reload_plugins();
+
 private Q_SLOTS:
 	void current_element_info(const Glib::RefPtr<Gst::Element>& element);
 };

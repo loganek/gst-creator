@@ -20,6 +20,11 @@ MainWindow::MainWindow(MainController* controller, QWidget *parent)
 
 	setAcceptDrops(false);
 
+	reload_plugins();
+}
+
+void MainWindow::reload_plugins()
+{
 	ObjectInspectorFilter* filter = new ObjectInspectorFilter();
 	filter->setSourceModel(new ObjectInspectorModel());
 
@@ -114,7 +119,16 @@ void MainWindow::on_actionGenerate_Cpp_Code_triggered(bool checked)
 
 void MainWindow::on_actionLoad_Plugin_triggered(bool checked)
 {
+	QString filename = QFileDialog::getOpenFileName(this, "Save Project", QDir::currentPath(),
+			"Shared Libraries (*.so);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
+	if (filename.isNull())
+		return;
+
+	Glib::RefPtr<Gst::Registry> registry = Gst::Registry::get();
+	registry->add_plugin(Gst::Plugin::load_file(filename.toUtf8().constData()));
+
+	reload_plugins();
 }
 
 void MainWindow::on_actionAdd_Plugin_Path_triggered(bool checked)
