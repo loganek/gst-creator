@@ -144,3 +144,8 @@ void MainWindow::on_actionAdd_Plugin_Path_triggered(bool checked)
 	if (registry->scan_path(filename.toUtf8().constData()))
 		reload_plugins();
 }
+
+void MainWindow::on_actionExit_triggered(bool checked)
+{
+	this->close();
+}

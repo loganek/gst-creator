@@ -128,6 +128,8 @@
     <addaction name="separator"/>
     <addaction name="actionLoad_Plugin"/>
     <addaction name="actionAdd_Plugin_Path"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
@@ -159,6 +161,9 @@
    <property name="text">
     <string>About GstCreator</string>
    </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
   </action>
   <action name="actionSave_As">
    <property name="text">
@@ -168,6 +173,9 @@
   <action name="actionLoad">
    <property name="text">
     <string>Load...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionGenerate_Cpp_Code">
@@ -193,6 +201,14 @@
   <action name="actionAdd_Plugin_Path">
    <property name="text">
     <string>Add Plugin Path...</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>
