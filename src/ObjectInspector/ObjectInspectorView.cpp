@@ -65,7 +65,8 @@ void ObjectInspectorView::on_object_inspector_double_clicked(const QModelIndex &
 	dialog.setWindowTitle("Inspect " + factory_name);
 	QHBoxLayout* lay = new QHBoxLayout();
 	dialog.setLayout(lay);
-	dialog.layout()->addWidget(new FactoryInspectorView(factory_name));
+	dialog.layout()->addWidget(new FactoryInspectorView(
+			index.parent().model() == model(), factory_name));
 	dialog.exec();
 }
 

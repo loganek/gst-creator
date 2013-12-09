@@ -22,7 +22,7 @@ private:
 	void build_properties_view(const Glib::RefPtr<Gst::ElementFactory>& factory);
 
 public:
-	FactoryInspectorView(const QString& factory_name, QWidget* parent = 0);
+	FactoryInspectorView(bool is_factory, const QString& name, QWidget* parent = 0);
 	virtual ~FactoryInspectorView();
 
 	static const char* pad_direction_to_string(Gst::PadDirection direction);

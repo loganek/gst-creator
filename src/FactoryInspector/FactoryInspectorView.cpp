@@ -11,24 +11,32 @@
 using namespace Gst;
 using Glib::RefPtr;
 
-FactoryInspectorView::FactoryInspectorView(const QString& factory_name, QWidget* parent)
+FactoryInspectorView::FactoryInspectorView(bool is_factory, const QString& name, QWidget* parent)
 : QWidget(parent)
 {
 	setLayout(new QVBoxLayout());
 
-	RefPtr<ElementFactory> factory = ElementFactory::find(factory_name.toUtf8().constData());
-
-	if (factory)
+	if (is_factory)
 	{
+		RefPtr<ElementFactory> factory = ElementFactory::find(name.toUtf8().constData());
+		if (!factory)
+			return;
+
 		build_element_factory_view(factory);
 		build_pad_templates_view(factory);
 		build_pads_view(factory);
 		build_properties_view(factory);
+		build_plugin_view(factory->get_plugin());
 	}
+	else
+	{
+		RefPtr<Plugin> plugin = Plugin::load_by_name(name.toUtf8().constData());
 
-	RefPtr<Plugin> plugin = factory->get_plugin();
+		if (!plugin)
+			return;
 
-	build_plugin_view(plugin);
+		build_plugin_view(plugin);
+	}
 }
 
 FactoryInspectorView::~FactoryInspectorView()
