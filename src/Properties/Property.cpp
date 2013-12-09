@@ -53,8 +53,7 @@ Property* Property::build_property(GParamSpec* param_spec,
 		return str_value.empty() ? new PropertyEnum(param_spec, element) :
 				new PropertyEnum(param_spec, element, str_value);
 	else if (!strcmp("GstCaps", g_type_name(value_type)))
-		return str_value.empty() ? new PropertyCaps(param_spec, element,
-				Caps::create_from_string(str_value.c_str())):
+		return str_value.empty() ? new PropertyCaps(param_spec, element):
 				new PropertyCaps(param_spec, element,
 						Caps::create_from_string(str_value.c_str()));
 	else

@@ -25,6 +25,7 @@ class CodeGenerator
 	void generate_init_elements();
 	void generate_static_links();
 	void generate_dynamic_links();
+	void generate_properties(const Glib::RefPtr<Gst::Element>& element);
 public:
 	CodeGenerator(const Glib::RefPtr<Gst::Pipeline>& model);
 

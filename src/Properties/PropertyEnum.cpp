@@ -96,3 +96,16 @@ void PropertyEnum::read_var()
 	value = std::to_string(enum_value);
 
 }
+
+bool PropertyEnum::is_default_value() const
+{
+	const GValue* v = g_param_spec_get_default_value(param_spec);
+	gint i = g_value_get_enum(v);
+
+	return std::to_string(i) == value;
+}
+
+std::string PropertyEnum::get_type_name() const
+{
+	return "gint";
+}

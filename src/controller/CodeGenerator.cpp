@@ -8,6 +8,7 @@
 #include "CodeGenerator.h"
 #include <iostream>
 #include "Commands/ConnectCommand.h"
+#include "Properties/Property.h"
 
 using namespace std;
 using namespace Gst;
@@ -112,6 +113,8 @@ void CodeGenerator::generate_init_elements()
 				"\"" << iterator->get_name() << "\");" << endl;
 		output << "\tpipeline->add(" << iterator->get_name() << ");" << endl;
 
+		generate_properties(*iterator);
+
 		auto pad_iterator = iterator->iterate_pads();
 
 		while (pad_iterator.next())
@@ -127,6 +130,35 @@ void CodeGenerator::generate_init_elements()
 		}
 	}
 	output << "}" << endl;
+}
+
+void CodeGenerator::generate_properties(const RefPtr<Element>& element)
+{
+	unsigned int property_count;
+	GParamSpec **property_specs = g_object_class_list_properties(
+			G_OBJECT_GET_CLASS(element->gobj()), &property_count);
+
+	for (int i = 0; i < property_count; i++)
+	{
+		Property* property = Property::build_property(property_specs[i], element, "");
+		if (property != nullptr)
+		{
+			if (!property->is_default_value())
+			{
+				output << "\t" << element->get_name() << "->property<" << property->get_type_name() <<
+				">(\"" << property_specs[i]->name << "\", ";
+				if (property->get_type_name() == "Glib::ustring")
+					output << "\"" << property->get_str_value() << "\"";
+				else if (property->get_type_name() == "Glib::RefPtr<Gst::Caps>")
+					output << "Gst::Caps::create_from_string(\"" << property->get_str_value() << "\")";
+				else
+					output << property->get_str_value();
+				output << ");" << endl;
+			}
+		}
+		delete property;
+	}
+
 }
 
 void CodeGenerator::generate_static_links()
@@ -163,17 +195,17 @@ void CodeGenerator::generate_dynamic_links()
 	for (auto connection : future_connections)
 	{
 		output << "\t" << connection.first.first->get_name()
-				<< "->signal_pad_added().connect("
-				<< "[this](const Glib::RefPtr<Gst::Pad>& pad){" << endl
-				<< "\t\tif (" << connection.second->get_parent_element()->get_name()
-				<< "->get_static_pad(\"" << connection.second->get_name() << "\")"
-				<< "->is_linked()) " << endl << "\t\t\treturn;" << endl
-				<< "\t\tif (pad->get_pad_template()->get_name() == \""
-				<< connection.first.second->get_name() << "\")"
-				<< endl << "\t\t\tpad->link("
-				<< connection.second->get_parent_element()->get_name()
-				<< "->get_static_pad(\"" << connection.second->get_name()
-				<< "\"));" << endl << "\t});" << endl << endl;
+						<< "->signal_pad_added().connect("
+						<< "[this](const Glib::RefPtr<Gst::Pad>& pad){" << endl
+						<< "\t\tif (" << connection.second->get_parent_element()->get_name()
+						<< "->get_static_pad(\"" << connection.second->get_name() << "\")"
+						<< "->is_linked()) " << endl << "\t\t\treturn;" << endl
+						<< "\t\tif (pad->get_pad_template()->get_name() == \""
+						<< connection.first.second->get_name() << "\")"
+						<< endl << "\t\t\tpad->link("
+						<< connection.second->get_parent_element()->get_name()
+						<< "->get_static_pad(\"" << connection.second->get_name()
+						<< "\"));" << endl << "\t});" << endl << endl;
 
 	}
 

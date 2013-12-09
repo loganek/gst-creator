@@ -35,6 +35,8 @@ public:
 
 	void set_value();
 	std::string get_str_value() const;
+	bool is_default_value() const;
+	std::string get_type_name() const;
 };
 
 #endif /* PROPERTYSTRING_H_ */

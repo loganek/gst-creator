@@ -57,5 +57,18 @@ void PropertyCaps::read_var()
 
 std::string PropertyCaps::get_str_value() const
 {
-	return value->to_string().c_str();
+	return value->to_string();
+}
+
+bool PropertyCaps::is_default_value() const
+{
+	const GValue* v = g_param_spec_get_default_value(param_spec);
+	Glib::RefPtr<Gst::Caps> caps = Glib::wrap(const_cast<GstCaps*>(gst_value_get_caps(v)), false);
+
+	return caps->equals(value);
+}
+
+std::string PropertyCaps::get_type_name() const
+{
+	return "Glib::RefPtr<Gst::Caps>";
 }

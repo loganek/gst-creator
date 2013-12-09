@@ -29,6 +29,8 @@ public:
 
 	std::string get_str_value() const;
 	void set_value();
+	bool is_default_value() const;
+	std::string get_type_name() const;
 };
 
 #endif /* PROPERTYBOOLEAN_H_ */

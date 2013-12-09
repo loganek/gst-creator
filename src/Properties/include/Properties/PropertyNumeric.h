@@ -37,6 +37,8 @@ public:
 		init();
 	}
 
+	bool is_default_value() const;
+	std::string get_type_name() const;
 	void get_min_max(T& min, T& max);
 };
 
@@ -105,14 +107,38 @@ std::string PropertyNumeric<T>::get_str_value() const
 	max = pvalue->maximum; \
 		} \
 
+#define UTILS_PROPERTY_NUM_FUNCS(type) \
+		template<> \
+		bool PropertyNumeric<type>::is_default_value() const \
+		{ \
+			const GValue* v = g_param_spec_get_default_value(param_spec); \
+			type n = g_value_get_##type(v); \
+			return n == value; \
+		} \
+		template<> \
+		std::string PropertyNumeric<type>::get_type_name() const \
+		{ \
+			return #type; \
+		}
+
 GET_MIN_MAX_FUNC(DOUBLE, Double, double)
+UTILS_PROPERTY_NUM_FUNCS(double)
 GET_MIN_MAX_FUNC(FLOAT, Float, float)
+UTILS_PROPERTY_NUM_FUNCS(float)
 GET_MIN_MAX_FUNC(INT, Int, int)
+UTILS_PROPERTY_NUM_FUNCS(int)
 GET_MIN_MAX_FUNC(UINT, UInt, unsigned int)
+UTILS_PROPERTY_NUM_FUNCS(uint)
 GET_MIN_MAX_FUNC(INT64, Int64, gint64)
+typedef gint64 int64;
+UTILS_PROPERTY_NUM_FUNCS(int64)
 GET_MIN_MAX_FUNC(UINT64, UInt64, guint64)
+typedef guint64 uint64;
+UTILS_PROPERTY_NUM_FUNCS(uint64)
 #if !(__x86_64__ || __ppc64__)
 GET_MIN_MAX_FUNC(ULONG, ULong, unsigned long)
+UTILS_PROPERTY_NUM_FUNCS(ulong)
 GET_MIN_MAX_FUNC(LONG, Long, long)
+UTILS_PROPERTY_NUM_FUNCS(long)
 #endif
 #endif /* PROPERTYNUMERIC_H_ */

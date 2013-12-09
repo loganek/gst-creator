@@ -62,3 +62,16 @@ void PropertyString::read_var()
 	element->get_property(param_spec->name, text);
 	value = text.c_str();
 }
+
+bool PropertyString::is_default_value() const
+{
+	const GValue* v = g_param_spec_get_default_value(param_spec);
+	const gchar* str = g_value_get_string(v);
+
+	return str != nullptr && strcmp(str, value.c_str()) == 0;
+}
+
+std::string PropertyString::get_type_name() const
+{
+	return "Glib::ustring";
+}

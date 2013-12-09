@@ -29,8 +29,10 @@ public:
 	PropertyCaps(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element);
 
+	bool is_default_value() const;
 	void set_value();
 	std::string get_str_value() const;
+	std::string get_type_name() const;
 };
 
 #endif /* PROPERTYCAPS_H_ */
