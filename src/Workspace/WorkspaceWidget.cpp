@@ -78,17 +78,23 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 		case Qt::LeftButton:
 		{
 			QGraphicsItem *item = item_at(me->scenePos());
-			if (!item || item->type() != QNEPort::Type)
+			if (!item)
 				break;
 
-			current_connection = new QNEConnection(0);
-			scene->addItem(current_connection);
-			current_connection->setPort1((QNEPort*) item);
-			current_connection->setPos1(item->scenePos());
-			current_connection->setPos2(me->scenePos());
-			current_connection->updatePath();
+			if (item->type() == QNEPort::Type)
+			{
+				current_connection = new QNEConnection(0);
+				scene->addItem(current_connection);
+				current_connection->setPort1((QNEPort*) item);
+				current_connection->setPos1(item->scenePos());
+				current_connection->setPos2(me->scenePos());
+				current_connection->updatePath();
+				return true;
+			}
+			else if (item->type() == QNEBlock::Type)
+				Q_EMIT current_element_changed(static_cast<QNEBlock*>(item)->get_model());
 
-			return true;
+			break;
 		}
 		case Qt::RightButton:
 		{
@@ -103,7 +109,6 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 				DisconnectCommand cmd(src_port->get_object_model(), sink_port->get_object_model());
 				cmd.run_command(this);
 			}
-
 			else if (item && (item->type() == QNEBlock::Type))
 			{
 				QNEBlock* block = static_cast<QNEBlock*>(item);

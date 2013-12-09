@@ -22,6 +22,10 @@ MainWindow::MainWindow(MainController* controller, QWidget *parent)
 	setAcceptDrops(false);
 
 	reload_plugins();
+
+	QObject::connect(ui->propertiesToolButton, &QToolButton::clicked, [this]{
+			PropertyCommand(selected_element, "", "").run_command(workspace);
+	});
 }
 
 void MainWindow::reload_plugins()
@@ -108,7 +112,9 @@ void MainWindow::on_actionLoad_triggered(bool checked)
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)
 {
+
 	ui->currentElementLabel->setText(element->get_name().c_str());
+	selected_element = element;
 }
 
 void MainWindow::on_actionCode_Generator_triggered(bool checked)

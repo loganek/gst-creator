@@ -38,6 +38,7 @@ private:
 	WorkspaceWidget* workspace;
 	ObjectInspectorView plugins_tree;
 	MainController* controller;
+	Glib::RefPtr<Gst::Element> selected_element;
 
 	void reload_plugins();
 

@@ -18,15 +18,15 @@ PropertyWidget::PropertyWidget(QWidget* parent)
 	layout()->addWidget(cancel_button);
 
 	QObject::connect(cancel_button, &QPushButton::clicked, [&](bool) {
-		if (parentWidget())
-			parentWidget()->close();
+		if (parentWidget() && parentWidget()->parentWidget())
+			parentWidget()->parentWidget()->close();
 		else
 			close();
 	} );
 	QObject::connect(ok_button, &QPushButton::clicked, [&](bool) {
 		save_properties();
-		if (parentWidget())
-			parentWidget()->close();
+		if (parentWidget() && parentWidget()->parentWidget())
+			parentWidget()->parentWidget()->close();
 		else
 			close();
 	} );
