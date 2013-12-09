@@ -2,6 +2,7 @@
 #include "ui_MainWindow.h"
 #include "Console/ConsoleView.h"
 #include "Logger/LoggerView.h"
+#include "PluginWizzardDialog.h"
 #include "controller.h"
 #include "CodeGeneratorDialog.h"
 #include "ObjectInspector/ObjectInspectorModel.h"
@@ -78,6 +79,13 @@ void MainWindow::add_workspace_canvas()
 MainWindow::~MainWindow()
 {
 	delete ui;
+}
+
+void MainWindow::on_actionPlugin_Wizzard_triggered(bool checked)
+{
+	PluginWizzardDialog plugin_wizzard;
+	plugin_wizzard.setWindowTitle("Plugin Wizzard");
+	plugin_wizzard.exec();
 }
 
 void MainWindow::on_actionAbout_triggered(bool checked)

@@ -30,6 +30,7 @@ private Q_SLOTS:
 	void on_actionLoad_Plugin_triggered(bool checked);
 	void on_actionAdd_Plugin_Path_triggered(bool checked);
 	void on_actionExit_triggered(bool checked);
+	void on_actionPlugin_Wizzard_triggered(bool checked);
 	static void show_error_box(QString text);
 
 private:

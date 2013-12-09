@@ -1,16 +1,19 @@
 qt5_wrap_ui(UIS_HDRS
 	ui_files/CodeGeneratorDialog.ui
 	ui_files/MainWindow.ui
+	ui_files/PluginWizzardDialog.ui
 )
 
 set(GUI_HEADERS 
 	include/gui/MainWindow.h
+	include/gui/PluginWizzardDialog.h
 	include/gui/CodeGeneratorDialog.h
 )
 
 add_library(gui
 	MainWindow.cpp
 	CodeGeneratorDialog.cpp
+	PluginWizzardDialog.cpp
 	${GUI_HEADERS}
 	${UIS_HDRS})
 include_directories(include/gui)
