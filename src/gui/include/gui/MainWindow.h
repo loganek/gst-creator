@@ -26,10 +26,11 @@ private Q_SLOTS:
 	void on_actionAbout_triggered(bool checked);
 	void on_actionSave_As_triggered(bool checked);
 	void on_actionLoad_triggered(bool checked);
-	void on_actionGenerate_Cpp_Code_triggered(bool checked);
+	void on_actionCode_Generator_triggered(bool checked);
 	void on_actionLoad_Plugin_triggered(bool checked);
 	void on_actionAdd_Plugin_Path_triggered(bool checked);
 	void on_actionExit_triggered(bool checked);
+	static void show_error_box(QString text);
 
 private:
 	void add_workspace_canvas();

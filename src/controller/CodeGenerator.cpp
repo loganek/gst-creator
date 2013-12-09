@@ -23,6 +23,9 @@ void CodeGenerator::generate_code(const string& filename)
 {
 	output.open(filename, std::ofstream::out | std::ofstream::trunc);
 
+	if (!output.is_open())
+		throw std::runtime_error("Cannot open file `" + filename + "`");
+
 	generate_all();
 }
 

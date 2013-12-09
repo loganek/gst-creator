@@ -3,6 +3,7 @@
 #include "Console/ConsoleView.h"
 #include "Logger/LoggerView.h"
 #include "controller.h"
+#include "CodeGeneratorDialog.h"
 #include "ObjectInspector/ObjectInspectorModel.h"
 #include "ObjectInspector/ObjectInspectorFilter.h"
 #include <QtWidgets/qmessagebox.h>
@@ -110,11 +111,22 @@ void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)
 	ui->currentElementLabel->setText(element->get_name().c_str());
 }
 
-void MainWindow::on_actionGenerate_Cpp_Code_triggered(bool checked)
+void MainWindow::on_actionCode_Generator_triggered(bool checked)
 {
+	CodeGeneratorDialog dlg;
+	if (!dlg.exec())
+		return;
+
 	CodeGenerator generator(controller->get_model());
 
-	generator.generate_code("output.cpp");
+	try
+	{
+		generator.generate_code(dlg.get_file_name().toUtf8().constData());
+	}
+	catch (const std::exception& e)
+	{
+		show_error_box(e.what());
+	}
 }
 
 void MainWindow::on_actionLoad_Plugin_triggered(bool checked)
@@ -148,4 +160,10 @@ void MainWindow::on_actionAdd_Plugin_Path_triggered(bool checked)
 void MainWindow::on_actionExit_triggered(bool checked)
 {
 	this->close();
+}
+
+void MainWindow::show_error_box(QString text)
+{
+	QMessageBox messageBox;
+	messageBox.critical(0, "gst-creator error", text);
 }
