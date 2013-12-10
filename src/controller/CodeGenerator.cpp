@@ -127,7 +127,7 @@ void CodeGenerator::generate_init_elements()
 			{
 				output << "\t" << iterator->get_name() << "->request_pad("
 						<< iterator->get_name() << "->get_pad_template(\""
-						<< pad_iterator->get_pad_template()->get_name() << "\", \""
+						<< pad_iterator->get_pad_template()->get_name() << "\"), \""
 						<< pad_iterator->get_name() << "\");" << endl;
 			}
 		}
