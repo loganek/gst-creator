@@ -27,7 +27,7 @@
    <item row="1" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
@@ -145,7 +145,7 @@
             <item>
              <widget class="QLineEdit" name="factoryParentEdit">
               <property name="text">
-               <string>Element</string>
+               <string>Gst::Element</string>
               </property>
              </widget>
             </item>
@@ -263,7 +263,7 @@
             <item>
              <widget class="QLabel" name="label_39">
               <property name="text">
-               <string>Filename:</string>
+               <string>Plugin Path:</string>
               </property>
              </widget>
             </item>
@@ -271,7 +271,7 @@
              <widget class="QLineEdit" name="pluginFileNameEdit"/>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton">
+             <widget class="QPushButton" name="selectPathPushButton">
               <property name="maximumSize">
                <size>
                 <width>30</width>

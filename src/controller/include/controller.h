@@ -12,5 +12,8 @@
 #include "controller/FileLoader.h"
 #include "controller/MainController.h"
 #include "controller/CodeGenerator.h"
+#include "controller/PluginWizard/PluginCodeGenerator.h"
+#include "controller/PluginWizard/FactoryInfo.h"
+#include "controller/PluginWizard/PluginInfo.h"
 
 #endif /* CONTROLLER_H_ */

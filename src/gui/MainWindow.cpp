@@ -85,7 +85,13 @@ void MainWindow::on_actionPlugin_Wizzard_triggered(bool checked)
 {
 	PluginWizzardDialog plugin_wizzard;
 	plugin_wizzard.setWindowTitle("Plugin Wizzard");
-	plugin_wizzard.exec();
+
+	if (!plugin_wizzard.exec())
+		return;
+
+	PluginCodeGenerator generator(plugin_wizzard.get_plugin(),
+			std::vector<FactoryInfo>{plugin_wizzard.get_factory()});
+	generator.generate_code(plugin_wizzard.get_directory().toUtf8().constData());
 }
 
 void MainWindow::on_actionAbout_triggered(bool checked)

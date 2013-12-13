@@ -9,6 +9,10 @@
 #define PLUGINWIZZARDDIALOG_H_
 
 #include <QDialog>
+#include <string>
+
+#include "controller/PluginWizard/FactoryInfo.h"
+#include "controller/PluginWizard/PluginInfo.h"
 
 namespace Ui {
 class PluginWizzardDialog;
@@ -22,8 +26,12 @@ public:
 	explicit PluginWizzardDialog(QWidget *parent = 0);
 	~PluginWizzardDialog();
 
+	PluginInfo get_plugin() const;
+	FactoryInfo get_factory() const;
+	QString get_directory() const;
 private:
 	Ui::PluginWizzardDialog *ui;
+	QString directory_name;
 };
 
 #endif /* PLUGINWIZZARDDIALOG_H_ */
