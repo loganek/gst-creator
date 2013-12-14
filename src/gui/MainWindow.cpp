@@ -117,7 +117,9 @@ void MainWindow::on_actionSave_As_triggered(bool checked)
 		if (filename.isNull())
 			return;
 
-		FileWriter(filename.toUtf8().constData(), controller->get_model()).save_model();
+		FileWriter(filename.toUtf8().constData(), controller->get_model(),
+				std::bind(&WorkspaceWidget::get_block_location, workspace, std::placeholders::_1))
+		.save_model();
 	}
 	catch (const std::exception& ex)
 	{
@@ -133,7 +135,10 @@ void MainWindow::on_actionLoad_triggered(bool checked)
 	if (filename.isNull())
 		return;
 
-	FileLoader(filename.toUtf8().constData(), controller->get_model()).load_model(workspace);
+	FileLoader(filename.toUtf8().constData(), controller->get_model(),
+			std::bind(&WorkspaceWidget::set_block_location, workspace,
+					std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
+	.load_model(workspace);
 }
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)

@@ -421,3 +421,23 @@ void WorkspaceWidget::future_connection_removed(const ConnectCommand::future_con
 		}
 	}
 }
+
+QPointF WorkspaceWidget::get_block_location(const Glib::RefPtr<Gst::Element>& element)
+{
+	QNEBlock* block = find_block(element);
+
+	if (block == nullptr)
+		return QPointF(0, 0);
+
+	return block->pos();
+}
+
+void WorkspaceWidget::set_block_location(const Glib::RefPtr<Gst::Element>& element, double x, double y)
+{
+	QNEBlock* block = find_block(element);
+
+	if (block == nullptr)
+		return;
+
+	block->setPos(x, y);
+}

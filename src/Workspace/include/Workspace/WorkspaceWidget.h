@@ -31,9 +31,9 @@ private:
 	QGraphicsItem* item_at(const QPointF &pos);
 	bool eventFilter(QObject *o, QEvent *e);
 
-	QNEBlock* find_block(const Glib::RefPtr<Gst::Element>& element);
 	QNEPort* find_port(const Glib::RefPtr<Gst::Pad>& pad);
 	QNEPort* find_port(const Glib::RefPtr<Gst::PadTemplate>& pad, const Glib::RefPtr<Gst::Element>& parent);
+	QNEBlock* find_block(const Glib::RefPtr<Gst::Element>& element);
 
 public:
 	explicit WorkspaceWidget(const Glib::RefPtr<Gst::Pipeline>& model, QWidget* parent = 0);
@@ -50,6 +50,9 @@ public:
 	void future_connection_added(const Glib::RefPtr<Gst::PadTemplate>& src_tpl,
 			const Glib::RefPtr<Gst::Element>& parent, const Glib::RefPtr<Gst::Pad>& sink);
 	void future_connection_removed(const ConnectCommand::future_connection_pads& conn);
+
+	QPointF get_block_location(const Glib::RefPtr<Gst::Element>& element);
+	void set_block_location(const Glib::RefPtr<Gst::Element>& element, double x, double y);
 
 Q_SIGNALS:
 	void current_element_changed(const Glib::RefPtr<Gst::Element>& element);

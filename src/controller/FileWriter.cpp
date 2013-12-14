@@ -14,10 +14,11 @@ using namespace std;
 using Glib::RefPtr;
 using namespace Gst;
 
-FileWriter::FileWriter(const string& filename, const RefPtr<Pipeline>& model)
+FileWriter::FileWriter(const string& filename, const RefPtr<Pipeline>& model, find_block finder)
 : model(model),
   filename(filename),
-  file(nullptr)
+  file(nullptr),
+  finder(finder)
 {}
 
 FileWriter::~FileWriter()
@@ -97,6 +98,8 @@ void FileWriter::write_single_element(const Glib::RefPtr<Gst::Element>& element)
 			writer.writeStartElement("element");
 			writer.writeAttribute("factory", iterator->get_factory()->get_name().c_str());
 			writer.writeAttribute("name", iterator->get_name().c_str());
+			writer.writeAttribute("X", QString::number(finder(*iterator).rx()));
+			writer.writeAttribute("Y", QString::number(finder(*iterator).ry()));
 			write_single_element(*iterator);
 			writer.writeEndElement();
 		}

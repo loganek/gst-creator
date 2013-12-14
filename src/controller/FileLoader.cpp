@@ -12,11 +12,12 @@ using namespace std;
 using namespace Gst;
 using Glib::RefPtr;
 
-FileLoader::FileLoader(const string& filename, const RefPtr<Pipeline>& model)
+FileLoader::FileLoader(const string& filename, const RefPtr<Pipeline>& model, position_setter pos_setter)
 : filename(filename),
   model(model),
   listener(nullptr),
-  file(nullptr)
+  file(nullptr),
+  pos_setter(pos_setter)
 {}
 
 FileLoader::~FileLoader()
@@ -112,6 +113,18 @@ void FileLoader::process_start_element()
 
 		AddCommand cmd(ObjectType::ELEMENT, current_element, new_element);
 		cmd.run_command(listener);
+
+		if (reader.attributes().hasAttribute("X") && reader.attributes().hasAttribute("Y"))
+		{
+			bool conv_ok;
+			double x = reader.attributes().value("X").toDouble(&conv_ok);
+			if (conv_ok)
+			{
+				double y = reader.attributes().value("Y").toDouble(&conv_ok);
+				if (conv_ok)
+					pos_setter(new_element, x, y);
+			}
+		}
 
 		element_stack.push(current_element);
 		current_element = new_element;
