@@ -19,6 +19,8 @@ class LoggerView : public QWidget
 
 private:
 	QTableWidget* table;
+	QCheckBox* cmd_cbox;
+	QCheckBox* msg_cbox;
 
 	void add_single_log(const QString& text);
 
