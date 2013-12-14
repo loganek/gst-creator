@@ -234,7 +234,15 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 		element->set_name(name.toUtf8().constData());
 		last_point = me->scenePos();
 		AddCommand cmd(ObjectType::ELEMENT, model, element);
-		cmd.run_command(this);
+		try
+		{
+			cmd.run_command(this);
+		}
+		catch (const std::exception& ex)
+		{
+			QMessageBox message_box;
+			message_box.critical(0,"Error", QString("Cannot add element: ") + ex.what());
+		}
 		return true;
 	}
 	}

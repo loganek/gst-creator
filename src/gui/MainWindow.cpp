@@ -25,6 +25,7 @@ MainWindow::MainWindow(MainController* controller, QWidget *parent)
 	reload_plugins();
 
 	QObject::connect(ui->propertiesToolButton, &QToolButton::clicked, [this]{
+		if (selected_element)
 			PropertyCommand(selected_element, "", "").run_command(workspace);
 	});
 }
@@ -104,13 +105,20 @@ void MainWindow::on_actionAbout_triggered(bool checked)
 
 void MainWindow::on_actionSave_As_triggered(bool checked)
 {
-	QString filename = QFileDialog::getSaveFileName(this, "Save Project", QDir::currentPath(),
-			"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
+	try
+	{
+		QString filename = QFileDialog::getSaveFileName(this, "Save Project", QDir::currentPath(),
+				"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
-	if (filename.isNull())
-		return;
+		if (filename.isNull())
+			return;
 
-	FileWriter(filename.toUtf8().constData(), controller->get_model()).save_model();
+		FileWriter(filename.toUtf8().constData(), controller->get_model()).save_model();
+	}
+	catch (const std::exception& ex)
+	{
+		show_error_box(QString("Cannot save project: ") + ex.what());
+	}
 }
 
 void MainWindow::on_actionLoad_triggered(bool checked)
@@ -126,7 +134,6 @@ void MainWindow::on_actionLoad_triggered(bool checked)
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)
 {
-
 	ui->currentElementLabel->setText(element->get_name().c_str());
 	selected_element = element;
 }
@@ -145,36 +152,50 @@ void MainWindow::on_actionCode_Generator_triggered(bool checked)
 	}
 	catch (const std::exception& e)
 	{
-		show_error_box(e.what());
+		show_error_box(QString("Cannot generate code: ") + e.what());
 	}
 }
 
 void MainWindow::on_actionLoad_Plugin_triggered(bool checked)
 {
-	QString filename = QFileDialog::getOpenFileName(this, "Load Plugin", QDir::currentPath(),
-			"Shared Libraries (*.so);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
+	try
+	{
+		QString filename = QFileDialog::getOpenFileName(this, "Load Plugin", QDir::currentPath(),
+				"Shared Libraries (*.so);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
-	if (filename.isNull())
-		return;
+		if (filename.isNull())
+			return;
 
-	Glib::RefPtr<Gst::Registry> registry = Gst::Registry::get();
-	registry->add_plugin(Gst::Plugin::load_file(filename.toUtf8().constData()));
+		Glib::RefPtr<Gst::Registry> registry = Gst::Registry::get();
+		registry->add_plugin(Gst::Plugin::load_file(filename.toUtf8().constData()));
 
-	reload_plugins();
+		reload_plugins();
+	}
+	catch (const std::exception& ex)
+	{
+		show_error_box(QString("Cannot load plugin: ") + ex.what());
+	}
 }
 
 void MainWindow::on_actionAdd_Plugin_Path_triggered(bool checked)
 {
-	QString filename = QFileDialog::getExistingDirectory(this, "Load Plugin Path",
-			".", QFileDialog::DontUseNativeDialog);
+	try
+	{
+		QString filename = QFileDialog::getExistingDirectory(this, "Load Plugin Path",
+				".", QFileDialog::DontUseNativeDialog);
 
-	if (filename.isNull())
-		return;
+		if (filename.isNull())
+			return;
 
-	Glib::RefPtr<Gst::Registry> registry = Gst::Registry::get();
+		Glib::RefPtr<Gst::Registry> registry = Gst::Registry::get();
 
-	if (registry->scan_path(filename.toUtf8().constData()))
-		reload_plugins();
+		if (registry->scan_path(filename.toUtf8().constData()))
+			reload_plugins();
+	}
+	catch (const std::exception& ex)
+	{
+		show_error_box(QString("Cannot add plugin path: ") + ex.what());
+	}
 }
 
 void MainWindow::on_actionExit_triggered(bool checked)
@@ -184,6 +205,6 @@ void MainWindow::on_actionExit_triggered(bool checked)
 
 void MainWindow::show_error_box(QString text)
 {
-	QMessageBox messageBox;
-	messageBox.critical(0, "gst-creator error", text);
+	QMessageBox message_box;
+	message_box.critical(0, "gst-creator error", text);
 }
