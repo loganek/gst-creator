@@ -54,13 +54,20 @@ FactoryInfo PluginWizzardDialog::get_factory() const
 	if (!ok)
 		throw std::runtime_error("Rank is not a number.");
 
-	return FactoryInfo(ui->factoryNameEdit->text().toUtf8().constData(),
+	FactoryInfo factory(ui->factoryNameEdit->text().toUtf8().constData(),
 			ui->factoryLongNameEdit->text().toUtf8().constData(),
 			ui->factoryKlassEdit->text().toUtf8().constData(),
 			ui->factoryAuthorEdit->text().toUtf8().constData(),
 			ui->factoryDescriptionEdit->text().toUtf8().constData(),
 			ui->factoryParentEdit->text().toUtf8().constData(),
 			rank);
+
+	factory.set_virtual_methods(ui->virtualRequestNewPadCheckBox->isChecked(),
+			ui->virtualReleasePadCheckBox->isChecked(),
+			ui->virtualChangeStateCheckBox->isChecked(),
+			ui->virtualSetBusCheckbox->isChecked());
+
+	return factory;
 }
 
 QString PluginWizzardDialog::get_directory() const
