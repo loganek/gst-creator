@@ -2,7 +2,7 @@
 #include "ui_MainWindow.h"
 #include "Console/ConsoleView.h"
 #include "Logger/LoggerView.h"
-#include "PluginWizzardDialog.h"
+#include "PluginWizardDialog.h"
 #include "controller.h"
 #include "CodeGeneratorDialog.h"
 #include "ObjectInspector/ObjectInspectorModel.h"
@@ -83,7 +83,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionPlugin_Wizzard_triggered(bool checked)
 {
-	PluginWizzardDialog plugin_wizzard;
+	PluginWizardDialog plugin_wizzard;
 	plugin_wizzard.setWindowTitle("Plugin Wizzard");
 
 	if (!plugin_wizzard.exec())

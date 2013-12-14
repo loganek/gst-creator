@@ -5,16 +5,16 @@
  *      Author: Marcin Kolny
  */
 
-#include "PluginWizzardDialog.h"
-#include "ui_PluginWizzardDialog.h"
+#include "PluginWizardDialog.h"
+#include "ui_PluginWizardDialog.h"
 #include <stdexcept>
 #include <QDateTime>
 #include <QFileDialog>
 #include <gst/gst.h>
 
-PluginWizzardDialog::PluginWizzardDialog(QWidget *parent)
+PluginWizardDialog::PluginWizardDialog(QWidget *parent)
 : QDialog(parent),
-  ui(new Ui::PluginWizzardDialog)
+  ui(new Ui::PluginWizardDialog)
 {
 	ui->setupUi(this);
 	ui->pluginReleaseDateEdit->setText(QDate::currentDate().toString("yyyy-MM-dd"));
@@ -30,12 +30,12 @@ PluginWizzardDialog::PluginWizzardDialog(QWidget *parent)
 	});
 }
 
-PluginWizzardDialog::~PluginWizzardDialog()
+PluginWizardDialog::~PluginWizardDialog()
 {
 	delete ui;
 }
 
-PluginInfo PluginWizzardDialog::get_plugin() const
+PluginInfo PluginWizardDialog::get_plugin() const
 {
 	return PluginInfo(ui->pluginNameEdit->text().toUtf8().constData(),
 			ui->pluginDescriptionEdit->text().toUtf8().constData(),
@@ -46,7 +46,7 @@ PluginInfo PluginWizzardDialog::get_plugin() const
 			ui->pluginOriginURLEdit->text().toUtf8().constData());
 }
 
-FactoryInfo PluginWizzardDialog::get_factory() const
+FactoryInfo PluginWizardDialog::get_factory() const
 {
 	bool ok;
 	int rank = ui->factoryRankEdit->text().toInt(&ok, 10);
@@ -70,7 +70,7 @@ FactoryInfo PluginWizzardDialog::get_factory() const
 	return factory;
 }
 
-QString PluginWizzardDialog::get_directory() const
+QString PluginWizardDialog::get_directory() const
 {
 	return directory_name;
 }
