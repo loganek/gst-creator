@@ -46,7 +46,7 @@ bool WorkspaceWidget::check_mime_data(const QMimeData* mime_data) const
 QString WorkspaceWidget::get_new_name(const QString& name)
 {
 	bool ok;
-	QString new_name = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+	QString new_name = QInputDialog::getText(this, "Select Element's Name",
 			tr("Element name:"), QLineEdit::Normal, name, &ok);
 	if (ok && !new_name.isEmpty())
 		return new_name;
@@ -284,6 +284,8 @@ void WorkspaceWidget::element_removed(const RefPtr<Element>& element)
 {
 	QNEBlock *b = find_block(element);
 	delete b;
+
+	Q_EMIT current_element_changed(RefPtr<Element>());
 }
 
 QNEPort* WorkspaceWidget::find_port(const RefPtr<Pad>& pad)

@@ -20,6 +20,8 @@ MainWindow::MainWindow(MainController* controller, QWidget *parent)
 
 	add_workspace_canvas();
 
+	ui->splitter->setStretchFactor(0, 1);
+	ui->splitter->setStretchFactor(1, 2);
 	setAcceptDrops(false);
 
 	reload_plugins();
@@ -51,7 +53,6 @@ void MainWindow::add_workspace_canvas()
 	ConsoleView* console = new ConsoleView(workspace);
 	LoggerView* logger = new LoggerView();
 
-
 	QSplitter* spl = new QSplitter();
 
 	QObject::connect(console, &ConsoleView::command_added, logger, &LoggerView::add_log);
@@ -67,6 +68,9 @@ void MainWindow::add_workspace_canvas()
 	frameLayout->addWidget(console);
 	frameLayout->addWidget(logger);
 	ui->rightFrame->layout()->addWidget(spl);
+
+	spl->setStretchFactor(0, 15);
+	spl->setStretchFactor(1, 1);
 
 	controller->get_model()->signal_element_added().connect([this](const Glib::RefPtr<Gst::Element>& e) {
 		workspace->new_element_added(e);
@@ -134,7 +138,7 @@ void MainWindow::on_actionLoad_triggered(bool checked)
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)
 {
-	ui->currentElementLabel->setText(element->get_name().c_str());
+	ui->currentElementLabel->setText(element ? element->get_name().c_str() : " none");
 	selected_element = element;
 }
 
