@@ -52,7 +52,7 @@ DisconnectCommand* DisconnectCommand::from_args(const vector<string>& args, cons
 	}
 }
 
-void DisconnectCommand::run_command(CommandListener* listener)
+void DisconnectCommand::run_command(std::vector<CommandListener*> listeners)
 {
 	if (type == ObjectType::ELEMENT)
 	{
@@ -67,7 +67,7 @@ void DisconnectCommand::run_command(CommandListener* listener)
 		if (GST_IS_PAD_TEMPLATE(src->gobj()))
 		{
 			RefPtr<PadTemplate> p_src = p_src.cast_static(src);
-			ConnectCommand::remove_future_connection(p_src, p_dst, listener);
+			ConnectCommand::remove_future_connection(p_src, p_dst, listeners);
 		}
 		else
 		{

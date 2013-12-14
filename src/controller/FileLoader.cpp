@@ -15,7 +15,6 @@ using Glib::RefPtr;
 FileLoader::FileLoader(const string& filename, const RefPtr<Pipeline>& model, position_setter pos_setter)
 : filename(filename),
   model(model),
-  listener(nullptr),
   file(nullptr),
   pos_setter(pos_setter)
 {}
@@ -48,12 +47,12 @@ void FileLoader::clean_model()
 		model->remove(element);
 }
 
-void FileLoader::load_model(CommandListener* listener)
+void FileLoader::load_model(std::vector<CommandListener*> listeners)
 {
 	clean_model();
 	open_file();
 
-	this->listener = listener;
+	this->listeners = listeners;
 
 	while (!reader.atEnd() && !reader.hasError())
 	{
@@ -87,7 +86,7 @@ void FileLoader::load_model(CommandListener* listener)
 		if (src_pad && sink_pad)
 		{
 			ConnectCommand cmd(src_pad, sink_pad);
-			cmd.run_command(listener);
+			cmd.run_command(listeners);
 		}
 	}
 }
@@ -112,7 +111,7 @@ void FileLoader::process_start_element()
 								ElementFactory::create_element(get_attribute("factory"));
 
 		AddCommand cmd(ObjectType::ELEMENT, current_element, new_element);
-		cmd.run_command(listener);
+		cmd.run_command(listeners);
 
 		if (reader.attributes().hasAttribute("X") && reader.attributes().hasAttribute("Y"))
 		{
@@ -164,7 +163,7 @@ void FileLoader::process_start_element()
 		{
 			AddCommand cmd(ObjectType::PAD, current_element,
 					Pad::create(pad_template, pad_name));
-			cmd.run_command(listener);
+			cmd.run_command(listeners);
 		}
 
 		if (is_linked && pad_template->get_direction() == PAD_SRC)
@@ -195,7 +194,7 @@ void FileLoader::process_start_element()
 				return;
 
 			ConnectCommand cmd(source_e, destination_e, true);
-			cmd.run_command(listener);
+			cmd.run_command(listeners);
 		}
 		else if (connection_type == "pad")
 		{
@@ -218,7 +217,7 @@ void FileLoader::process_start_element()
 				return;
 
 			ConnectCommand cmd(pad_tpl, tpl_parent, dest_pad);
-			cmd.run_command(listener);
+			cmd.run_command(listeners);
 		}
 	}
 }

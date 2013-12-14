@@ -21,6 +21,7 @@ private:
 	constexpr static const char* active_style_sheet = "QFrame{ border: 1px solid red; border-radius: 4px; padding: 2px;}";
 	constexpr static const char* passive_style_sheet = "QFrame{ border: 1px solid black; border-radius: 4px; padding: 2px;}";
 
+	CommandListener* controller;
 	QGraphicsView* view;
 	QGraphicsScene* scene;
 	QNEConnection* current_connection;
@@ -50,6 +51,7 @@ public:
 	void future_connection_added(const Glib::RefPtr<Gst::PadTemplate>& src_tpl,
 			const Glib::RefPtr<Gst::Element>& parent, const Glib::RefPtr<Gst::Pad>& sink);
 	void future_connection_removed(const ConnectCommand::future_connection_pads& conn);
+	void set_controller(CommandListener* controller);
 
 	QPointF get_block_location(const Glib::RefPtr<Gst::Element>& element);
 	void set_block_location(const Glib::RefPtr<Gst::Element>& element, double x, double y);

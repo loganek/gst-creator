@@ -41,10 +41,10 @@ public:
 	Glib::RefPtr<Gst::Object> get_dst() { return dst; }
 	static ConnectCommand* from_args(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
 	static std::vector<std::string> get_suggestions(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
-	void run_command(CommandListener* listener = nullptr);
+	void run_command(std::vector<CommandListener*> listeners = {});
 
 	static void element_pad_added(const Glib::RefPtr<Gst::Pad>& pad);
-	static void remove_future_connection(const Glib::RefPtr<Gst::PadTemplate>& tpl, const Glib::RefPtr<Gst::Pad>& pad, CommandListener* listener);
+	static void remove_future_connection(const Glib::RefPtr<Gst::PadTemplate>& tpl, const Glib::RefPtr<Gst::Pad>& pad, std::vector<CommandListener*> listeners = {});
 
 	static std::set<future_connection_elements> get_future_connections_element();
 	static std::set<future_connection_pads> get_future_connections_pads();

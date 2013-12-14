@@ -37,7 +37,7 @@ PropertyCommand::~PropertyCommand()
 	delete property;
 }
 
-void PropertyCommand::run_command(CommandListener* listener)
+void PropertyCommand::run_command(std::vector<CommandListener*> listeners)
 {
 	if (run_window)
 	{

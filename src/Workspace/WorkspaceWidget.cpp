@@ -17,6 +17,7 @@ using Glib::RefPtr;
 WorkspaceWidget::WorkspaceWidget(const RefPtr<Pipeline>& model, QWidget* parent)
 : QWidget(parent),
   model(model),
+  controller(nullptr),
   current_connection(nullptr)
 {
 	setAcceptDrops(true);
@@ -107,13 +108,13 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 				QNEPort* sink_port = con->port1()->isOutput() ? con->port2() : con->port1();
 
 				DisconnectCommand cmd(src_port->get_object_model(), sink_port->get_object_model());
-				cmd.run_command(this);
+				cmd.run_command({controller, this});
 			}
 			else if (item && (item->type() == QNEBlock::Type))
 			{
 				QNEBlock* block = static_cast<QNEBlock*>(item);
 				RemoveCommand cmd(ObjectType::ELEMENT, block->get_model());
-				cmd.run_command(this);
+				cmd.run_command({controller, this});
 			}
 			break;
 		}
@@ -173,7 +174,7 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 				if (!src_port->get_object_model() && !sink_port->get_object_model())
 				{
 					ConnectCommand cmd (src_port->block()->get_model(), sink_port->block()->get_model());
-					cmd.run_command(this);
+					cmd.run_command({controller, this});
 					return true;
 				}
 
@@ -183,24 +184,24 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 				{
 					auto tpl = RefPtr<PadTemplate>::cast_static(src_port->get_object_model());
 					AddCommand add_cmd(ObjectType::PAD, src_port->block()->get_model(), tpl);
-					src_pad = src_pad.cast_static(add_cmd.run_command_ret(this));
+					src_pad = src_pad.cast_static(add_cmd.run_command_ret({controller, this}));
 				}
 				else if (sink_port->is_template_model() && RefPtr<PadTemplate>::cast_static(sink_port->get_object_model())->get_presence() == PAD_REQUEST)
 				{
 					auto tpl = RefPtr<PadTemplate>::cast_static(sink_port->get_object_model());
 					AddCommand add_cmd(ObjectType::PAD, sink_port->block()->get_model(), tpl);
-					sink_pad = sink_pad.cast_static(add_cmd.run_command_ret(this));
+					sink_pad = sink_pad.cast_static(add_cmd.run_command_ret({controller, this}));
 				}
 				if (src_port->is_template_model() && RefPtr<PadTemplate>::cast_static(src_port->get_object_model())->get_presence() == PAD_SOMETIMES)
 				{
 					auto pad_parent = src_port->block()->get_model();
 					auto tpl = RefPtr<PadTemplate>::cast_static(src_port->get_object_model());
 					ConnectCommand con_cmd(tpl, pad_parent, sink_pad);
-					con_cmd.run_command(this);
+					con_cmd.run_command({controller, this});
 					return true;
 				}
 				ConnectCommand cmd(src_pad, sink_pad);
-				cmd.run_command(this);
+				cmd.run_command({controller, this});
 
 
 				return true;
@@ -236,7 +237,7 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 		AddCommand cmd(ObjectType::ELEMENT, model, element);
 		try
 		{
-			cmd.run_command(this);
+			cmd.run_command({controller, this});
 		}
 		catch (const std::exception& ex)
 		{
@@ -440,4 +441,9 @@ void WorkspaceWidget::set_block_location(const Glib::RefPtr<Gst::Element>& eleme
 		return;
 
 	block->setPos(x, y);
+}
+
+void WorkspaceWidget::set_controller(CommandListener* controller)
+{
+	this->controller = controller;
 }

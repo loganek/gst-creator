@@ -66,7 +66,7 @@ public:
 		return type;
 	}
 
-	virtual void run_command(CommandListener* listener = nullptr) = 0;
+	virtual void run_command(std::vector<CommandListener*> listeners = {}) = 0;
 
 	static void syntax_error(const std::string& error)
 	{

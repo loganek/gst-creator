@@ -25,7 +25,7 @@ RemoveCommand::~RemoveCommand()
 {
 }
 
-void RemoveCommand::run_command(CommandListener* listener)
+void RemoveCommand::run_command(std::vector<CommandListener*> listeners)
 {
 	RefPtr<Object> parent = object->get_parent();
 

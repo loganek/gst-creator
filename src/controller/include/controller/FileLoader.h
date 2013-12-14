@@ -25,7 +25,7 @@ private:
 	Glib::RefPtr<Gst::Element> current_element;
 	std::stack<Glib::RefPtr<Gst::Element>> element_stack;
 	std::map<Glib::ustring, Glib::ustring> connections;
-	CommandListener* listener;
+	std::vector<CommandListener*> listeners;
 	QFile* file;
 	position_setter pos_setter;
 
@@ -37,7 +37,7 @@ public:
 	FileLoader(const std::string& filename, const Glib::RefPtr<Gst::Pipeline>& model, position_setter pos_setter);
 	~FileLoader();
 
-	void load_model(CommandListener* listener);
+	void load_model(std::vector<CommandListener*> listeners);
 };
 
 

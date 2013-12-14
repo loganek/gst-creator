@@ -22,6 +22,8 @@ public:
 	explicit MainWindow(MainController* file_controller, QWidget *parent = 0);
 	~MainWindow();
 
+	QMessageBox::StandardButton ask_before_save();
+
 private Q_SLOTS:
 	void on_actionAbout_triggered(bool checked);
 	void on_actionSave_As_triggered(bool checked);
@@ -31,7 +33,11 @@ private Q_SLOTS:
 	void on_actionAdd_Plugin_Path_triggered(bool checked);
 	void on_actionExit_triggered(bool checked);
 	void on_actionPlugin_Wizzard_triggered(bool checked);
+	void on_actionSave_triggered(bool checked);
+
 	static void show_error_box(QString text);
+	void save_project_dialog();
+	void save_project();
 
 private:
 	void add_workspace_canvas();

@@ -28,7 +28,7 @@ MainWindow::MainWindow(MainController* controller, QWidget *parent)
 
 	QObject::connect(ui->propertiesToolButton, &QToolButton::clicked, [this]{
 		if (selected_element)
-			PropertyCommand(selected_element, "", "").run_command(workspace);
+			PropertyCommand(selected_element, "", "").run_command({workspace});
 	});
 }
 
@@ -50,7 +50,8 @@ void MainWindow::add_workspace_canvas()
 	workspace_frame->setLayout(new QGridLayout());
 	QFrame *frame = new QFrame;
 	workspace = new WorkspaceWidget(controller->get_model());
-	ConsoleView* console = new ConsoleView(workspace);
+	workspace->set_controller(controller);
+	ConsoleView* console = new ConsoleView({workspace, controller});
 	LoggerView* logger = new LoggerView();
 
 	QSplitter* spl = new QSplitter();
@@ -109,19 +110,26 @@ void MainWindow::on_actionAbout_triggered(bool checked)
 			"License:\tGPL");
 }
 
-void MainWindow::on_actionSave_As_triggered(bool checked)
+void MainWindow::save_project_dialog()
+{
+	QString filename = QFileDialog::getSaveFileName(this, "Save Project", QDir::currentPath(),
+			"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
+
+	if (filename.isNull())
+		return;
+
+	controller->set_current_project_file(filename.toUtf8().constData());
+}
+
+void MainWindow::save_project()
 {
 	try
 	{
-		QString filename = QFileDialog::getSaveFileName(this, "Save Project", QDir::currentPath(),
-				"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
-
-		if (filename.isNull())
-			return;
-
-		FileWriter(filename.toUtf8().constData(), controller->get_model(),
+		FileWriter(controller->get_current_project_file(), controller->get_model(),
 				std::bind(&WorkspaceWidget::get_block_location, workspace, std::placeholders::_1))
-		.save_model();
+							.save_model();
+
+		controller->reset_modified_state();
 	}
 	catch (const std::exception& ex)
 	{
@@ -129,8 +137,33 @@ void MainWindow::on_actionSave_As_triggered(bool checked)
 	}
 }
 
+void MainWindow::on_actionSave_As_triggered(bool checked)
+{
+	save_project_dialog();
+	save_project();
+}
+
+void MainWindow::on_actionSave_triggered(bool checked)
+{
+	if (controller->get_current_project_file().empty())
+	{
+		save_project_dialog();
+
+		if (controller->get_current_project_file().empty())
+			return;
+	}
+
+	save_project();
+}
+
 void MainWindow::on_actionLoad_triggered(bool checked)
 {
+	if (controller->get_modified_state())
+	{
+		if (ask_before_save() == QMessageBox::Cancel)
+			return;
+	}
+
 	QString filename = QFileDialog::getOpenFileName(this, "Save Project", QDir::currentPath(),
 			"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
@@ -140,7 +173,7 @@ void MainWindow::on_actionLoad_triggered(bool checked)
 	FileLoader(filename.toUtf8().constData(), controller->get_model(),
 			std::bind(&WorkspaceWidget::set_block_location, workspace,
 					std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
-	.load_model(workspace);
+	.load_model({workspace});
 }
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)
@@ -211,7 +244,27 @@ void MainWindow::on_actionAdd_Plugin_Path_triggered(bool checked)
 
 void MainWindow::on_actionExit_triggered(bool checked)
 {
+	if (controller->get_modified_state())
+	{
+		auto reply = ask_before_save();
+		if (reply == QMessageBox::Cancel)
+			return;
+	}
+
 	this->close();
+}
+
+QMessageBox::StandardButton MainWindow::ask_before_save()
+{
+	QMessageBox::StandardButton reply =
+			QMessageBox::question(this, "gst-creator", "Do you want to save your project before?",
+			QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+	if (reply == QMessageBox::Yes)
+	{
+		on_actionSave_triggered(true);
+	}
+
+	return reply;
 }
 
 void MainWindow::show_error_box(QString text)
