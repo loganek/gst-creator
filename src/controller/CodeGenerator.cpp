@@ -144,7 +144,7 @@ void CodeGenerator::generate_properties(const RefPtr<Element>& element)
 	for (int i = 0; i < property_count; i++)
 	{
 		Property* property = Property::build_property(property_specs[i], element, "");
-		if (property != nullptr)
+		if (property != nullptr && property->is_writable())
 		{
 			if (!property->is_default_value())
 			{

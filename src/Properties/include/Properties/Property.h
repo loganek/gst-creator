@@ -35,6 +35,8 @@ public:
 	virtual bool is_default_value() const = 0;
 	virtual std::string get_type_name() const = 0;
 
+	bool is_writable() const;
+
 	static Property* build_property(GParamSpec* param_spec,
 			const Glib::RefPtr<Gst::Element>& element,
 			const std::string& value);

@@ -40,6 +40,11 @@ QWidget* Property::get_widget()
 	return widget;
 }
 
+bool Property::is_writable() const
+{
+	return param_spec->flags & G_PARAM_WRITABLE;
+}
+
 Property* Property::build_property(GParamSpec* param_spec,
 		const RefPtr<Element>& element, const std::string& str_value)
 {
