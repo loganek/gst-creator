@@ -12,7 +12,8 @@ using namespace Gst;
 
 MainController::MainController(const RefPtr<Pipeline>& model)
 : model(model)
-{}
+{
+}
 
 RefPtr<Pipeline> MainController::get_model() const
 {

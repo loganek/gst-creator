@@ -1,8 +1,8 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "Console/ConsoleView.h"
-#include "Logger/LoggerView.h"
 #include "PluginWizardDialog.h"
+#include "Logger/LoggerView.h"
 #include "controller.h"
 #include "CodeGeneratorDialog.h"
 #include "ObjectInspector/ObjectInspectorModel.h"
@@ -79,6 +79,8 @@ void MainWindow::add_workspace_canvas()
 	controller->get_model()->signal_element_removed().connect([this](const Glib::RefPtr<Gst::Element>& e) {
 		workspace->element_removed(e);
 	});
+
+	controller->get_model()->get_bus()->add_watch(sigc::mem_fun(*logger, &LoggerView::add_bus_log));
 }
 
 MainWindow::~MainWindow()

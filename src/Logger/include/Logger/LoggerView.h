@@ -10,6 +10,7 @@
 
 #include <QtWidgets>
 #include <memory>
+#include <gstreamermm.h>
 #include "Commands/Command.h"
 
 class LoggerView : public QWidget
@@ -19,8 +20,11 @@ class LoggerView : public QWidget
 private:
 	QTableWidget* table;
 
+	void add_single_log(const QString& text);
+
 public Q_SLOTS:
 	void add_log(std::shared_ptr<Command> cmd);
+	bool add_bus_log(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefPtr<Gst::Message>& message);
 
 public:
 	explicit LoggerView(QWidget* parent = 0);
