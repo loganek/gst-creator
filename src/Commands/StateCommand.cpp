@@ -6,6 +6,7 @@
  */
 
 #include "StateCommand.h"
+#include "CommandListener.h"
 #include "utils/EnumUtils.h"
 
 using Glib::RefPtr;
@@ -30,7 +31,7 @@ StateCommand* StateCommand::from_args(const std::vector<std::string>& vect, cons
 
 void StateCommand::run_command(std::vector<CommandListener*> listeners)
 {
-	Gst::State gst_state;
+	Gst::State gst_state = Gst::STATE_NULL;
 
 	switch (state)
 	{
@@ -44,6 +45,9 @@ void StateCommand::run_command(std::vector<CommandListener*> listeners)
 		gst_state = Gst::STATE_NULL;
 		break;
 	}
+
+	for (auto listener : listeners)
+		listener->state_changed(state);
 
 	model->set_state(gst_state);
 }

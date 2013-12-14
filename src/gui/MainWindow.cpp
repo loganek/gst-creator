@@ -30,6 +30,12 @@ MainWindow::MainWindow(MainController* controller, QWidget *parent)
 		if (selected_element)
 			PropertyCommand(selected_element, "", "").run_command({workspace});
 	});
+
+	QObject::connect(ui->pausedRadioButton, &QRadioButton::clicked, this, &MainWindow::pipeline_state_paused);
+	QObject::connect(ui->stoppedRadioButton, &QRadioButton::clicked, this, &MainWindow::pipeline_state_stopped);
+	QObject::connect(ui->playingRadioButton, &QRadioButton::clicked, this, &MainWindow::pipeline_state_playing);
+
+
 }
 
 void MainWindow::reload_plugins()
@@ -51,7 +57,7 @@ void MainWindow::add_workspace_canvas()
 	QFrame *frame = new QFrame;
 	workspace = new WorkspaceWidget(controller->get_model());
 	workspace->set_controller(controller);
-	ConsoleView* console = new ConsoleView({workspace, controller});
+	ConsoleView* console = new ConsoleView({workspace, controller, this});
 	LoggerView* logger = new LoggerView();
 
 	QSplitter* spl = new QSplitter();
@@ -127,7 +133,7 @@ void MainWindow::save_project()
 	{
 		FileWriter(controller->get_current_project_file(), controller->get_model(),
 				std::bind(&WorkspaceWidget::get_block_location, workspace, std::placeholders::_1))
-							.save_model();
+									.save_model();
 
 		controller->reset_modified_state();
 	}
@@ -258,7 +264,7 @@ QMessageBox::StandardButton MainWindow::ask_before_save()
 {
 	QMessageBox::StandardButton reply =
 			QMessageBox::question(this, "gst-creator", "Do you want to save your project before?",
-			QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+					QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 	if (reply == QMessageBox::Yes)
 	{
 		on_actionSave_triggered(true);
@@ -271,4 +277,42 @@ void MainWindow::show_error_box(QString text)
 {
 	QMessageBox message_box;
 	message_box.critical(0, "gst-creator error", text);
+}
+
+void MainWindow::pipeline_state_stopped(bool)
+{
+	if (ui->stoppedRadioButton->isChecked())
+		StateCommand(State::STOP, controller->get_model()).run_command({workspace, controller});
+}
+
+void MainWindow::pipeline_state_paused(bool)
+{
+	if (ui->pausedRadioButton->isChecked())
+		StateCommand(State::PAUSE, controller->get_model()).run_command({workspace, controller});
+}
+
+void MainWindow::pipeline_state_playing(bool)
+{
+	if (ui->playingRadioButton->isChecked())
+		StateCommand(State::PLAY, controller->get_model()).run_command({workspace, controller});
+}
+
+void MainWindow::state_changed(State state)
+{
+	QRadioButton* btn = nullptr;
+
+	switch (state)
+	{
+	case State::PLAY:
+		btn = ui->playingRadioButton;
+		break;
+	case State::STOP:
+		btn = ui->stoppedRadioButton;
+		break;
+	case State::PAUSE:
+		btn = ui->pausedRadioButton;
+	}
+
+	if (btn != nullptr)
+		btn->setChecked(true);
 }

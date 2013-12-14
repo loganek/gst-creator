@@ -3,6 +3,7 @@
 
 #include "ObjectInspector/ObjectInspectorView.h"
 #include "Workspace/WorkspaceWidget.h"
+#include "Commands/CommandListener.h"
 
 #include <QMainWindow>
 #include <QAbstractItemModel>
@@ -14,7 +15,7 @@ class MainWindow;
 
 class MainController;
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, public CommandListener
 {
 	Q_OBJECT
 
@@ -23,6 +24,7 @@ public:
 	~MainWindow();
 
 	QMessageBox::StandardButton ask_before_save();
+	void state_changed(State state);
 
 private Q_SLOTS:
 	void on_actionAbout_triggered(bool checked);
@@ -51,6 +53,9 @@ private:
 
 private Q_SLOTS:
 	void current_element_info(const Glib::RefPtr<Gst::Element>& element);
+	void pipeline_state_stopped(bool);
+	void pipeline_state_paused(bool);
+	void pipeline_state_playing(bool);
 };
 
 #endif // MAINWINDOW_H
