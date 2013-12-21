@@ -116,10 +116,10 @@ void FileLoader::process_start_element()
 		if (reader.attributes().hasAttribute("X") && reader.attributes().hasAttribute("Y"))
 		{
 			bool conv_ok;
-			double x = reader.attributes().value("X").toDouble(&conv_ok);
+			double x = reader.attributes().value("X").toString().toDouble(&conv_ok);
 			if (conv_ok)
 			{
-				double y = reader.attributes().value("Y").toDouble(&conv_ok);
+				double y = reader.attributes().value("Y").toString().toDouble(&conv_ok);
 				if (conv_ok)
 					pos_setter(new_element, x, y);
 			}
