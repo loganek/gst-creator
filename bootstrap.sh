@@ -4,6 +4,7 @@ sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
 sudo apt-get update -qq
 sudo apt-get install -qq mm-common
 sudo apt-get install -qq cmake
+sudo apt-get install -qq libsigc++-2.0-dev
 sudo apt-get install -qq qt5-qmake qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
 sudo apt-get install -qq libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 sudo apt-get install -qq git
@@ -17,7 +18,7 @@ sudo mv libg* /usr/lib/
 cd $GST_CREATOR_DIRECTORY
 git clone git://git.gnome.org/glib
 cd glib
-git checkout 2.38
+git checkout 2.38.0
 ./autogen.sh
 make
 sudo make install
