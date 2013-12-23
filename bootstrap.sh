@@ -9,6 +9,7 @@ sudo apt-get install -qq qt5-qmake qtbase5-dev qtdeclarative5-dev libqt5webkit5-
 sudo apt-get install -qq libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 sudo apt-get install -qq git
 sudo apt-get install -qq libffi-dev
+sudo apt-get install -qq libxml-parser-perl
 GST_CREATOR_DIRECTORY=$(pwd)
 sudo apt-get install -qq libgtest-dev
 cd /usr/src/gtest
@@ -23,7 +24,6 @@ git checkout 2.38.0
 make
 sudo make install
 cd ..
-sudo apt-get install libxml-parser-perl
 git clone git://git.gnome.org/glibmm
 cd glibmm
 git checkout 2.38.0
