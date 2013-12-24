@@ -3,6 +3,7 @@
 #include "Console/ConsoleView.h"
 #include "PluginWizardDialog.h"
 #include "Logger/LoggerView.h"
+#include "Logger/GstLogger.h"
 #include "controller.h"
 #include "CodeGeneratorDialog.h"
 #include "ObjectInspector/ObjectInspectorModel.h"
@@ -35,7 +36,13 @@ MainWindow::MainWindow(MainController* controller, QWidget *parent)
 	QObject::connect(ui->stoppedRadioButton, &QRadioButton::clicked, this, &MainWindow::pipeline_state_stopped);
 	QObject::connect(ui->playingRadioButton, &QRadioButton::clicked, this, &MainWindow::pipeline_state_playing);
 
+	ui->debugLevelComboBox->addItems({
+		"none", "error", "warning", "fixme", "debug", "log", "trace"
+	});
 
+	QObject::connect(ui->debugLevelComboBox,   static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [controller](int index){
+		controller->set_debug_level(index);
+	});
 }
 
 void MainWindow::reload_plugins()
@@ -71,6 +78,7 @@ void MainWindow::add_workspace_canvas()
 	spl->setOrientation(Qt::Vertical);
 	spl->addWidget(workspace_frame);
 	spl->addWidget(frame);
+	spl->addWidget(new GstLogger());
 	frame->setLayout(frameLayout);
 	frameLayout->addWidget(console);
 	frameLayout->addWidget(logger);

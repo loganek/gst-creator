@@ -9,6 +9,18 @@
 
 using Glib::RefPtr;
 using namespace Gst;
+#include <iostream>
+void log_func(GstDebugCategory * category,
+                                 GstDebugLevel      level,
+                                 const gchar      * file,
+                                 const gchar      * function,
+                                 gint               line,
+                                 GObject          * object,
+                                 GstDebugMessage  * message,
+                                 gpointer           user_data)
+{
+	std::cout << gst_debug_message_get(message) << std::endl;
+}
 
 MainController::MainController(const RefPtr<Pipeline>& model)
 : model(model),
@@ -21,6 +33,9 @@ MainController::MainController(const RefPtr<Pipeline>& model)
 	model->signal_element_removed().connect([this](const Glib::RefPtr<Gst::Element>& e) {
 		set_modified_state();
 	});
+
+	gst_debug_set_default_threshold(GST_LEVEL_INFO);
+	gst_debug_add_log_function(log_func, nullptr, nullptr);
 }
 
 RefPtr<Pipeline> MainController::get_model() const
@@ -55,4 +70,12 @@ void MainController::set_modified_state()
 bool MainController::get_modified_state() const
 {
 	return model_modified_state;
+}
+
+void MainController::set_debug_level(int level)
+{
+	if (level < 0) level = 0;
+	else if (level > GST_LEVEL_TRACE) level = GST_LEVEL_TRACE;
+
+	gst_debug_set_default_threshold((GstDebugLevel)level);
 }

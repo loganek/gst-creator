@@ -9,5 +9,7 @@
 #define LOGGER_H_
 
 #include "Logger/LoggerView.h"
+#include "Logger/GstLogger.h"
+#include "Logger/GstLoggerProperties.h"
 
 #endif /* LOGGER_H_ */
