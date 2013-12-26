@@ -8,6 +8,7 @@ GstLoggerProperties::GstLoggerProperties(QWidget *parent)
 	ui->setupUi(this);
 	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
+
 	ui->tableWidget->setHorizontalHeaderLabels({"Category", "Debug Level"});
 
 	QStringList debug_levels = {
@@ -32,7 +33,8 @@ GstLoggerProperties::GstLoggerProperties(QWidget *parent)
 	{
 		GstDebugCategory* category = static_cast<GstDebugCategory*>(categories->data);
 		ui->tableWidget->insertRow(ui->tableWidget->rowCount());
-		ui->tableWidget->setCellWidget(ui->tableWidget->rowCount()-1, 0, new QLineEdit(gst_debug_category_get_name(category)));
+		ui->tableWidget->setCellWidget(ui->tableWidget->rowCount()-1, 0,
+				new QLineEdit(gst_debug_category_get_name(category)));
 
 		auto cb = new QComboBox();
 		cb->addItems(debug_levels);
@@ -66,12 +68,12 @@ std::map<GstDebugCategory*, GstDebugLevel> GstLoggerProperties::get_speciefied_l
 	for (int i = 0; i < ui->tableWidget->rowCount(); i++)
 	{
 		GstDebugCategory* cat = _gst_debug_get_category(
-				static_cast<QLineEdit>(ui->tableWidget->cellWidget(i, 0)).
+				static_cast<QLineEdit*>(ui->tableWidget->cellWidget(i, 0))->
 				text().toStdString().c_str()
 		);
 		if (cat != nullptr)
-			ret_map[cat] = (GstDebugLevel)static_cast<QComboBox>(
-					ui->tableWidget->cellWidget(i, 0)).currentIndex();
+			ret_map[cat] = (GstDebugLevel)static_cast<QComboBox*>(
+					ui->tableWidget->cellWidget(i, 1))->currentIndex();
 	}
 
 	return ret_map;
