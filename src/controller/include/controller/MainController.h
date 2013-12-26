@@ -44,8 +44,6 @@ public:
 	{set_modified_state();}
 	void future_connection_removed(const ConnectCommand::future_connection_pads& conn)
 	{set_modified_state();}
-
-	void set_debug_level(int level);
 };
 
 #endif /* MAINCONTROLLER_H_ */

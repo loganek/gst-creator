@@ -57,11 +57,3 @@ bool MainController::get_modified_state() const
 {
 	return model_modified_state;
 }
-
-void MainController::set_debug_level(int level)
-{
-	if (level < 0) level = 0;
-	else if (level > GST_LEVEL_TRACE) level = GST_LEVEL_TRACE;
-
-	gst_debug_set_default_threshold((GstDebugLevel)level);
-}

@@ -35,14 +35,6 @@ MainWindow::MainWindow(MainController* controller, QWidget *parent)
 	QObject::connect(ui->pausedRadioButton, &QRadioButton::clicked, this, &MainWindow::pipeline_state_paused);
 	QObject::connect(ui->stoppedRadioButton, &QRadioButton::clicked, this, &MainWindow::pipeline_state_stopped);
 	QObject::connect(ui->playingRadioButton, &QRadioButton::clicked, this, &MainWindow::pipeline_state_playing);
-
-	ui->debugLevelComboBox->addItems({
-		"none", "error", "warning", "fixme", "debug", "log", "trace"
-	});
-
-	QObject::connect(ui->debugLevelComboBox,   static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [controller](int index){
-		controller->set_debug_level(index);
-	});
 }
 
 void MainWindow::reload_plugins()
