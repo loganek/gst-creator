@@ -16,7 +16,7 @@ RefPtr<Gst::Element> GstUtils::find_element(std::string text, const RefPtr<Pipel
 	std::vector<std::string> elements = StringUtils::split(text, ":");
 	RefPtr<Bin> current_bin = model;
 
-	for (int i = 0; i < elements.size() - 1; i++)
+	for (size_t i = 0; i < elements.size() - 1; i++)
 		current_bin = current_bin.cast_static(model->get_element(elements[i].c_str()));
 
 	return current_bin->get_element(elements.back().c_str());
@@ -150,7 +150,7 @@ std::vector<std::string> GstUtils::get_properties_string(const RefPtr<Element>& 
 	GParamSpec **property_specs = g_object_class_list_properties(
 			G_OBJECT_GET_CLASS(element->gobj()), &property_count);
 
-	for (int i = 0; i < property_count; i++)
+	for (guint i = 0; i < property_count; i++)
 		values.push_back(property_specs[i]->name);
 
 	return values;

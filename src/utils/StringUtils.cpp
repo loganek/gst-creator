@@ -13,7 +13,7 @@
 std::vector<std::string> StringUtils::split(std::string text,
 		const std::string& delim)
 {
-	int pos;
+	size_t pos;
 	std::vector<std::string> values;
 
 	while ((pos = text.find(delim)) != std::string::npos)
@@ -42,7 +42,7 @@ std::string StringUtils::join(const std::vector<std::string>& arr,
 
 std::string StringUtils::trim(std::string text)
 {
-	int pos = text.find_last_not_of(' ');
+	size_t pos = text.find_last_not_of(' ');
 	if(pos != std::string::npos)
 	{
 		text.erase(pos + 1);

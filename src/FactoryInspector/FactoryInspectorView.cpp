@@ -150,7 +150,7 @@ QTreeWidgetItem* FactoryInspectorView::get_caps_view(const RefPtr<Caps>& caps)
 	if (finish)
 		return caps_item;
 
-	for (int i = 0; i < caps->size(); i++)
+	for (guint i = 0; i < caps->size(); i++)
 	{
 		Structure structure = caps->get_structure(i);
 		QTreeWidgetItem* format_item = new QTreeWidgetItem({structure.get_name().c_str()});

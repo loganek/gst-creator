@@ -22,8 +22,6 @@ bool ObjectInspectorFilter::filterAcceptsRow(int sourceRow,
 
 bool ObjectInspectorFilter::should_be_displayed(const QModelIndex index) const
 {
-	bool result = false;
-
 	if ( sourceModel()->rowCount(index) > 0 )
 	{
 		for (int i = 0; i < sourceModel()->rowCount(index); i++)

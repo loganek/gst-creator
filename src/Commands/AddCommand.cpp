@@ -19,10 +19,10 @@ int CommandListener::refcount = 0;
 AddCommand::AddCommand(ObjectType type,
 		const RefPtr<Element>& parent,
 		const RefPtr<Object>& object)
-: type(type),
-  Command(CommandType::ADD),
+: Command(CommandType::ADD),
+  object(object),
   parent(parent),
-  object(object)
+  type(type)
 {
 }
 

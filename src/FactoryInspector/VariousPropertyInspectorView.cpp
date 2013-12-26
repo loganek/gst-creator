@@ -132,7 +132,6 @@ void VariousPropertyInspectorView::param_spec_enum()
 	GEnumValue *values;
 	guint j = 0;
 	gint enum_value;
-	const gchar *value_nick = "";
 
 	values = G_ENUM_CLASS (g_type_class_ref(param->value_type))->values;
 	enum_value = g_value_get_enum (&value);
@@ -149,6 +148,6 @@ void VariousPropertyInspectorView::param_spec_enum()
 	item->addChild(new QTreeWidgetItem({"Enum values",
 		(enum_values.size() < 1 ? "none" : enum_values[0])}));
 
-	for (int i = 1; i < enum_values.size(); i++)
+	for (size_t i = 1; i < enum_values.size(); i++)
 		item->addChild(new QTreeWidgetItem({"", enum_values[i]}));
 }

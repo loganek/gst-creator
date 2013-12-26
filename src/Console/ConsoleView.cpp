@@ -144,9 +144,6 @@ void ConsoleView::suggest(const QString& text)
 
 void ConsoleView::make_suggestion(const QString& text, bool autocomplete)
 {
-	const QPalette &pal = edit->palette();
-	QColor color = pal.color(QPalette::Disabled, QPalette::WindowText);
-
 	std::string line = edit->text().toUtf8().constData();
 	command_args = StringUtils::split(StringUtils::trim(line), " ");
 
@@ -156,7 +153,7 @@ void ConsoleView::make_suggestion(const QString& text, bool autocomplete)
 	std::string upper_cur_text = StringUtils::to_upper(cur_text);
 	std::vector<std::string> vals = get_current_suggestions(command_args);
 
-	for (int i = 0; i < vals.size(); i++)
+	for (size_t i = 0; i < vals.size(); i++)
 	{
 		if (cur_text.size() > vals[i].size() ||
 				(vals[i].substr(0, cur_text.size()) != cur_text &&
@@ -184,7 +181,7 @@ void ConsoleView::make_suggestion(const QString& text, bool autocomplete)
 	suggestions->setUpdatesEnabled(false);
 	suggestions->clear();
 
-	for (int i = 0; i < vals.size(); ++i)
+	for (size_t i = 0; i < vals.size(); ++i)
 	{
 		QTreeWidgetItem * item;
 		item = new QTreeWidgetItem(suggestions);

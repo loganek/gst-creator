@@ -15,9 +15,9 @@ using Glib::RefPtr;
 
 RemoveCommand::RemoveCommand(ObjectType type,
 		const RefPtr<Object>& object)
-: type(type),
-  Command(CommandType::REMOVE),
-  object(object)
+: Command(CommandType::REMOVE),
+  object(object),
+  type(type)
 {
 }
 

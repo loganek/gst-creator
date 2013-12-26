@@ -16,9 +16,9 @@ using Glib::RefPtr;
 
 WorkspaceWidget::WorkspaceWidget(const RefPtr<Pipeline>& model, QWidget* parent)
 : QWidget(parent),
-  model(model),
   controller(nullptr),
-  current_connection(nullptr)
+  current_connection(nullptr),
+  model(model)
 {
 	setAcceptDrops(true);
 	scene = new QGraphicsScene();

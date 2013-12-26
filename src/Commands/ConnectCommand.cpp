@@ -93,9 +93,9 @@ void ConnectCommand::element_pad_added(const RefPtr<Pad>& pad)
 }
 
 ConnectCommand::ConnectCommand(const RefPtr<Object>& src, const RefPtr<Object>& dst, bool future)
-: src(src),
+: Command(CommandType::CONNECT),
+  src(src),
   dst(dst),
-  Command(CommandType::CONNECT),
   future(future)
 {
 	if (GST_IS_ELEMENT(src->gobj()) || GST_IS_ELEMENT(dst->gobj()))
@@ -115,9 +115,9 @@ ConnectCommand::ConnectCommand(const RefPtr<Object>& src, const RefPtr<Object>& 
 }
 
 ConnectCommand::ConnectCommand(const RefPtr<PadTemplate>& src, const RefPtr<Element>& src_parent, const RefPtr<Pad>& dst)
-: src(src),
+: Command(CommandType::CONNECT),
+  src(src),
   dst(dst),
-  Command(CommandType::CONNECT),
   src_parent(src_parent),
   future(true)
 {

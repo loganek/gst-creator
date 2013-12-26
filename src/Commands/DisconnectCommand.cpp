@@ -14,9 +14,9 @@ using Glib::RefPtr;
 using namespace std;
 
 DisconnectCommand::DisconnectCommand(const RefPtr<Object>& src, const RefPtr<Object>& dst)
-: src(src),
-  dst(dst),
-  Command(CommandType::DISCONNECT)
+: Command(CommandType::DISCONNECT),
+  src(src),
+  dst(dst)
 {
 	if (GST_IS_ELEMENT(src->gobj()) || GST_IS_ELEMENT(dst->gobj()))
 		type = ObjectType::ELEMENT;

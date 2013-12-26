@@ -17,8 +17,8 @@ FactoryInfo::FactoryInfo(string name, string long_name,
 		string description, string parent, int rank)
 : name(name), long_name(long_name), klass(klass),
   author(author), description(description),
-  parent(parent), rank(rank), v_change_state(false),
-  v_release_pad(false), v_request_new_pad(false),
+  parent(parent), rank(rank), v_request_new_pad(false),
+  v_release_pad(false), v_change_state(false),
   v_set_bus(false)
 {
 }

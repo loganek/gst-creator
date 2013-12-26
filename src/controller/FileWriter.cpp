@@ -58,7 +58,7 @@ void FileWriter::write_single_element(const Glib::RefPtr<Gst::Element>& element)
 	GParamSpec **property_specs = g_object_class_list_properties(
 			G_OBJECT_GET_CLASS(element->gobj()), &property_count);
 
-	for (int i = 0; i < property_count; i++)
+	for (size_t i = 0; i < property_count; i++)
 	{
 		Property* property = Property::build_property(property_specs[i], element, "");
 

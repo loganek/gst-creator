@@ -13,9 +13,9 @@ using Glib::RefPtr;
 using namespace std;
 
 StateCommand::StateCommand(State state, const RefPtr<Gst::Pipeline>& model)
-: state(state),
-  model(model),
-  Command(CommandType::STATE)
+: Command(CommandType::STATE),
+  state(state),
+  model(model)
 {
 }
 

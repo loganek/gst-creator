@@ -10,8 +10,8 @@
 
 ObjectInspectorItem::ObjectInspectorItem(const std::string& name, FactoryType factory_type, ObjectInspectorItem* parent)
 : parent_item(parent),
-  factory_name(name),
-  factory_type(factory_type)
+  factory_type(factory_type),
+  factory_name(name)
 {
 }
 

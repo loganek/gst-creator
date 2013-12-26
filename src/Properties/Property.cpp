@@ -13,9 +13,9 @@ using namespace Gst;
 using Glib::RefPtr;
 
 Property::Property(GParamSpec* param_spec, const RefPtr<Element>& element)
-: param_spec(param_spec),
-  element(element),
-  was_built(false)
+: was_built(false),
+  param_spec(param_spec),
+  element(element)
 {
 	widget = new QWidget();
 	widget->setLayout(new QHBoxLayout());
@@ -99,6 +99,8 @@ Property* Property::build_numeric_property(GParamSpec* param_spec,
 	NUM_CASE(G_TYPE_DOUBLE, double)
 	NUM_CASE(G_TYPE_FLOAT, float)
 	}
+
+	return nullptr;
 }
 
 QWidget* Property::build_property_window(const RefPtr<Element>& element)
@@ -110,7 +112,7 @@ QWidget* Property::build_property_window(const RefPtr<Element>& element)
 	GParamSpec **property_specs = g_object_class_list_properties(
 			G_OBJECT_GET_CLASS(element->gobj()), &property_count);
 
-	for (int i = 0; i < property_count; i++)
+	for (size_t i = 0; i < property_count; i++)
 	{
 		Property* property = build_property(property_specs[i], element, "");
 		if (property != nullptr)

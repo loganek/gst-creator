@@ -36,7 +36,7 @@ QWidget* PropertyInspectorView::get_property_inspector_view(const RefPtr<Element
 
 	property_specs = g_object_class_list_properties(G_OBJECT_GET_CLASS(element->gobj()), &property_count);
 
-	for (int i = 0; i < property_count; i++)
+	for (guint i = 0; i < property_count; i++)
 	{
 		tree->addTopLevelItem(generate_property_item(property_specs[i], element->gobj()));
 	}

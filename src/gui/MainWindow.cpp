@@ -13,8 +13,8 @@
 
 MainWindow::MainWindow(MainController* controller, QWidget *parent)
 : QMainWindow(parent),
-  controller(controller),
-  ui(new Ui::MainWindow)
+  ui(new Ui::MainWindow),
+  controller(controller)
 {
 	ui->setupUi(this);
 	ui->objectInspectorFrame->layout()->addWidget(&plugins_tree);

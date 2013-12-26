@@ -12,8 +12,8 @@ PropertyEnum::PropertyEnum(GParamSpec* param_spec,
 		const Glib::RefPtr<Gst::Element>& element,
 		const std::string& value)
 : Property(param_spec, element),
-  combobox(nullptr),
-  value(value)
+  value(value),
+  combobox(nullptr)
 {
 }
 
