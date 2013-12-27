@@ -40,6 +40,11 @@ public:
 	static std::string generate_element_path(Glib::RefPtr<Gst::Object> obj, const Glib::RefPtr<Gst::Object>& max_parent = Glib::RefPtr<Gst::Object>());
 	static void clean_model(const Glib::RefPtr<Gst::Pipeline>& model);
 	static Linkage find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPtr<Gst::Element> destination);
+	static Linkage find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPtr<Gst::Pad> dst_port);
+	static Linkage find_connection(Glib::RefPtr<Gst::Pad> src_pad, Glib::RefPtr<Gst::Element> destination);
+	static Linkage find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPtr<Gst::PadTemplate> dst_tpl);
+	static Linkage find_connection(Glib::RefPtr<Gst::PadTemplate> src_tpl, Glib::RefPtr<Gst::Element> destination);
+	static Linkage find_connection(Glib::RefPtr<Gst::Object> source, Glib::RefPtr<Gst::Object> destination);
 };
 
 #endif /* GSTUTILS_H_ */

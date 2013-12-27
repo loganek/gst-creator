@@ -243,26 +243,67 @@ void GstUtils::clean_model(const RefPtr<Pipeline>& model)
 		model->remove(element);
 }
 
+Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Pad> src_pad, Glib::RefPtr<Gst::Element> destination)
+{
+	auto second_iterator = destination->iterate_sink_pads();
+	while (second_iterator.next())
+	{
+		if (src_pad->can_link(*second_iterator))
+			return {true, src_pad, src_pad->get_parent(), *second_iterator, destination};
+	}
+
+	for (auto a : destination->get_factory()->get_static_pad_templates())
+	{
+		if (a.get_direction() == PAD_SRC)
+			continue;
+		auto dest_tpl = destination->get_pad_template(a.get_name_template());
+		if (src_pad->can_link(Gst::Pad::create(dest_tpl)))
+			return {true, src_pad, src_pad->get_parent(), dest_tpl, destination};
+	}
+
+	return {false};
+}
+
+Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPtr<Gst::PadTemplate> dst_tpl)
+{
+	return find_connection(source, Pad::create(dst_tpl));
+}
+
+Linkage GstUtils::find_connection(Glib::RefPtr<Gst::PadTemplate> src_tpl, Glib::RefPtr<Gst::Element> destination)
+{
+	return find_connection(Pad::create(src_tpl), destination);
+}
+
+Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPtr<Gst::Pad> dst_port)
+{
+	auto iterator = source->iterate_src_pads();
+	while (iterator.next())
+	{
+		if (iterator->can_link(dst_port))
+			return {true, *iterator, source, dst_port, dst_port->get_parent()};
+	}
+
+	for (auto a : source->get_factory()->get_static_pad_templates())
+	{
+		if (a.get_direction() == PAD_SINK)
+			continue;
+		auto src_tpl = source->get_pad_template(a.get_name_template());
+		if (Gst::Pad::create(src_tpl)->can_link(dst_port))
+			return {true, src_tpl, source, dst_port, dst_port->get_parent()};
+	}
+
+	return {false};
+}
+
 Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPtr<Gst::Element> destination)
 {
 	auto first_iterator = source->iterate_src_pads();
 	while (first_iterator.next())
 	{
-		auto second_iterator = destination->iterate_sink_pads();
-		while (second_iterator.next())
-		{
-			if (first_iterator->can_link(*second_iterator))
-				return {true, *first_iterator, *second_iterator, source, destination};
-		}
+		Linkage lnkg = find_connection(*first_iterator, destination);
 
-		for (auto a : destination->get_factory()->get_static_pad_templates())
-		{
-			if (a.get_direction() == PAD_SRC)
-				continue;
-			auto tpl = destination->get_pad_template(a.get_name_template());
-			if (first_iterator->can_link(Gst::Pad::create(tpl)))
-				return {true, *first_iterator, tpl, source, destination};
-		}
+		if (lnkg.exists)
+			return lnkg;
 	}
 
 	for (auto fts : source->get_factory()->get_static_pad_templates())
@@ -284,6 +325,30 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPt
 			if (tmp_pad->can_link(Gst::Pad::create(dest_tpl)))
 				return {true, tpl, dest_tpl, source, destination};
 		}
+	}
+
+	return {false};
+}
+
+Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Object> source, Glib::RefPtr<Gst::Object> destination)
+{
+	if (GST_IS_ELEMENT(source->gobj()))
+	{
+		if (GST_IS_ELEMENT(destination->gobj()))
+			return find_connection(RefPtr<Element>::cast_static(source), RefPtr<Element>::cast_static(destination));
+		else if (GST_IS_PAD(destination->gobj()))
+			return find_connection(RefPtr<Element>::cast_static(source), RefPtr<Pad>::cast_static(destination));
+		else if (GST_IS_PAD_TEMPLATE(destination->gobj()))
+			return find_connection(RefPtr<Element>::cast_static(source), RefPtr<PadTemplate>::cast_static(destination));
+	}
+	else if (GST_IS_ELEMENT(destination->gobj()))
+	{
+		if (GST_IS_ELEMENT(source->gobj()))
+			return find_connection(RefPtr<Element>::cast_static(source), RefPtr<Element>::cast_static(destination));
+		else if (GST_IS_PAD(destination->gobj()))
+			return find_connection(RefPtr<Pad>::cast_static(source), RefPtr<Element>::cast_static(destination));
+		else if (GST_IS_PAD_TEMPLATE(destination->gobj()))
+			return find_connection(RefPtr<PadTemplate>::cast_static(source), RefPtr<Element>::cast_static(destination));
 	}
 
 	return {false};

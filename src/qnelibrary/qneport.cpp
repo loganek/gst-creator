@@ -167,8 +167,11 @@ bool QNEPort::can_link(QNEPort* sink_port) const
 	if (!model && !sink_model)
 		return GstUtils::find_connection(m1, m2).exists;
 
-	if ((!model && sink_model) || (model && !sink_model))
-		return false;
+	if (!model && sink_model)
+		return GstUtils::find_connection(Glib::RefPtr<Gst::Object>::cast_static(m1), sink_model).exists;
+
+	if (model && !sink_model)
+		return GstUtils::find_connection(model, Glib::RefPtr<Gst::Object>::cast_static(m2)).exists;
 
 	if (GST_IS_PAD(model->gobj()) && GST_IS_PAD(sink_model->gobj()))
 		return Glib::RefPtr<Gst::Pad>::cast_static(model)->can_link(
