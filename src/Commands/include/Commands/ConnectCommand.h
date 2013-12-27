@@ -9,6 +9,8 @@
 #define CONNECTCOMMAND_H_
 
 #include "Command.h"
+#include "utils/GstUtils.h"
+
 #include <gstreamermm.h>
 #include <set>
 #include <utility>
@@ -40,6 +42,7 @@ public:
 	Glib::RefPtr<Gst::Object> get_src() { return src; }
 	Glib::RefPtr<Gst::Object> get_dst() { return dst; }
 	static ConnectCommand* from_args(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
+	static ConnectCommand* from_linkage(const Linkage& lnk, std::vector<CommandListener*> listeners);
 	static std::vector<std::string> get_suggestions(const std::vector<std::string>& args, const Glib::RefPtr<Gst::Pipeline>& model);
 	void run_command(std::vector<CommandListener*> listeners = {});
 

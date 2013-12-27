@@ -173,8 +173,11 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 			{
 				if (!src_port->get_object_model() && !sink_port->get_object_model())
 				{
-					ConnectCommand cmd (src_port->block()->get_model(), sink_port->block()->get_model());
-					cmd.run_command({controller, this});
+					Linkage lnk = GstUtils::find_connection(src_port->block()->get_model(), sink_port->block()->get_model());
+
+					ConnectCommand* cmd = ConnectCommand::from_linkage(lnk, {controller, this});
+					cmd->run_command({controller, this});
+					delete cmd;
 					return true;
 				}
 

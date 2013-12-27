@@ -225,7 +225,7 @@ std::string GstUtils::generate_element_path(RefPtr<Object> obj, const RefPtr<Obj
 		else
 			first = false;
 
-		 path = tmp_path + path;
+		path = tmp_path + path;
 	}
 
 	return path;
@@ -241,4 +241,50 @@ void GstUtils::clean_model(const RefPtr<Pipeline>& model)
 
 	for (auto element : elements)
 		model->remove(element);
+}
+
+Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPtr<Gst::Element> destination)
+{
+	auto first_iterator = source->iterate_src_pads();
+	while (first_iterator.next())
+	{
+		auto second_iterator = destination->iterate_sink_pads();
+		while (second_iterator.next())
+		{
+			if (first_iterator->can_link(*second_iterator))
+				return {true, *first_iterator, *second_iterator, source, destination};
+		}
+
+		for (auto a : destination->get_factory()->get_static_pad_templates())
+		{
+			if (a.get_direction() == PAD_SRC)
+				continue;
+			auto tpl = destination->get_pad_template(a.get_name_template());
+			if (first_iterator->can_link(Gst::Pad::create(tpl)))
+				return {true, *first_iterator, tpl, source, destination};
+		}
+	}
+
+	for (auto fts : source->get_factory()->get_static_pad_templates())
+	{
+		auto tpl = source->get_pad_template(fts.get_name_template());
+		auto tmp_pad = Gst::Pad::create(tpl);
+		auto second_iterator = destination->iterate_sink_pads();
+		while (second_iterator.next())
+		{
+			if (tmp_pad->can_link(*second_iterator))
+				return {true, tpl, *second_iterator, source, destination};
+		}
+
+		for (auto a : destination->get_factory()->get_static_pad_templates())
+		{
+			if (a.get_direction() == PAD_SRC)
+				continue;
+			auto dest_tpl = destination->get_pad_template(a.get_name_template());
+			if (tmp_pad->can_link(Gst::Pad::create(dest_tpl)))
+				return {true, tpl, dest_tpl, source, destination};
+		}
+	}
+
+	return {false};
 }

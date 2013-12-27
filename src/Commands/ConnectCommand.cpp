@@ -6,8 +6,8 @@
  */
 
 #include "utils/EnumUtils.h"
-#include "utils/GstUtils.h"
 #include "CommandListener.h"
+#include "AddCommand.h"
 #include <set>
 
 using namespace Gst;
@@ -141,6 +141,26 @@ void ConnectCommand::remove_future_connection(const RefPtr<PadTemplate>& tpl, co
 			future_connection_pads_map.erase(it);
 		}
 	}
+}
+
+ConnectCommand* ConnectCommand::from_linkage(const Linkage& lnk, std::vector<CommandListener*> listeners)
+{
+	if (GST_IS_PAD(lnk.src->gobj()) && GST_IS_PAD(lnk.sink->gobj()))
+		return new ConnectCommand(lnk.src, lnk.sink);
+	else if (GST_IS_PAD_TEMPLATE(lnk.src->gobj()) && GST_IS_PAD(lnk.sink->gobj()))
+		return new ConnectCommand(RefPtr<PadTemplate>::cast_static(lnk.src),
+				RefPtr<Element>::cast_static(lnk.src_parent), RefPtr<Pad>::cast_static(lnk.sink));
+	else if (GST_IS_PAD(lnk.src->gobj()) && GST_IS_PAD_TEMPLATE(lnk.sink->gobj()))
+		return new ConnectCommand(lnk.src_parent, lnk.sink_parent);
+	else if (GST_IS_PAD_TEMPLATE(lnk.src->gobj()) && GST_IS_PAD_TEMPLATE(lnk.sink->gobj()))
+	{
+		AddCommand cmd(ObjectType::PAD, RefPtr<Element>::cast_static(lnk.sink_parent), lnk.sink);
+
+		return new ConnectCommand(RefPtr<PadTemplate>::cast_static(lnk.src),
+				RefPtr<Element>::cast_static(lnk.src_parent), RefPtr<Pad>::cast_static(cmd.run_command_ret()));
+	}
+
+	return nullptr;
 }
 
 ConnectCommand* ConnectCommand::from_args(const vector<string>& args, const Glib::RefPtr<Gst::Pipeline>& model)

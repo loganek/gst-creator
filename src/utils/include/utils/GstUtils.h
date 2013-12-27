@@ -11,6 +11,15 @@
 #include <gstreamermm.h>
 #include <vector>
 
+struct Linkage
+{
+	bool exists;
+	Glib::RefPtr<Gst::Object> src;
+	Glib::RefPtr<Gst::Object> sink;
+	Glib::RefPtr<Gst::Object> src_parent;
+	Glib::RefPtr<Gst::Object> sink_parent;
+};
+
 class GstUtils
 {
 private:
@@ -30,6 +39,7 @@ public:
 	static bool is_src_element(const Glib::RefPtr<Gst::Element>& element);
 	static std::string generate_element_path(Glib::RefPtr<Gst::Object> obj, const Glib::RefPtr<Gst::Object>& max_parent = Glib::RefPtr<Gst::Object>());
 	static void clean_model(const Glib::RefPtr<Gst::Pipeline>& model);
+	static Linkage find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPtr<Gst::Element> destination);
 };
 
 #endif /* GSTUTILS_H_ */

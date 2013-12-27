@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #include <QPen>
 
 #include "qneconnection.h"
+#include "qneblock.h"
+#include "utils/GstUtils.h"
 
 QNEPort::QNEPort(const Glib::RefPtr<Gst::Object>& model, QGraphicsItem *parent)
 : QGraphicsPathItem(parent),
@@ -159,9 +161,11 @@ bool QNEPort::can_link(QNEPort* sink_port) const
 
 	if (isOutput_ == sink_port->isOutput_)
 		return false;
+	auto m1 = block()->get_model();
+	auto m2 = sink_port->block()->get_model();
 
 	if (!model && !sink_model)
-		return true;
+		return GstUtils::find_connection(m1, m2).exists;
 
 	if ((!model && sink_model) || (model && !sink_model))
 		return false;
