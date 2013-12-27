@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	Glib::RefPtr<Gst::Pipeline> model = Gst::Pipeline::create("main-pipeline");
 	MainController controller(model);
 	MainWindow w(&controller);
-
+	controller.set_main_view(&w);
 	w.show();
 
 	return a.exec();

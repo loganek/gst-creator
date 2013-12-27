@@ -116,15 +116,20 @@ void MainWindow::on_actionAbout_triggered(bool checked)
 			"License:\tGPL");
 }
 
-void MainWindow::save_project_dialog()
+bool MainWindow::save_project_dialog()
 {
 	QString filename = QFileDialog::getSaveFileName(this, "Save Project", QDir::currentPath(),
 			"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
 	if (filename.isNull())
-		return;
+		return false;
+
+	if (!filename.endsWith(".gstc", Qt::CaseInsensitive))
+			filename += ".gstc";
 
 	controller->set_current_project_file(filename.toUtf8().constData());
+
+	return true;
 }
 
 void MainWindow::save_project()
@@ -145,18 +150,17 @@ void MainWindow::save_project()
 
 void MainWindow::on_actionSave_As_triggered(bool checked)
 {
-	save_project_dialog();
-	save_project();
+	if (save_project_dialog())
+		save_project();
 }
 
 void MainWindow::on_actionSave_triggered(bool checked)
 {
 	if (controller->get_current_project_file().empty())
 	{
-		save_project_dialog();
-
-		if (controller->get_current_project_file().empty())
-			return;
+		if (save_project_dialog())
+			if (controller->get_current_project_file().empty())
+				return;
 	}
 
 	save_project();
@@ -170,7 +174,7 @@ void MainWindow::on_actionLoad_triggered(bool checked)
 			return;
 	}
 
-	QString filename = QFileDialog::getOpenFileName(this, "Save Project", QDir::currentPath(),
+	QString filename = QFileDialog::getOpenFileName(this, "Open Project", QDir::currentPath(),
 			"gst-creator files (*.gstc);;All files (*.*)", 0, QFileDialog::DontUseNativeDialog);
 
 	if (filename.isNull())
@@ -180,6 +184,9 @@ void MainWindow::on_actionLoad_triggered(bool checked)
 			std::bind(&WorkspaceWidget::set_block_location, workspace,
 					std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
 	.load_model({workspace});
+
+	controller->reset_modified_state();
+	controller->set_current_project_file(filename.toStdString());
 }
 
 void MainWindow::current_element_info(const Glib::RefPtr<Gst::Element>& element)
@@ -315,4 +322,20 @@ void MainWindow::state_changed(State state)
 
 	if (btn != nullptr)
 		btn->setChecked(true);
+}
+
+void MainWindow::modified_state_changed(bool state)
+{
+	static QString modified_indicator = "* ";
+
+	if (state && !windowTitle().startsWith(modified_indicator))
+		setWindowTitle(modified_indicator + windowTitle());
+	else if (!state && windowTitle().startsWith(modified_indicator))
+		setWindowTitle(windowTitle().right(std::max(windowTitle().length()-2, 0)));
+}
+
+
+void MainWindow::current_project_file_changed(const std::string& filename)
+{
+	setWindowTitle(QString::fromStdString(filename) + " - gst-creator");
 }

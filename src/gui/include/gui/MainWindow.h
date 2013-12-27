@@ -26,6 +26,9 @@ public:
 	QMessageBox::StandardButton ask_before_save();
 	void state_changed(State state);
 
+	void modified_state_changed(bool state);
+	void current_project_file_changed(const std::string& filename);
+
 private Q_SLOTS:
 	void on_actionAbout_triggered(bool checked);
 	void on_actionSave_As_triggered(bool checked);
@@ -38,7 +41,7 @@ private Q_SLOTS:
 	void on_actionSave_triggered(bool checked);
 
 	static void show_error_box(QString text);
-	void save_project_dialog();
+	bool save_project_dialog();
 	void save_project();
 
 private:
