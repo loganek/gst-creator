@@ -35,21 +35,9 @@ void FileLoader::open_file()
 	reader.setDevice(file);
 }
 
-void FileLoader::clean_model()
-{
-	auto iterator = model->iterate_elements();
-	vector<RefPtr<Element>> elements;
-
-	while (iterator.next())
-		elements.push_back(*iterator);
-
-	for (auto element : elements)
-		model->remove(element);
-}
-
 void FileLoader::load_model(std::vector<CommandListener*> listeners)
 {
-	clean_model();
+	GstUtils::clean_model(model);
 	open_file();
 
 	this->listeners = listeners;

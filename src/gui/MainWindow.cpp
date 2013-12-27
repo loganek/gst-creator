@@ -108,6 +108,19 @@ void MainWindow::on_actionPlugin_Wizzard_triggered(bool checked)
 	generator.generate_code(plugin_wizzard.get_directory().toUtf8().constData());
 }
 
+void MainWindow::on_actionNew_Project_triggered(bool checked)
+{
+	if (controller->get_modified_state())
+	{
+		if (ask_before_save() == QMessageBox::Cancel)
+			return;
+	}
+
+	controller->clean_model();
+	controller->reset_modified_state();
+	controller->set_current_project_file(std::string());
+}
+
 void MainWindow::on_actionAbout_triggered(bool checked)
 {
 	QMessageBox::about(this, "About GstCreator",
@@ -337,5 +350,8 @@ void MainWindow::modified_state_changed(bool state)
 
 void MainWindow::current_project_file_changed(const std::string& filename)
 {
-	setWindowTitle(QString::fromStdString(filename) + " - gst-creator");
+	setWindowTitle("gst-creator");
+
+	if (!filename.empty())
+		setWindowTitle(QString::fromStdString(filename) + " - " + windowTitle());
 }

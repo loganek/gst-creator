@@ -7,6 +7,7 @@
 
 #include "MainController.h"
 #include "gui/MainWindow.h"
+#include "utils/GstUtils.h"
 
 using Glib::RefPtr;
 using namespace Gst;
@@ -71,4 +72,9 @@ void MainController::set_modified_state()
 bool MainController::get_modified_state() const
 {
 	return model_modified_state;
+}
+
+void MainController::clean_model()
+{
+	GstUtils::clean_model(model);
 }

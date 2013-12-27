@@ -7,6 +7,7 @@
 
 #include "GstUtils.h"
 #include "StringUtils.h"
+#include <vector>
 
 using namespace Gst;
 using Glib::RefPtr;
@@ -228,4 +229,16 @@ std::string GstUtils::generate_element_path(RefPtr<Object> obj, const RefPtr<Obj
 	}
 
 	return path;
+}
+
+void GstUtils::clean_model(const RefPtr<Pipeline>& model)
+{
+	auto iterator = model->iterate_elements();
+	std::vector<RefPtr<Element>> elements;
+
+	while (iterator.next())
+		elements.push_back(*iterator);
+
+	for (auto element : elements)
+		model->remove(element);
 }

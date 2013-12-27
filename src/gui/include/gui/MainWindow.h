@@ -39,6 +39,7 @@ private Q_SLOTS:
 	void on_actionExit_triggered(bool checked);
 	void on_actionPlugin_Wizzard_triggered(bool checked);
 	void on_actionSave_triggered(bool checked);
+	void on_actionNew_Project_triggered(bool checked);
 
 	static void show_error_box(QString text);
 	bool save_project_dialog();

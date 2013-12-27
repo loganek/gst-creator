@@ -31,7 +31,6 @@ private:
 
 	Glib::ustring get_attribute(const char* attribute_name);
 	void open_file();
-	void clean_model();
 	void process_start_element();
 public:
 	FileLoader(const std::string& filename, const Glib::RefPtr<Gst::Pipeline>& model, position_setter pos_setter);

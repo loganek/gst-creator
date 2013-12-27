@@ -29,6 +29,7 @@ public:
 	static bool is_sink_element(const Glib::RefPtr<Gst::Element>& element);
 	static bool is_src_element(const Glib::RefPtr<Gst::Element>& element);
 	static std::string generate_element_path(Glib::RefPtr<Gst::Object> obj, const Glib::RefPtr<Gst::Object>& max_parent = Glib::RefPtr<Gst::Object>());
+	static void clean_model(const Glib::RefPtr<Gst::Pipeline>& model);
 };
 
 #endif /* GSTUTILS_H_ */
