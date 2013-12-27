@@ -258,7 +258,7 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Pad> src_pad, Glib::RefPtr<G
 			continue;
 		auto dest_tpl = destination->get_pad_template(a.get_name_template());
 		if (src_pad->can_link(Gst::Pad::create(dest_tpl)))
-			return {true, src_pad, src_pad->get_parent(), dest_tpl, destination};
+			return {true, src_pad, dest_tpl, src_pad->get_parent(), destination};
 	}
 
 	return {false};
@@ -289,7 +289,7 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPt
 			continue;
 		auto src_tpl = source->get_pad_template(a.get_name_template());
 		if (Gst::Pad::create(src_tpl)->can_link(dst_port))
-			return {true, src_tpl, source, dst_port, dst_port->get_parent()};
+			return {true, src_tpl, dst_port, source, dst_port->get_parent()};
 	}
 
 	return {false};
@@ -345,9 +345,9 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Object> source, Glib::RefPtr
 	{
 		if (GST_IS_ELEMENT(source->gobj()))
 			return find_connection(RefPtr<Element>::cast_static(source), RefPtr<Element>::cast_static(destination));
-		else if (GST_IS_PAD(destination->gobj()))
+		else if (GST_IS_PAD(source->gobj()))
 			return find_connection(RefPtr<Pad>::cast_static(source), RefPtr<Element>::cast_static(destination));
-		else if (GST_IS_PAD_TEMPLATE(destination->gobj()))
+		else if (GST_IS_PAD_TEMPLATE(source->gobj()))
 			return find_connection(RefPtr<PadTemplate>::cast_static(source), RefPtr<Element>::cast_static(destination));
 	}
 

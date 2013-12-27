@@ -171,9 +171,15 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 
 			if (src_port->block() != sink_port->block() && src_port->isOutput() != sink_port->isOutput() && !src_port->isConnected(sink_port))
 			{
-				if (!src_port->get_object_model() && !sink_port->get_object_model())
+				if (!src_port->get_object_model() || !sink_port->get_object_model())
 				{
-					Linkage lnk = GstUtils::find_connection(src_port->block()->get_model(), sink_port->block()->get_model());
+					Linkage lnk;
+					if (!src_port->get_object_model() && !sink_port->get_object_model())
+						lnk = GstUtils::find_connection(src_port->block()->get_model(), sink_port->block()->get_model());
+					else if (!src_port->get_object_model() && sink_port->get_object_model())
+						lnk = GstUtils::find_connection(Glib::RefPtr<Gst::Object>::cast_static(src_port->block()->get_model()), sink_port->get_object_model());
+					else
+						lnk = GstUtils::find_connection(src_port->get_object_model(), Glib::RefPtr<Gst::Object>::cast_static(sink_port->block()->get_model()));
 
 					ConnectCommand* cmd = ConnectCommand::from_linkage(lnk, {controller, this});
 					cmd->run_command({controller, this});
