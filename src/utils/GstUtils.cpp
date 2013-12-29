@@ -249,7 +249,7 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Pad> src_pad, Glib::RefPtr<G
 	while (second_iterator.next())
 	{
 		if (src_pad->can_link(*second_iterator))
-			return {true, src_pad, src_pad->get_parent(), *second_iterator, destination};
+			return {true, src_pad, *second_iterator, src_pad->get_parent(), destination};
 	}
 
 	for (auto a : destination->get_factory()->get_static_pad_templates())

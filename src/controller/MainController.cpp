@@ -78,3 +78,8 @@ void MainController::clean_model()
 {
 	GstUtils::clean_model(model);
 }
+
+MainController::~MainController()
+{
+	model->set_state(STATE_NULL);
+}

@@ -26,6 +26,8 @@ private:
 
 public:
 	MainController(const Glib::RefPtr<Gst::Pipeline>& model);
+	virtual ~MainController();
+
 	Glib::RefPtr<Gst::Pipeline> get_model() const;
 
 	void set_main_view(MainWindow* main_view);

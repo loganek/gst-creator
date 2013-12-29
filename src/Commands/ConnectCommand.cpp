@@ -151,7 +151,11 @@ ConnectCommand* ConnectCommand::from_linkage(const Linkage& lnk, std::vector<Com
 		return new ConnectCommand(RefPtr<PadTemplate>::cast_static(lnk.src),
 				RefPtr<Element>::cast_static(lnk.src_parent), RefPtr<Pad>::cast_static(lnk.sink));
 	else if (GST_IS_PAD(lnk.src->gobj()) && GST_IS_PAD_TEMPLATE(lnk.sink->gobj()))
-		return new ConnectCommand(lnk.src_parent, lnk.sink_parent);
+	{
+		AddCommand cmd(ObjectType::PAD, RefPtr<Element>::cast_static(lnk.sink_parent), lnk.sink);
+
+		return new ConnectCommand(lnk.src, RefPtr<Pad>::cast_static(cmd.run_command_ret()));
+	}
 	else if (GST_IS_PAD_TEMPLATE(lnk.src->gobj()) && GST_IS_PAD_TEMPLATE(lnk.sink->gobj()))
 	{
 		AddCommand cmd(ObjectType::PAD, RefPtr<Element>::cast_static(lnk.sink_parent), lnk.sink);
