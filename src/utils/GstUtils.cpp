@@ -254,7 +254,7 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Pad> src_pad, Glib::RefPtr<G
 
 	for (auto a : destination->get_factory()->get_static_pad_templates())
 	{
-		if (a.get_direction() == PAD_SRC)
+		if (a.get_direction() == PAD_SRC || a.get_presence() == PAD_ALWAYS)
 			continue;
 		auto dest_tpl = destination->get_pad_template(a.get_name_template());
 		if (src_pad->can_link(Gst::Pad::create(dest_tpl)))
@@ -280,12 +280,12 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPt
 	while (iterator.next())
 	{
 		if (iterator->can_link(dst_port))
-			return {true, *iterator, source, dst_port, dst_port->get_parent()};
+			return {true, *iterator, dst_port, source, dst_port->get_parent()};
 	}
 
 	for (auto a : source->get_factory()->get_static_pad_templates())
 	{
-		if (a.get_direction() == PAD_SINK)
+		if (a.get_direction() == PAD_SINK || a.get_presence() == PAD_ALWAYS)
 			continue;
 		auto src_tpl = source->get_pad_template(a.get_name_template());
 		if (Gst::Pad::create(src_tpl)->can_link(dst_port))
@@ -308,6 +308,9 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPt
 
 	for (auto fts : source->get_factory()->get_static_pad_templates())
 	{
+		if (fts.get_presence() == PAD_ALWAYS)
+			continue;
+
 		auto tpl = source->get_pad_template(fts.get_name_template());
 		auto tmp_pad = Gst::Pad::create(tpl);
 		auto second_iterator = destination->iterate_sink_pads();
@@ -319,7 +322,7 @@ Linkage GstUtils::find_connection(Glib::RefPtr<Gst::Element> source, Glib::RefPt
 
 		for (auto a : destination->get_factory()->get_static_pad_templates())
 		{
-			if (a.get_direction() == PAD_SRC)
+			if (a.get_direction() == PAD_SRC || a.get_presence() == PAD_ALWAYS)
 				continue;
 			auto dest_tpl = destination->get_pad_template(a.get_name_template());
 			if (tmp_pad->can_link(Gst::Pad::create(dest_tpl)))

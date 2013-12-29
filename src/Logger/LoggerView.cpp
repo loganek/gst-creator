@@ -37,10 +37,10 @@ LoggerView::~LoggerView()
 void LoggerView::add_single_log(const QString& text)
 {
 	QStringList row = {  };
-		row.append("");
-		table->insertRow(0);
-		table->setItem(0, 0, new QTableWidgetItem(QDateTime::currentDateTime().toString("H:mm:ss dd/MM/yyyy")));
-		table->setItem(0, 1, new QTableWidgetItem(text));
+	row.append("");
+	table->insertRow(0);
+	table->setItem(0, 0, new QTableWidgetItem(QDateTime::currentDateTime().toString("H:mm:ss dd/MM/yyyy")));
+	table->setItem(0, 1, new QTableWidgetItem(text));
 }
 
 void LoggerView::add_log(std::shared_ptr<Command> cmd)
@@ -53,8 +53,31 @@ bool LoggerView::add_bus_log(const Glib::RefPtr<Gst::Bus>& bus, const Glib::RefP
 {
 	Glib::ustring msg_type = Gst::Enums::get_name(message->get_message_type());
 	if (msg_cbox->isChecked())
-		add_single_log(QString("Bus message from ") +
-				bus->get_name().c_str() + ": " + msg_type.c_str());
+	{
+		std::string msg_text;
 
+		switch (message->get_message_type())
+		{
+		case Gst::MESSAGE_ERROR:
+		{
+			Glib::Error err;
+			Glib::RefPtr<Gst::MessageError>::cast_static(message)->parse(err, msg_text);
+			msg_text += std::string(", Error: ") + err.what().c_str();
+			break;
+		}
+		case Gst::MESSAGE_STATE_CHANGED:
+		{
+			Gst::State old_state, new_state, pending;
+			Glib::RefPtr<Gst::MessageStateChanged>::cast_static(message)->parse(old_state, new_state, pending);
+			msg_text = (Gst::Enums::get_name(old_state) + " -> " + Gst::Enums::get_name(new_state)).c_str();
+			break;
+		}
+		default:
+			msg_text = "unknown message";
+		}
+
+		add_single_log(QString("Bus message from ") +
+				bus->get_name().c_str() + ": " + msg_type.c_str() + ": " + msg_text.c_str());
+	}
 	return true;
 }
