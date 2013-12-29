@@ -14,7 +14,8 @@
 MainWindow::MainWindow(MainController* controller, QWidget *parent)
 : QMainWindow(parent),
   ui(new Ui::MainWindow),
-  controller(controller)
+  controller(controller),
+  can_modify_gui(true)
 {
 	ui->setupUi(this);
 	ui->objectInspectorFrame->layout()->addWidget(&plugins_tree);
@@ -172,8 +173,12 @@ void MainWindow::on_actionSave_triggered(bool checked)
 	if (controller->get_current_project_file().empty())
 	{
 		if (save_project_dialog())
+		{
 			if (controller->get_current_project_file().empty())
 				return;
+		}
+		else
+			return;
 	}
 
 	save_project();
@@ -270,13 +275,6 @@ void MainWindow::on_actionAdd_Plugin_Path_triggered(bool checked)
 
 void MainWindow::on_actionExit_triggered(bool checked)
 {
-	if (controller->get_modified_state())
-	{
-		auto reply = ask_before_save();
-		if (reply == QMessageBox::Cancel)
-			return;
-	}
-
 	this->close();
 }
 
@@ -341,6 +339,9 @@ void MainWindow::modified_state_changed(bool state)
 {
 	static QString modified_indicator = "* ";
 
+	if (!can_modify_gui)
+		return;
+
 	if (state && !windowTitle().startsWith(modified_indicator))
 		setWindowTitle(modified_indicator + windowTitle());
 	else if (!state && windowTitle().startsWith(modified_indicator))
@@ -354,4 +355,17 @@ void MainWindow::current_project_file_changed(const std::string& filename)
 
 	if (!filename.empty())
 		setWindowTitle(QString::fromStdString(filename) + " - " + windowTitle());
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	can_modify_gui = false;
+	if (controller->get_modified_state())
+	{
+		if (ask_before_save() == QMessageBox::Cancel)
+		{
+			event->ignore();
+			can_modify_gui = true;
+		}
+	}
 }

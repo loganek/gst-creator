@@ -18,6 +18,8 @@ class MainController;
 class MainWindow : public QMainWindow, public CommandListener
 {
 	Q_OBJECT
+protected:
+	void closeEvent(QCloseEvent *event);
 
 public:
 	explicit MainWindow(MainController* file_controller, QWidget *parent = 0);
@@ -52,6 +54,8 @@ private:
 	ObjectInspectorView plugins_tree;
 	MainController* controller;
 	Glib::RefPtr<Gst::Element> selected_element;
+
+	bool can_modify_gui;
 
 	void reload_plugins();
 
