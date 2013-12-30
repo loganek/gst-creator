@@ -51,6 +51,8 @@ void PropertyCaps::init()
 void PropertyCaps::read_var()
 {
 	element->get_property(param_spec->name, value);
+	if (!value)
+		value = Gst::Caps::create_any();
 	tmp_value = value->to_string();
 }
 
