@@ -252,7 +252,74 @@ Po uruchomieniu aplikacji użytkownikowi ukaże się główne okno programu. Sk�
   \caption{Zrzut ekranu głównego okna programu}
   \label{fig:mainWindow}
 \end{figure}
-\subsubsection{Inspektor obiektów}
+\subsubsection{Inspektor elementów}
+Inspektor elementów daje możliwość przejrzenia wszystkich dostępnych wtyczek (ang. \textit{plug-ins}) biblioteki GStreamer. Pozwala również na wyświetlenie informacji na temat zawartych w nich fabryk elementów, wraz ze szczegółowymi danymi każdej fabryki. 
+\begin{minipage}{0.55\textwidth}
+Lista wtyczek oraz dostępnych w nich fabryk wizualizowana jest w postaci drzewa obiektów. Wtyczka jest elementem nadrzędnym dla fabryki elementów. Oprócz tego moduł zawiera wyszukiwarkę, która umożliwia przeszukiwanie listy obiektów (rysunek ~\ref{fig:elementInspector}).
+W celu uzyskania informacji na temat konkretnej wtyczki, należy skierować kursor na nazwę danej wtyczki, a następnie dwukrotnie kliknąć na wskazany obiekt. Na ekranie użytkownika pokaże się okno (rysunek ~\ref{fig:matroskaInspectWindow}), zawierające informację na temat wtyczki:
+\end{minipage}
+\hfill
+\begin{minipage}{0.35\textwidth}\raggedleft
+\begin{figure}[H]
+  \includegraphics[width=0.8\textwidth]{img/element-inspector.png}
+  \caption{Wyszukiwanie frazy w inspektorze elementów}
+  \label{fig:elementInspector}
+\end{figure}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item nazwa,
+\item opis,
+\item ścieżka do pliku,
+\item wersja,
+\item licencja,
+\item moduł źródłowy,
+\item data wydania,
+\item pakiet, w skład którego wchodzi wtyczka,
+\item pochodzenie pakietu.
+\end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.55\textwidth}\raggedleft
+\begin{figure}[H]
+  \includegraphics[width=0.95\textwidth]{img/matroska-inspect-window.png}
+  \caption{Okno właściwości wtyczki \textit{matroska}}
+  \label{fig:matroskaInspectWindow}
+\end{figure}
+\end{minipage}
+\vspace{6mm}
+
+\noindent
+Aby uzyskać dostęp do informacji na temat konkretnej fabryki elementów, należy dwukrotnie kliknąć na obiekt inspektora elementów reprezentujący daną fabrykę. Spowoduje to wyświetlenie okna właściwości fabryki (rysunek ~\ref{fig:xingmuxFactoryInfoWindow}). Informacje rozmieszczone są w oknie w pięciu grupach.
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item Szczegóły fabryki (ang. \textit{factory details}) - wyświetla podstawowe informacje na temat fabryki:
+  \begin{itemize}
+    \setlength{\itemsep}{0em}
+  \item \textit{długą nazwę} fabryki,
+  \item klasę, do jakiej przynależy fabryka,
+  \item opis,
+  \item autora.
+  \end{itemize}
+\item Szablony gniazd (ang. \textit{pad templates}) - wyświetla wszystkie dostępne szablony gniazd, a także informacje o kompatybilnych formatach multimedialnych. Formaty wyświetlane są w postaci drzewa, tak, aby użytkownik mógł w łatwy sposób wyszukać pożądany format.
+\item Gniazda (ang. \textit{pads}) - agreguje informacje na temat statycznych gniazd.
+\item Właściwości (ang. \textit{properties}) - prezentuje informacje dotyczące właściwości zdefiniowanych w danej fabryce elementów. Wyświetla informacje dotyczące:
+  \begin{itemize}
+    \setlength{\itemsep}{0em}
+  \item nazwy,
+  \item flag dostępu: właściwość do zapisu (ang. \textit{writable}), właściwość do odczytu (ang. \textit{readable}),
+  \item typu,
+  \item domyślnej wartości,
+  \item dozwolonych wartości (w przypadku typów numerycznych i wyliczeniowych).
+  \end{itemize}
+\item Szczegóły wtyczki (ang. \textit{plugin details}) - wyświetla informacje na temat wtyczki, w której znajduje się fabryka.
+\end{itemize}
+\begin{figure}[H]
+  \includegraphics[width=110mm]{img/xingmux-factory-info-window.png}
+  \caption{Okno informacyjne dla fabryki elementu \textit{xingmux}}
+  \label{fig:xingmuxFactoryInfoWindow}
+\end{figure}
 \subsubsection{Wiersz poleceń}
 Wiersz poleceń umożliwia budowę modelu na podstawie prostych komend interpretowanych przez program. Wiersz poleceń posiada również mechanizm podpowiadania składni (rysunek ~\ref{fig:commandLine}), który ma na celu przyśpieszenie i ułatwienie użytkownikowi pracy z programem. W przypadku słów kluczowych, wielkość liter nie ma znaczenia. Poniżej przedstawiona zostanie syntaktyka poszczególnych poleceń. 
 \begin{figure}[H]
