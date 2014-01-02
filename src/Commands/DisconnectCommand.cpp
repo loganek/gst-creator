@@ -28,6 +28,7 @@ DisconnectCommand::DisconnectCommand(const RefPtr<Object>& src, const RefPtr<Obj
 
 DisconnectCommand* DisconnectCommand::from_args(const vector<string>& args, const Glib::RefPtr<Gst::Pipeline>& model)
 {
+	// TODO remove future connections
 	if (args.size() != 4)
 		syntax_error("invalid arguments count. Expected 4, but " + to_string(args.size()) + " found.");
 

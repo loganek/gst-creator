@@ -188,16 +188,16 @@ ConnectCommand* ConnectCommand::from_args(const vector<string>& args, const Glib
 	}
 	else
 	{
-		RefPtr<Object> src;
-
-		if (future)
-			src = GstUtils::find_pad_template(args[1], model);
-		else
-			src = GstUtils::find_pad(args[1], model);
 
 		RefPtr<Pad> dest = GstUtils::find_pad(args[3], model);
-
-		return new ConnectCommand(src, dest, future);
+		if (future)
+		{
+			RefPtr<PadTemplate> src = GstUtils::find_pad_template(args[1], model);
+			RefPtr<Element> parent = GstUtils::find_element(args[1].substr(0, args[1].find_last_of(":")), model);
+			return new ConnectCommand(src, parent, dest);
+		}
+		else
+			return new ConnectCommand(GstUtils::find_pad(args[1], model), dest, future);
 	}
 }
 

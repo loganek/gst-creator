@@ -174,8 +174,189 @@ bool Preset::load_preset(const Glib::ustring& name)
 W tym etapie, wygenerowany kod źródłowy jest zawsze poprawny. Programista może jedynie dopisać dodatkowe pliki. Przechowują one na ogół klasy usprawniające (ale nie rozszerzające funkcjonalność) pracę z biblioteką.
 \cleardoublepage
 \section{Specyfikacja zewnętrzna}
+\subsection{Proces instalacji biblioteki gstreamermm}
+Na listingu ~\ref{gstreamermmInstall} przedstawiony został zestaw poleceń, jakie należy wykonać w celu instalacji biblioteki gstreamermm. Proces instalacji wymaga połączenia z internetem, ponieważ źródła biblioteki muszą zostać pobrane ze zdalnego repozytorium.
+\begin{lstlisting}[caption=Polecenia kompilujące program gst-creator, label=gstreamermmInstall]
+[m.kolny@m.kolny-cmp ~]$ git clone git://
+                             git.gnome.org/gstreamermm
+[m.kolny@m.kolny-cmp ~]$ cd gstreamermm
+[m.kolny@m.kolny-cmp gstreamermm]$ 
+[m.kolny@m.kolny-cmp gstreamermm]$ ./autogen.sh
+[m.kolny@m.kolny-cmp gstreamermm]$ make
+[m.kolny@m.kolny-cmp gstreamermm]$ sudo make install
+\end{lstlisting}
+
+\subsubsection{Wymagane zależności dla kompilacji biblioteki}
+Poniżej znajduje się lista zależności, jakie muszą zostać spełnione w celu poprawnej kompilacji i instalacji biblioteki gstreamermm:
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item narzędzie mm-common w wersji 0.9.6 lub wyższej,
+\item biblioteka giomm-2.4 w wersji 2.36.0 lub wyższej,
+\item biblioteka gstreamer-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-app-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-audio-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-base-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-check-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-controller-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-fft-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-net-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-pbutils-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-plugins-base-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-riff-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-rtp-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-sdp-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-tag-1.0 w wersji 1.0.10 lub wyższej,
+\item biblioteka gstreamer-video-1.0 w wersji 1.0.10 lub wyższej.
+\end{itemize}
+Ponadto, w celu kompilacji przykładowych programów wykorzystujących bibliotekę gstreamermm, w systemie musi być zainstalowana biblioteka gtkmm-3.0 w wersji 3.0 lub wyższej.
 \subsection{Proces instalacji programu}
+Oprogramowanie dostarczane jest w postaci kodu źródłowego, dla tego w celu uruchomienia programu, należy dokonać kompilacji programu. Skrypt budujący został przygotowany pod narzędzie \textbf{CMake}. Aby skompilować program, należy wykonać polecenia w konsoli przedstawione na listingu ~\ref{compileProject} (użytkownik powinien znajdować się w katalogu głównym repozytorium programu).
+\begin{lstlisting}[caption=Polecenia kompilujące program gst-creator, label=compileProject]
+[m.kolny@m.kolny-cmp gst-creator]$ mkdir build
+[m.kolny@m.kolny-cmp gst-creator]$ cd build/
+[m.kolny@m.kolny-cmp build]$ cmake ..
+[m.kolny@m.kolny-cmp build]$ make
+[m.kolny@m.kolny-cmp build]$ ./src/gst-creator &$
+\end{lstlisting}
+Polecenia spowodują skompilowanie aplikacji w katalogu build. Skompilowany plik wykonywalny znajduje się w katalogu \textbf{./build/src/} pod nazwą \textbf{gst-creator}. 
+\subsubsection{Zależności kompilacji programu}
+Kompilacja programu gst-creator wymaga spełnienia następujących zależności:
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item CMake w wersji 2.8.9 lub wyższej,
+\item gstreamermm w wersji 1.0
+\item GTest w wersji 1.6 lub wyższej.
+\end{itemize}
+\subsection{Automatyczna kompilacja i instalacja zależności oraz aplikacji}
+W celu uproszczenia procesu kompilacji aplikacji, przygotowałem skrypt, mający na celu automatyczne rozwiązywanie zależności. Skrypt został przetestowany na świeżej instalacji systemu operacyjnego Ubuntu 13.04 i386. Aby uruchomić skrypt automatycznej instalacji, należy wykonać polecenia pokazane na listingu ~\ref{autoinstallerRunner}.
+\begin{lstlisting}[caption=Uruchomienie skryptu autoinstalatora, label=autoinstallerRunner]
+[m.kolny@m.kolny-cmp gst-creator]$ chmod +x bootstrap.sh
+[m.kolny@m.kolny-cmp gst-creator]$ ./bootstrap.sh
+\end{lstlisting}
 \subsection{Instrukcja obsługi}
+\subsubsection{Główne okno programu}
+Po uruchomieniu aplikacji użytkownikowi ukaże się główne okno programu. Składa się ono z ośmiu podstawowych modułów, które zostały oznaczone na rysunku ~\ref{fig:mainWindow}. Poniżej w skrócie zostaną omówione poszczególne elementy głównego okna.
+\begin{enumerate}
+  \setlength{\itemsep}{0em}
+\item Główne menu programu - umożliwia dostęp do podstawowych operacji związanych z plikiem projektu. Ponadto daje użytkownikowi możliwość skorzystania z dodatkowych narzędzi takich jak generator kodu źródłowego czy generator \textit{plug-inów}.
+\item Wskaźnik stanu modelu programu - pozwala użytownikowi śledzić oraz zmieniać aktualny stan, w jakim znajduje się model programu.
+\item Informacja o aktualnie zaznaczonym elemencie - informuje użytkownika o tym, jaki element jest w danej chwili zaznaczony. Daje również możliwość do szybkiej zmiany właściwości zaznaczonego elementu.
+\item Inspektor elementów - zawiera listę wszystkich dostępnych elementów, jakie mogą zostać wykorzystane przez użytkownika przy tworzeniu modelu programu.
+\item Obszar roboczy programu - miejsce, w którym użytkownik składa z dostępnych elementów reprezentowanych przez bloczki model programu.
+\item Wiersz poleceń - umożliwia tworzenie modelu programu poprzez wydawanie odpowiednich poleceń do programu.
+\item Konsola logowania zdarzeń programu - przechwytuje i wyświetla zdarzenia pochodzące z aplikacji oraz z magistrali.
+\item Konsola logowania zdarzeń GStreamera - przechwytuje i wyświetla zdarzenia pochodzące z biblioteki GStreamer.
+\end{enumerate}
+\begin{figure}[H]
+  \includegraphics[width=160mm]{img/main-window.png}
+  \caption{Zrzut ekranu głównego okna programu}
+  \label{fig:mainWindow}
+\end{figure}
+\subsubsection{Inspektor obiektów}
+\subsubsection{Wiersz poleceń}
+Wiersz poleceń umożliwia budowę modelu na podstawie prostych komend interpretowanych przez program. Wiersz poleceń posiada również mechanizm podpowiadania składni (rysunek ~\ref{fig:commandLine}), który ma na celu przyśpieszenie i ułatwienie użytkownikowi pracy z programem. W przypadku słów kluczowych, wielkość liter nie ma znaczenia. Poniżej przedstawiona zostanie syntaktyka poszczególnych poleceń. 
+\begin{figure}[H]
+  \includegraphics[width=140mm]{img/command-line.png}
+  \caption{Mechanizm podpowiadania składni w wierszu poleceń}
+  \label{fig:commandLine}
+\end{figure}
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item \textbf{ADD} - dodaje element do modelu programu lub dodaje gniazdo do elementu.
+\underline{Składnia:} \\
+\texttt{ADD \\
+\hspace*{2em} \{ELEMENT \textit{fabryka} [\textit{nazwa\_elementu}]\} | \\
+\hspace*{2em} \{PAD TO \textit{element} USING \textit{szablon} [\textit{nazwa\_gniazda}]\} }
+\begin{itemize}
+\item \textit{fabryka} - nazwa fabryki, jaka ma zostać użyta do skonstruowania elementu.
+\item \textit{nazwa\_elementu} - nazwa dla nowo utworzonego elementu (parametr opcjonalny).
+\item \textit{element} - nazwa elementu, do którego dodane zostanie gniazdo.
+\item \textit{szablon} - schemat, na podstawie którego zostanie utworzone gniazdo.
+\item \textit{nazwa\_gniazda} - nazwa dla nowo utworzonego gniazda (parametr opcjonalny).
+\end{itemize}
+\underline{Przykłady:} \\
+\texttt{ADD ELEMENT giosink} \\
+\texttt{ADD ELEMENT fakesrc fake-generator} \\
+\texttt{ADD PAD TO tee0 USING src\_\%u} \\
+\texttt{ADD PAD to matroskamux0 USING subtitle\_\%u sub1}
+\cleardoublepage
+\item \textbf{REMOVE} - usuwa element z modelu programu lub usuwa gniazdo z elementu. \\
+\underline{Składnia:} \\
+\texttt{REMOVE \\
+\hspace*{2em} \{ELEMENT \textit{nazwa\_elementu}\} | \\
+\hspace*{2em} \{PAD \textit{nazwa\_elementu}:\textit{nazwa\_gniazda}\}}
+\begin{itemize}
+\item \textit{nazwa\_elementu} - nazwa elementu, który ma zostać usunięty.
+\item \textit{nazwa\_gniazda} - nazwa gniazda, które ma zostać usunięte.
+\end{itemize}
+\underline{Przykłady:} \\
+\texttt{REMOVE ELEMENT videotestsrc0}
+\texttt{REMOVE PAD matroskamux0:sub1}
+\item \textbf{PROPERTY} - umożliwia zmianę właściwości elementu.
+\underline{Składnia:} \\
+\texttt{PROPERTY \textit{element} [\textit{właściwość} \textit{wartość}]}
+\begin{itemize}
+\item \textit{element} - nazwa elementu, którego właściwość będzie zmieniana.
+\item \textit{właściwość} - nazwa właściwości, jaka powinna zostać zmieniona (parametr opcjonalny).
+\item \textit{wartość} - nowa wartość dla zadanej właściwości (parametr opcjonalny). 
+\end{itemize}
+\underline{Przykłady:} \\
+\texttt{PROPERTY videotestsrc0} \\
+\texttt{PROPERTY filesink0 location /home/m.kolny/output.mkv} \\
+\underline{Uwagi:} \\
+Użycie polecenia \textit{PROPERTY} w wariancie jednoargumentowym nie spowoduje de facto zmiany żadnego parametru. Wynikiem wykonania takiego polecenia będzie za to wyświetlenia okna z listą wszystkich dostępnych parametrów dla danego elementu(rysunek ~\ref{fig:allPropertiesWindow}), z możliwością zmiany tych parametrów.
+\begin{figure}[H]
+  \includegraphics[width=150mm]{img/all-properties-window.png}
+  \caption{Okno konfiguracji parametrów elementu \textit{videotestsrc0} - wynik wykonania polecenia \texttt{PROPERTY videoetstsrc0}}
+  \label{fig:allPropertiesWindow}
+\end{figure}
+\cleardoublepage
+\item \textbf{STATE} - zmienia stan modelu programu. \\
+\underline{Składnia:} \\
+\texttt{STATE STOP | PAUSE | PLAY} \\
+\underline{Przykłady:} \\
+\texttt{STATE STOP} \\
+\texttt{STATE PLAY}
+\item \textbf{CONNECT} - łączy ze sobą elementy lub gniazda. \\
+\underline{Składnia:} \\
+\texttt{CONNECT \\
+\hspace*{2em} \{ELEMENT \textit{element\_źródłowy} WITH \textit{element\_docelowy}\} \\
+\hspace*{2em} | \\
+\hspace*{2em} \{PAD \textit{element\_źródłowy}:\textit{gniazdo\_źródłowe} WITH \\
+\hspace*{4em} \textit{element\_docelowy}:\textit{gniazdo\_docelowe}\} \\
+\hspace*{2em} [FUTURE]}
+\begin{itemize}
+\item \textit{element\_źródłowy} - nazwa elementu źródłowego dla połączenia.
+\item \textit{element\_docelowy} - nazwa elementu docelowego dla połączenia.
+\item \textit{gniazdo\_źródłowe} - nazwa gniazda w elementcie źródłowym.
+\item \textit{gniazdo\_docelowe} - nazwa gniazda w elementcie docelowym.
+\end{itemize}
+\underline{Przykłady:} \\
+\texttt{CONNECT ELEMENT matroskademux0 WITH avdec\_aac0 FUTURE} \\
+\texttt{CONNECT ELEMENT videotestsrc0 WITH xvimagesink0} \\
+\texttt{CONNECT pad matroskademux0:video\_\%u WITH xvimagesink0:sink FUTURE}
+\texttt{CONNECT ELEMENT audiotestsrc0:src WITH autoaudiosink0:sink} \\
+\underline{Uwagi:} \\
+Słowo kluczowe \texttt{FUTURE} powinno zostać użyte w przypadku, gdy dane gniazdo nie istnieje na etapie projektowania modelu programu, a jego istnienie jest zależne od formatu wejściowych danych multimedialnych.
+\cleardoublepage
+\item \textbf{DISCONNECT} - rozłącza ze sobą elementy lub gniazda. \\
+\underline{Składnia:} \\
+\texttt{DISCONNECT \\
+\hspace*{2em} \{ELEMENT \textit{element\_źródłowy} WITH \textit{element\_docelowy}\} \\
+\hspace*{2em} | \\
+\hspace*{2em} \{PAD \textit{element\_źródłowy}:\textit{gniazdo\_źródłowe} WITH \\
+\hspace*{4em} \textit{element\_docelowy}:\textit{gniazdo\_docelowe}\}
+}
+\begin{itemize}
+\item \textit{element\_źródłowy} - element źródłowy istniejącego połączenia.
+\item \textit{element\_źródłowy} - element docelowy istniejącego połączenia.
+\item \textit{gniazdo\_źródłowe} - gniazdo źródłowe istniejącego połączenia.
+\item \textit{gniazdo\_docelowe} - gniazdo docelowe istniejącego połączenia.
+\end{itemize}
+\underline{Przykłady:} \\
+\texttt{DISCONNECT ELEMENT queue0 WITH xvimagesink0} \\
+\texttt{DISCONNECT PAD videotestsrc0 WITH autovideosink0}
+\end{itemize}
 \cleardoublepage
 \section{Specyfikacja wewnętrzna}
 \subsection{Rozwój biblioteki gstreamermm}
