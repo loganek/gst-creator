@@ -21,26 +21,6 @@ CommandParser::~CommandParser()
 
 }
 
-/**
- * Command list:
- *  - add
- *    - element factory [_name_] [to bin1:bin2:bin3 default=pipeline]
- *    - pad using _template_ [_name_] to [bin1:bin2 default=pipeline]:element
- *
- *  - remove
- *    - element
- *    - pad
- *
- *  - connect
- *    - {element|pad} obj1 with obj2
- *    - pads element1:pad1 element2:pad2
- *  - reconnect
- *    - {pad | element}
- *    - to {pad | element}
- *  - property
- *    - element property_name TYPE value
- *
- */
 Command* CommandParser::parse(const std::string& text)
 {
 	command_args = StringUtils::split(StringUtils::trim(text), " ");

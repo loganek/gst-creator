@@ -73,6 +73,16 @@ showstringspaces=false}
 \maketitle
 \tableofcontents
 \cleardoublepage
+\section{Założenia projektowe}
+Celem projektu jest stworzenie oprogramowania, umożliwiającego w łatwy i wygodny sposób projektować programy przetwarzające strumienie multimedialne, w oparciu o bibliotekę GStreamer. Funkcjonalność programu zawiera się w niżej wymienionych punktach.
+\begin{itemize}
+ \setlength{\itemsep}{0em}
+\item Tworzenie programu metodą \textit{przeciągnij-upuść} (ang. \textit{drag\&drop}). Dzięki temu, nawet osoba nie posiadająca wiedzy na temat tworzenia oprogramowania, będzie mogła stworzyć własny program.
+\item Zapis projektu do pliku i powtórne załadowanie projektu do programu. Założeniem jest, że użytkownik będzie chciał w przyszłości zmodyfikować wcześniej utworzony program. Zapisywanie i odczytywanie plików projektu umożliwi osobom korzystającym z programu późniejsze modyfikacje swojego projektu.
+\item Generowanie kodu źródłowego na podstawie projektu. Aplikacja powinna nie tylko dawać możliwość prototypowania programu. Prototyp może rozroznąć się do bardzo dużych rozmiarów, co później może powodować problemy w implementacji. Automatyczne generowanie kodu na podstawie utworzonego prototypu zwolni użytkownika z obowiązku żmudnej pracy przepisywania kodu źródłowego.
+\item Wyświetlanie wiadomości pochodzących z biblioteki GStreamer. Biblioteka GStreamer wysyła użytkownikowi wiele komunikatów informujących o przebiegu wykonania programu. Użytkownik powinien mieć możliwość śledzenia, a także filtrowania tych informacji, w celu poprawienia błędów w swojej aplikacji.
+\end{itemize}
+\cleardoublepage
 \section{Analiza problemu}
 \subsection{Narzędzia}
 \subsubsection{Biblioteka GStreamer}
@@ -399,7 +409,7 @@ Nie znając dokładnego formatu przychodzacych danych multimedialnych, użytkown
   \caption{Wykorzystanie połączeń przyszłościowych}
   \label{fig:futureConnections}
 \end{figure}
-Na rysunku ~\ref{fig:futureConnections} można zobaczyć przykładowe użycie połączeń przyszłościowych. Przed uruchomieniem programu, nie można określić, jakiego formatu dane pojawią się na wejściu elementu \textit{decodebin0}. Dlatego użytkownik może zaznaczyć, że w przypadku wystąpienia strumienia audio lub wideo, powinno wygenerować się połączenie pomiędzy dekoderem a jednym z rendererów. Można zauważyć, że dane multimedialne zawierały trzy strumienie (zostały wygenerowane trzy gniazda źródłowe w elemencie dekodującym). Użytkownik zaplanował jednak połączenia tylko dla dwóch gniazd, dlatego trzecie nie zostało podłaczone
+Na rysunku ~\ref{fig:futureConnections} można zobaczyć przykładowe użycie połączeń przyszłościowych. Przed uruchomieniem programu, nie można określić, jakiego formatu dane pojawią się na wejściu elementu \textit{decodebin0}. Dlatego użytkownik może zaznaczyć, że w przypadku wystąpienia strumienia audio lub wideo, powinno wygenerować się połączenie pomiędzy dekoderem a jednym z rendererów. Można zauważyć, że dane multimedialne zawierały trzy strumienie (zostały wygenerowane trzy gniazda źródłowe w elemencie dekodującym). Użytkownik zaplanował jednak połączenia tylko dla dwóch gniazd, dlatego trzecie nie zostało podłaczone\\
 \item \textbf{Tworzenie inteligentnych połączeń} \\
 Każdy blok, zawierający piny wejściowe lub wyjściowe, posiada też tzw. \textit{inteligentne piny}, oznaczone w bloku jako \textit{ai\_sink} w przypadku pinów wejściowych, oraz \textit{ai\_src} w przypadku pinów wyjściowych. Kiedy użytkownik nie jest pewien tego, jakie gniazdo powinien wybrać dla danego połączenia, może skorzystać z \textit{inteligentnych połączeń}. Są to połączenia, w których występuje conajmniej jeden inteligentny pin. Po wykonaniu inteligentnego połączenia, zostanie ono zastapione przez najlepsze stałe połączenie. Proces inteligentnego łączenia przedstawia rysunek ~\ref{fig:aiConnectionProcess}. Po wykonaniu inteligentnego połączenia pomiędzy audio enkoderem \textit{avenc\_aac0} i elementu muksującego \textit{avimux0}, program wykonuje przeszukiwania, w celu wykonania najlepszego połączenia. Poprawnym wynikiem jest utworzenie połączenia pomiędzy gniazdem źródłowym enkodera i gniazdem wejściowym typu \textit{audio} elementu \textit{muxera}.
 \begin{figure}[H]
@@ -570,7 +580,7 @@ Aktualnie program generuje tylko kod źródłowy w języku C++ w oparciu o wrapp
 \begin{figure}[H]
   \includegraphics[width=80mm]{img/code-generator.png}
   \caption{Okno generatora kodu}
-  \label{fig:pluginWizzard}
+  \label{fig:codeGenerator}
 \end{figure}
 Publiczny interfejs wygenerowanej klasy, gotowej do użycia we własnym programie, przedstawiony jest na listingu ~\ref{codeGeneratorPublicApi}.
 \begin{lstlisting}[caption=Publiczny interfejs klasy stworzonej przez generator kodu, label=codeGeneratorPublicApi]
@@ -622,7 +632,7 @@ typedef enum {
 
 Po wygenerowaniu kodu na podstawie powyższej definicji, oczekiwanym wynikiem jest fragment przedstawiony na listingu ~\ref{expectedGeneratedEnum}, natomiast generator tworzył kod, zaprezentowany na listingu ~\ref{outputGeneratedEnum}. Poprawienie błędu polegało na zmodyfikowaniu reguł dla wyrażeń regularnych generatora.
 
-    \begin{lstlisting}[caption=Oczekiwany wynik działania generatora kodu, label=badEnumForGenerator]
+    \begin{lstlisting}[caption=Oczekiwany wynik działania generatora kodu, label=expectedGeneratedEnum]
 (define-flags-extended QueryType
   (in-module "Gst")
   (c-name "GstQueryType")
@@ -635,7 +645,7 @@ Po wygenerowaniu kodu na podstawie powyższej definicji, oczekiwanym wynikiem je
 "GST_QUERY_MAKE_TYPE (20,  FLAG(BOTH))")
     \end{lstlisting}
 
-    \begin{lstlisting}[caption=Błędnie wygenerowany kod przez generator, label=badEnumForGenerator]
+    \begin{lstlisting}[caption=Błędnie wygenerowany kod przez generator, label=outputGeneratedEnum]
 (define-enum-extended QueryType
   (in-module "Gst")
   (c-name "GstQueryType")
@@ -653,7 +663,7 @@ Po wygenerowaniu kodu na podstawie powyższej definicji, oczekiwanym wynikiem je
 "(GST_QUERY_MAKE_TYPE (20) + 1")
     \end{lstlisting}
 
-\subsection{Opis modułów}
+\subsection{Struktura programu gst-creator}
 Struktura programu podzielona jest na biblioteki, które gromadzą w sobie powiązane logicznie klasy. Poniżej przedstawione zostały wszystkie moduły, wraz z opisem oraz listą klas.
 \subsubsection{Moduł Commands}
 Biblioteka zawiera klasy implementujące wzorzec projektowy \textit{Commands}. Obiekty tych klas wykorzystywane są do operacji na modelu programu.\\
@@ -669,18 +679,72 @@ W ramach klasy została również zdefiniowana metoda \\
 \texttt{static std::vector<std::string> get\_suggestions(const std::vector<std::string>\& args, const Glib::RefPtr<Gst::Pipeline>\& model);}\\
 odpowiedzialna za zwrócenie podpowiedzi następnego argumentu, na podstawie już istniejącej listy argumentów.\\
 Metody \texttt{from\_args} oraz \texttt{get\_suggestion} zdefiniowane są również w pozostałych klasach komend.
-\item \texttt{ConnectCommand} 
-\item \texttt{DisconnectCommand} 
-\item \texttt{PropertyCommand} 
-\item \texttt{RemoveCommand}
-\item \texttt{StateCommand}
+\item \texttt{ConnectCommand} - komenda łącząca ze soba gniazda. Uruchomienie komendy może skutkować wywołaniem komendy \texttt{AddCommand} tworzącą gniazdo. Taka sytuacja może wystąpić w przypadku tworzenia inteligentnego połączenia.
+\item \texttt{DisconnectCommand} - komenda usuwająca połączenia pomiędzy elementami.
+\item \texttt{PropertyCommand} - komenda zmieniająca właściwość elementu. W szczególnym przypadku może też posłużyć jako komenda wywołująca okno konfiguracji właściwości.
+\item \texttt{RemoveCommand} - komenda usuwająca elementy lub gniazda.
+\item \texttt{StateCommand} - komenda zmiany stanu modelu programu.
 \end{itemize}
 \subsubsection{Moduł Console}
+Moduł odpowiada za wiersz poleceń. Zawiera klasy odpowiadające za logike oraz za widok konsoli. 
+\cleardoublepage
+\textbf{Lista klas}
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item \texttt{CommandParser} - klasa parsera komend. Na podstawie tekstu wprowadzonego przez użytkownika, parser generuje instancję klasy \texttt{Command}. Następnie komenda jest zwracana programiście, i może być uruchomiona w dowolnej chwili.
+\item \texttt{ConsoleView} - klasa widoku konsoli. Realizuje operacje związane z interfejsem użytkownika - wyświetla podpowiedzi, uruchamia parser komend, daje użytkownikowi możliwość wykonania poleceń.
+\end{itemize}
 \subsubsection{Moduł controller}
+Biblioteka ta dostarcza zestaw klas realizujących podstawową logikę głównego okna programu oraz dodatkowych narzędzi (generatora kodu oraz kreatora wtyczek). \\ 
+\textbf{Lista klas}
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item \texttt{CodeGenerator} - klasa generująca kod źródłowy na podstawie modelu programu.
+\item \texttt{FileLoader} - klasa odpowiedzialna za załadowanie pliku projektu do programu.
+\item \texttt{FileWriter} - klasa realizuje funkcjonalność zapisuj stworzonego przez użytkownika projektu do pliku.
+\item \texttt{MainController} - klasa głównego kontrolera, odpowiedzialna jest głównie za wykrywanie zmian zachodzących w modelu programu.
+\item \texttt{FactoryInfo} - przechowuje informacje na temat fabryki elementów, jaka ma zostać wygenerowana przez kreator wtyczek. Generuje również kod źródłowy klasy fabryki.
+\item \texttt{PluginInfo} - klasa przechowująca informacje na temat wtyczki dla kreatora wtyczek. Ponadto generuje kod źródłowy klasy wtyczki.
+\item \texttt{PluginCodeGenerator} - główna klasa kreatora wtyczek. Uruchamia generator kodu źródłowego dla fabryki oraz wtyczki, zapisuje kod do pliku.
+\end{itemize}
 \subsubsection{Moduł FactoryInspector}
+Moduł FactoryInspector udostępnia programiście klasy umożliwiające wyświetlanie informacji na temat danej fabryki elementów biblioteki GStreamer. \\
+\textbf{Lista klas}
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item \texttt{FactoryInspectorView} - klasa odpowiada za prezentację wszystkich dostępnych informacji o fabryce elementów. 
+\item \texttt{PropertyInspectorView} - klasa przedstawia listę właściwości dostępnych w ramach danej fabryki. Jest wykorzystywana w konstrukcji obiektu klasy \texttt{FactoryInspectorView}.
+\item \texttt{VariousPropertyInspectorView} - klasa wykorzystywana jest do wyświetlania informacji na temat właściwości elementu o następujących typach:
+  \begin{itemize}
+    \setlength{\itemsep}{0em}
+  \item \texttt{GParamSpecEnum},
+  \item \texttt{GParamSpecFlags},
+  \item \texttt{GParamSpecObject},
+  \item \texttt{GParamSpecBoxed},
+  \item \texttt{GParamSpecPointer},
+  \item \texttt{GArray},
+  \item \texttt{GstParamSpecFraction}.
+  \end{itemize}
+\end{itemize}
+Powyższe typy są niestandardowe pod względem wyświetlania ich w interfejsie użytkownika, dla tego ich obsługa nie została zaimplementowana w klasie \texttt{PropertyInspectorView}.
 \subsubsection{Moduł gui}
+Biblioteka gui gromadzi w sobie klasy, jakie używane są do tworzenia okien programu. Wygląd okna określany jest poprzez plik \textit{ui}, będące plikiem opisu graficznego interfejsu. Na jego podstawie generowany jest kod klasy widoku. \\
+\textbf{Lista klas}
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item \texttt{CodeGeneratorDialog} - okno dialogowe dla generatora kodu źródłowego.
+\item \texttt{MainWindow} - główne okno programu.
+\item \texttt{PluginWizardDialog} - okno dialogowe dla kreatora wtyczek.
+\end{itemize}
 \subsubsection{Moduł Logger}
-Zadaniem biblioteki Logger jest dostarczenie zestawu klas umożliwiających prezentowanie użytkownikowi informacji wychodzących z aplikacji.
+Zadaniem biblioteki Logger jest dostarczenie zestawu klas umożliwiających prezentowanie użytkownikowi informacji wychodzących z aplikacji. \\
+\textbf{Lista klas}
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item \texttt{GstLogger} - klasa odpowiedzialna za prezentacje wiadomości pochodzących z biblioteki GStreamer przydatnych do debugowania programu. Dziedziczy po klasie \texttt{QWidget} i jest używana jako oddzielny komponent graficznego interfejsu użytkownika.
+\item \texttt{GstLoggerProperties} - wykorzystywana jest do określania, jakie wiadomości mają być wysyłane z biblioteki GStreamer, i jakie mają zostać wyświetlane w klasie \texttt{GstLogger}.
+\item \texttt{LoggerView} - klasa odpowiada za przechwytywanie i wyświetlanie wiadomości z magistrali strumienia GStreamer, a także innych komunikatów aplikacji. Klasa umożliwia filtrowanie wiadomości na podstawie źródła pochodzenia wiadomości.
+\end{itemize}
 \subsubsection{Moduł ObjectInspector}
 Biblioteka odpowiada za funkcjonalność inspektora elementów. Implementuje klasy związane z wyświetlaniem dostępnych wtyczek i fabryk.\\
 \textbf{Lista klas}
@@ -733,7 +797,59 @@ Biblioteka Workspace odpowiada za poprawne działanie obszaru roboczego, na któ
 \item \texttt{WorkspaceWidget} - klasa pochodna klasy \texttt{QWidget}, przedstawia kontrolkę obszaru roboczego. Ponadto klasa implementuje fragment interfejsu \texttt{CommandListener}, dzięki czemu zmiany w modelu programu są od razu widoczne w graficznej reprezentacji projektu. \\
 Klasa implementuje wszystkie funkcje, jakie potrzebne są podczas projektowania graficznego (przesuwanie blokczków, łączenie pinów, usuwanie połączeń, elementów).
 \end{itemize}
+\cleardoublepage
+\section{Testowanie oprogramowania}
+Oprogramowanie gst-creator przeszło szereg testów, które dowiodły poprawności programu.\\
+Główne testy składały się z jedenastu etapów:
+\begin{enumerate}
+  \setlength{\itemsep}{0em}
+\item Utworzenie modelu programu.
+\item Kilkukrotna zmiana stanu modelu programu.
+\item Wprowadzenie modelu programu w stan zatrzymania.
+\item Zapis projektu.
+\item Załadowanie projektu. 
+\item Kilkukrotna zmiana stanu modelu programu.
+\item Zamknięcie aplikacji.
+\item Uruchomenie aplikacji.
+\item Kilkukrotna zmiana stanu modelu programu.
+\item Wygenerowanie kodu źródłowego na podstawie modelu programu.
+\item Kompilacja źródeł i uruchomienie aplikacji.
+\end{enumerate}
+Rysunki ~\ref{fig:mainTestScreen1} oraz ~\ref{fig:mainTestScreen2} przedstawiają przykładowe programy stworzone za pomocą aplikacji gst-creator, które wykorzystywane były w testach.
+\begin{figure}[H]
+  \includegraphics[width=160mm]{img/main-test-screen1.png}
+  \caption{Odtwarzacz multimedialny stworzony w aplikacji gst-creator, z zastosowaniem filtra \textit{fisheye}. Fragment filmu \textit{Monsters} \cite{monstersDownloadPage}}
+  \label{fig:mainTestScreen1}
+\end{figure}
+\begin{figure}[H]
+  \includegraphics[width=160mm]{img/main-test-screen2.png}
+  \caption{Program odtwarzający plik audio oraz obraz z kamery, jednocześnie zapisując obydwa strumienie do pliku}
+  \label{fig:mainTestScreen2}
+\end{figure}
 
+
+\subsection{Testy pojedynczych modułów}
+Wykonałem również testy pojedynczych modułów programu.
+\begin{itemize}
+  \setlength{\itemsep}{0em}
+\item Moduł konsoli testowany był poprzez wprowadzanie (często niepoprawnych) poleceń, i sprawdzanie reakcji programu na te polecenia.
+\item Kreator wtyczek został sprawdzony poprzez wygenerowanie kilkunastu wtyczek z różnymi parametrami. Wygenerowany kod był następnie kompilowany, a wtyczka sprawdzana została programem \textbf{gst-inspect} wchodzącym w skład pakietu GStreamer.
+\item Mechanizm zmiany właściwości przetestowałem wprowadzając poprawne oraz niepoprawne wartości dla każdego z dostępnych typów. Sprawdzałem, czy program odpowiednio zapisze poprawne wartości, oraz czy zachowa się w sposób oczekiwany przy niepoprawnych wartościach.
+\item Moduł wyświetlania informacji o wtyczkach i fabrykach obiektów testowany był za każdym razem, gdy szukałem informacji na temat danego obiektu.
+\end{itemize}
+\cleardoublepage
+\section{Wnioski}
+W ramach projektu udało mi się zrealizować wszystkie założenia projektowe. Korzystając z oprogramowania, użytkownik może w swobodny sposób tworzyć programy przetwarzające strumienie multimedialne, które później może zastąpić kodem źródłowym, i użyć w swoim własnym programie. 
+
+Zaimplementowałem również mechanizm zapisu projektu do pliku, dzięki czemu użytkownik w każdej chwili będzie mógł zmodyfikować swój projekt. 
+
+Napisałem moduł pozwalający na śledzenie wiadomości pochodzących z biblioteki GStreamer z możliwością filtrowania poziomu ważności informacji oraz ich pochodzenia.
+
+Dodatkowo, w programie zaimplementowałem funkcje, które nie były przewidziane w założeniach projektowych, ale mogą przydać się użytkownikowi podczas pracy z programem. Pierwsza z funkcji, to narzędzie kreatora wtyczek, dzięki któremu w łatwy sposób można wygenerować szablon dla własnego \textit{plug-inu}. 
+
+Drugą istotną funkcją jest wiersz poleceń, dzięki któremu użytkownik może budować model programu używając tylko i wyłącznie klawiatury.
+
+Oprócz tego, w programie zawarłem też funkcjonalność przeglądania informacji na temat dostępnych wtyczek oraz fabryk elementów, co również jest bardzo przydatne na etapie prototypowania aplikacji.
 \cleardoublepage
 \begin{thebibliography}{9}
 
@@ -745,5 +861,7 @@ Klasa implementuje wszystkie funkcje, jakie potrzebne są podczas projektowania 
   https://github.com/peper0/gstreamermm-plugins [10.12.2013]
 \bibitem{algoholic}
   http://algoholic.eu [28.12.2013]
+\bibitem{monstersDownloadPage}
+  http://www.auby.no/files/video\_tests/ [31.12.2013]
 \end{thebibliography}
 \end{document}
