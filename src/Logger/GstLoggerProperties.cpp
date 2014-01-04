@@ -12,7 +12,7 @@ GstLoggerProperties::GstLoggerProperties(QWidget *parent)
 	ui->tableWidget->setHorizontalHeaderLabels({"Category", "Debug Level"});
 
 	QStringList debug_levels = {
-			"none", "error", "warning", "fixme", "debug", "log", "trace"
+			"none", "error", "warning", "fixme", "info", "debug", "log", "trace"
 	};
 
 	ui->defaultDebugLevelComboBox->addItems(debug_levels);
