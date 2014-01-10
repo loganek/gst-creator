@@ -50,6 +50,7 @@
 
   \end{titlepage}
 }
+
 \begin{document}
 \definecolor{cppred}{rgb}{0.6,0,0} % strings
 \definecolor{cppgreen}{rgb}{0.25,0.5,0.35} % comments
@@ -73,8 +74,14 @@ showstringspaces=false}
 \maketitle
 \tableofcontents
 \cleardoublepage
-\textbf{\Large Założenia projektowe} \\
-Celem projektu jest stworzenie oprogramowania, umożliwiającego w łatwy i wygodny sposób projektować programy przetwarzające strumienie multimedialne, w oparciu o bibliotekę GStreamer. Funkcjonalność programu zawiera się w niżej wymienionych punktach.
+\section{Wstęp}
+Multimedia są częstą formą przekazu danych pomiędzy urządzeniami. Ich zaletą jest możliwość zawarcia w sobie informacji przedstawianych w różnych formach. I tak, w ramach jednego strumienia multimedialnego, możliwe jest przesłanie zarówno obrazu, jak i dźwięku, czy nawet tekstu. 
+
+\noindent Postanowieniem projektu jest utworzenie środowiska programistycznego, które pozwalałoby w łatwy sposób tworzyć programy do generowania, a także przetwarzania strumieni multimedialnych, z wykorzystaniem biblioteki GStreamer.
+\cleardoublepage
+\section{Analiza problemu}
+\subsection{Założenia projektowe}
+Celem projektu jest stworzenie środowiska, umożliwiającego w łatwy i wygodny sposób projektować programy przetwarzające strumienie multimedialne, w oparciu o bibliotekę GStreamer. Funkcjonalność programu zawiera się w niżej wymienionych punktach.
 \begin{itemize}
  \setlength{\itemsep}{0em}
 \item Tworzenie programu metodą \textit{przeciągnij-upuść} (ang. \textit{drag\&drop}). Dzięki temu, nawet osoba nie posiadająca wiedzy na temat tworzenia oprogramowania, będzie mogła stworzyć własny program.
@@ -82,8 +89,7 @@ Celem projektu jest stworzenie oprogramowania, umożliwiającego w łatwy i wygo
 \item Generowanie kodu źródłowego na podstawie projektu. Aplikacja powinna nie tylko dawać możliwość prototypowania programu. Prototyp może rozrosnąć się do bardzo dużych rozmiarów, co później może powodować problemy w implementacji. Automatyczne generowanie kodu na podstawie utworzonego prototypu zwolni użytkownika z obowiązku żmudnej pracy przepisywania kodu źródłowego.
 \item Wyświetlanie wiadomości pochodzących z biblioteki GStreamer. Biblioteka GStreamer wysyła użytkownikowi wiele komunikatów informujących o przebiegu wykonania programu. Użytkownik powinien mieć możliwość śledzenia, a także filtrowania tych informacji, w celu poprawienia błędów w swojej aplikacji.
 \end{itemize}
-\cleardoublepage
-\section{Analiza problemu}
+
 \subsection{Narzędzia}
 \subsubsection{Biblioteka GStreamer}
 \paragraph{}
@@ -104,6 +110,8 @@ Elementy dzielą się na te, które zawierają tylko gniazda wejściowe (ang. \t
 \end{figure}
 \paragraph{}
 Rysunek ~\ref{fig:sampleDemuxer} przedstawia przykładowy element, zawierający dwa gniazda wyjściowe, i jedno gniazdo wejściowe (jest to szczególny wariant filtra, tzw. \textit{demuxer}).
+
+Do tworzenia elementów w bibliotece gstreamer wykorzystuje się \textbf{fabrykę elementów}, która zwraca użytkownikowi obiekt reprezentujący dany element.
 \paragraph{}
 \textbf{Kontener} (ang. \textit{bin}) jest szczególnym elementem. Podobnie, jak elementy, kontenery posiadają gniazda. Natomiast algorytmy zdefiniowane w elemencie-kontenerze realizowane są poprzez inne elementy, które agregowane są w danym kontenerze. Rysunek ~\ref{fig:sampleBin} przedstawia przykładowy kontener, zawierający dwa elementy, oraz jedno gniazdo wejściowe.
 \begin{figure}[H]
@@ -112,7 +120,7 @@ Rysunek ~\ref{fig:sampleDemuxer} przedstawia przykładowy element, zawierający 
   \label{fig:sampleBin}
 \end{figure}
 \paragraph{}
-\textbf{Strumień} (ang. \textit{pipeline}) jest specjalnym przypadkiem kontenera. Jest to kontener nadrzędny całego modelu programu. Przechowuje w sobie główne elementy oraz kontenery agregujące inne obiekty przetwarzające. Strumień nie posiada żadnych gniazd. Rysunek ~\ref{fig:samplePipeline} przedstawia przykładowy strumień, realizujący operację odtwarzania strumienia audio-video z pliku ogg.
+\textbf{Strumień} (ang. \textit{pipeline}) jest specjalnym przypadkiem kontenera. Jest to kontener nadrzędny całego programu. Przechowuje w sobie główne elementy oraz kontenery agregujące inne obiekty przetwarzające. Strumień nie posiada żadnych gniazd. Rysunek ~\ref{fig:samplePipeline} przedstawia przykładowy strumień, realizujący operację odtwarzania strumienia audio-video z pliku ogg.
 \begin{figure}[H]
   \includegraphics[width=150mm]{img/simple-player.png}
   \caption{Przykładowy strumień \cite{gstmainpage}}
@@ -152,15 +160,15 @@ Ostatnia grupa, to gniazda, pojawiające się na żądanie użytkownika. Można 
 Adapter (ang. \textit{wrapper}) jest wzorcem projektowym, który ma na celu współdzielenie interfejsu pomiędzy dwoma blokami kodu źródłowego. Biblioteka GStreamer została napisana w języku ANSI C, dlatego, aby umożliwić programistom innych języków korzystanie z biblioteki, nie mieszając różnych języków, powstało kilka adapterów dla innych języków programowania (np. C++ czy C\#).
 
 Biblioteka \textbf{gstreamermm} to projekt, którego celem jest stworzenie biblioteki-adaptera w języku C++ dla biblioteki GStreamer. Projekt rozwijany jest na licencji LGPL, dlatego każdy może uzyskać dostęp do kodu źródłowego biblioteki, a także w dowolny sposób modyfikować źródła.
-
-Biblioteka gstreamermm należy do rodziny projektów pochodzących od projektu biblioteki-wrappera \textbf{gtkmm}. Biblioteka gtkmm umożliwia użytkownikowi korzystanie z funkcjonalności biblioteki GTK+, posługując się interfejsem napisanym w języku C++. Projekty oparte o fragmenty kodu biblioteki gtkmm, opierają się głównie o generowanie kodu źródłowego w języku C++ na podstawie źródeł napisanych w języku ANSI C. Wszystkie projekty korzystają ze wspólnych generatorów kodu, dlatego każde usprawnienie generatora w jednym projekcie, powoduje polepszenie jakości kodu w pozostałych projektach..
-
-Kod źródłowy biblioteki jest w większości generowany automatycznie na podstawie źródeł projektu GStreamer w trójetapowym procesie. Rysunek ~\ref{fig:mmGenerateProcess} prezentuje wszystkie trzy kroki procesu generacji kodu źródłowego.
 \begin{figure}[H]
   \includegraphics[width=100mm]{img/mm-generate-process.png}
   \caption{Schemat procesu generacji kodu źródłowego biblioteki gstreamermm}
   \label{fig:mmGenerateProcess}
 \end{figure}
+Biblioteka gstreamermm należy do rodziny projektów pochodzących od projektu biblioteki-wrappera \textbf{gtkmm}. Biblioteka gtkmm umożliwia użytkownikowi korzystanie z funkcjonalności biblioteki GTK+, posługując się interfejsem napisanym w języku C++. Projekty oparte o fragmenty kodu biblioteki gtkmm, opierają się głównie o generowanie kodu źródłowego w języku C++ na podstawie źródeł napisanych w języku ANSI C. Wszystkie projekty korzystają ze wspólnych generatorów kodu, dlatego każde usprawnienie generatora w jednym projekcie, powoduje polepszenie jakości kodu w pozostałych projektach..
+
+Kod źródłowy biblioteki jest w większości generowany automatycznie na podstawie źródeł projektu GStreamer w trójetapowym procesie. Rysunek ~\ref{fig:mmGenerateProcess} prezentuje wszystkie trzy kroki procesu generacji kodu źródłowego.
+
 Pierwszym etapem generacji kodu jest przeszukanie źródeł biblioteki GStreamer, a następnie wygenerowanie plików definicji. Pliki definicji zawierają informacje na temat typów wyliczeniowych zdefiniowanych w bibliotece, funkcji, sygnałów, metod wirtualnych czy struktur danych. W przypadku wygenerowania przez generator błędnej definicji, stosowane są pisane przez programistę tzw. \textit{łatki} (ang. \textit{patch}).
 
 W kolejnym przebiegu, generator na podstawie plików definicji, generuje pliki \textit{.hg} oraz \textit{.ccg}. Zawartość plików przypomina składnią język C++, jednak zawiera wywołania makrodefinicji ułatwiających adaptowanie poszczególnych elementów biblioteki. Przykład użycia makrodefinicji przedstawiony został na listingu ~\ref{macroSampleUsage}.
@@ -184,21 +192,9 @@ bool Preset::load_preset(const Glib::ustring& name)
 W tym etapie, wygenerowany kod źródłowy jest zawsze poprawny. Programista może jedynie dopisać dodatkowe pliki. Przechowują one na ogół klasy usprawniające (ale nie rozszerzające funkcjonalność) pracę z biblioteką.
 \cleardoublepage
 \section{Specyfikacja zewnętrzna}
-Program powinien być uruchamiany pod systemem operacyjnym Linux. Wymaga on zainstalowanej biblioteki gstreamermm 1.0.
+Środowisko gst-creator powinno być uruchamiane pod systemem operacyjnym Linux. Wymaga ono zainstalowanej w systemie biblioteki gstreamermm 1.0.
 \subsection{Proces instalacji biblioteki gstreamermm}
-Na listingu ~\ref{gstreamermmInstall} przedstawiona została lista poleceń, jakie należy wykonać w celu instalacji biblioteki gstreamermm. Proces instalacji wymaga połączenia z internetem, ponieważ źródła biblioteki muszą zostać pobrane ze zdalnego repozytorium.
-\begin{lstlisting}[caption=Polecenia kompilujące program gst-creator, label=gstreamermmInstall]
-[m.kolny@m.kolny-cmp ~]$ git clone git://
-                             git.gnome.org/gstreamermm
-[m.kolny@m.kolny-cmp ~]$ cd gstreamermm
-[m.kolny@m.kolny-cmp gstreamermm]$ 
-[m.kolny@m.kolny-cmp gstreamermm]$ ./autogen.sh
-[m.kolny@m.kolny-cmp gstreamermm]$ make
-[m.kolny@m.kolny-cmp gstreamermm]$ sudo make install
-\end{lstlisting}
-
-\textbf{Wymagane zależności dla kompilacji biblioteki}\\
-Poniżej znajduje się lista zależności, jakie muszą zostać spełnione w celu poprawnej kompilacji i instalacji biblioteki gstreamermm:
+Poniżej znajduje się lista narzędzi oraz bibliotek, jakie muszą zostać zainstalowane w systemie, w celu poprawnej kompilacji i instalacji biblioteki gstreamermm:
 \begin{itemize}
   \setlength{\itemsep}{0em}
 \item narzędzie mm-common w wersji 0.9.6 lub wyższej,
@@ -219,8 +215,21 @@ Poniżej znajduje się lista zależności, jakie muszą zostać spełnione w cel
 \item biblioteka gstreamer-tag-1.0 w wersji 1.0.10 lub wyższej,
 \item biblioteka gstreamer-video-1.0 w wersji 1.0.10 lub wyższej.
 \end{itemize}
-Ponadto, w celu kompilacji przykładowych programów wykorzystujących bibliotekę gstreamermm, w systemie musi być zainstalowana biblioteka gtkmm-3.0 w wersji 3.0 lub wyższej.
-\subsection{Proces instalacji programu}
+W pliku \textit{bootstrap.sh} znajduje się lista poleceń dla systemu Linux Ubuntu, która umożliwia instalację wyżej wymienionego oprogramowania.\\
+Ponadto, w celu kompilacji przykładowych programów wykorzystujących bibliotekę gstreamermm, w systemie musi być zainstalowana biblioteka gtkmm-3.0 w wersji 3.0 lub wyższej.\\
+Na listingu ~\ref{gstreamermmInstall} przedstawiona została lista poleceń dla systemu Linux, jakie należy wykonać w celu kompilacji i instalacji biblioteki gstreamermm. Proces instalacji wymaga połączenia z internetem, ponieważ źródła biblioteki muszą zostać pobrane ze zdalnego repozytorium.
+\begin{lstlisting}[caption=Polecenia kompilujące program gst-creator, label=gstreamermmInstall]
+[m.kolny@m.kolny-cmp ~]$ git clone git://
+                             git.gnome.org/gstreamermm
+[m.kolny@m.kolny-cmp ~]$ cd gstreamermm
+[m.kolny@m.kolny-cmp gstreamermm]$ 
+[m.kolny@m.kolny-cmp gstreamermm]$ ./autogen.sh
+[m.kolny@m.kolny-cmp gstreamermm]$ make
+[m.kolny@m.kolny-cmp gstreamermm]$ sudo make install
+\end{lstlisting}
+
+
+\subsection{Proces instalacji środowiska gst-creator}
 Oprogramowanie dostarczane jest w postaci kodu źródłowego, dlatego w celu uruchomienia programu, należy dokonać kompilacji programu. Skrypt budujący został przygotowany pod narzędzie \textbf{CMake}. Aby skompilować program, należy wykonać polecenia w konsoli przedstawione na listingu ~\ref{compileProject} (użytkownik powinien znajdować się w katalogu głównym repozytorium programu).
 \begin{lstlisting}[caption=Polecenia kompilujące program gst-creator, label=compileProject]
 [m.kolny@m.kolny-cmp gst-creator]$ mkdir build
@@ -228,42 +237,46 @@ Oprogramowanie dostarczane jest w postaci kodu źródłowego, dlatego w celu uru
 [m.kolny@m.kolny-cmp build]$ cmake ..
 [m.kolny@m.kolny-cmp build]$ make
 \end{lstlisting}
-Polecenia spowodują skompilowanie aplikacji w katalogu build. Skompilowany plik wykonywalny znajduje się w katalogu \textbf{./build/src/} pod nazwą \textbf{gst-creator}. \\
-\textbf{Zależności kompilacji programu} \\
-Kompilacja programu gst-creator wymaga spełnienia następujących zależności:
+Polecenia spowodują skompilowanie aplikacji w katalogu build. Skompilowany plik wykonywalny znajduje się w katalogu \textbf{./build/src/} pod nazwą \textbf{gst-creator}. 
+\paragraph{}
+\textbf{Wymagania odnośnie środowiska dla kompilacji programu} \\
+Kompilacja programu gst-creator wymaga wcześniejszego zainstalowania następujących narzędzi i bibliotek:
 \begin{itemize}
   \setlength{\itemsep}{0em}
 \item CMake w wersji 2.8.9 lub wyższej,
 \item gstreamermm w wersji 1.0
 \item GTest w wersji 1.6 lub wyższej.
 \end{itemize}
-\subsection{Automatyczna kompilacja i instalacja zależności oraz aplikacji}
+Polecenia, dzięki którym możemy zainstalować wyżej wymienione narzędzia oraz biblioteki w systemie Linux Ubuntu, znajdują się w pliku \textit{bootstrap.sh}.
+\paragraph{}
+\textbf{Automatyczna kompilacja i instalacja zależności oraz aplikacji}\\
 W celu uproszczenia procesu kompilacji aplikacji, przygotowałem skrypt, mający na celu automatyczne rozwiązywanie zależności. Skrypt został przetestowany na świeżej instalacji systemu operacyjnego Ubuntu 13.04 i386. Aby uruchomić skrypt automatycznej instalacji, należy wykonać polecenia pokazane na listingu ~\ref{autoinstallerRunner}.
 \begin{lstlisting}[caption=Uruchomienie skryptu autoinstalatora, label=autoinstallerRunner]
 [m.kolny@m.kolny-cmp gst-creator]$ chmod +x bootstrap.sh
 [m.kolny@m.kolny-cmp gst-creator]$ ./bootstrap.sh
 \end{lstlisting}
+Jego wykonanie spowoduje instalację środowiska gst-creator, a także wszystkich bibliotek wymaganych do poprawnej kompilacji i uruchomienia środowiska (gstreamer, gstreamermm, gtest, cmake).
 \subsection{Instrukcja obsługi}
 \subsubsection{Uruchomienie programu}
 Aby uruchomić program, należy wykonać polecenie przedstawione na listingu ~\ref{runApp}. Uruchomienie programu nie wymaga żadnych dodatkowych plików.
 \begin{lstlisting}[caption=Uruchomienie programu, label=runApp]
 [m.kolny@m.kolny-cmp build]$ ./src/gst-creator $
 \end{lstlisting} 
-\subsubsection{Główne okno programu}
-Po uruchomieniu aplikacji użytkownikowi ukaże się główne okno programu. Składa się ono z ośmiu podstawowych modułów, które zostały oznaczone na rysunku ~\ref{fig:mainWindow}. Poniżej w skrócie zostaną omówione poszczególne elementy głównego okna programu.
 \begin{figure}[H]
-  \includegraphics[width=160mm]{img/main-window.png}
+  \includegraphics[width=155mm]{img/main-window.png}
   \caption{Zrzut ekranu głównego okna programu}
   \label{fig:mainWindow}
 \end{figure}
+\subsubsection{Główne okno programu}
+Po uruchomieniu aplikacji użytkownikowi ukaże się główne okno programu. Składa się ono z ośmiu podstawowych modułów, które zostały oznaczone na rysunku ~\ref{fig:mainWindow}. Poniżej w skrócie zostaną omówione poszczególne elementy głównego okna. Ich dokładny opis znajduje się w dalszej części rozdziału.
 \begin{enumerate}
   \setlength{\itemsep}{0em}
 \item Główne menu programu - umożliwia dostęp do podstawowych operacji związanych z plikiem projektu. Ponadto daje użytkownikowi możliwość skorzystania z dodatkowych narzędzi takich jak generator kodu źródłowego czy kreator wtyczek.
-\item Wskaźnik stanu modelu programu - pozwala użytownikowi śledzić oraz zmieniać aktualny stan, w jakim znajduje się model programu.
+\item Wskaźnik stanu programu - pozwala użytownikowi śledzić oraz zmieniać aktualny stan, w jakim znajduje się program stworzony za pomocą środowiska gst-creator.
 \item Aktualnie zaznaczony element - informuje użytkownika o tym, jaki element jest w danej chwili zaznaczony. Daje również możliwość do szybkiej zmiany właściwości zaznaczonego elementu.
-\item Inspektor elementów - zawiera listę wszystkich dostępnych elementów, jakie mogą zostać wykorzystane przez użytkownika przy tworzeniu modelu programu.
-\item Obszar roboczy programu - miejsce, w którym użytkownik składa z dostępnych elementów reprezentowanych przez bloczki model programu.
-\item Wiersz poleceń - umożliwia tworzenie modelu programu poprzez wydawanie odpowiednich poleceń do programu.
+\item Inspektor elementów - zawiera listę wszystkich dostępnych elementów, jakie mogą zostać wykorzystane przez użytkownika przy tworzeniu programu.
+\item Obszar roboczy programu - miejsce, w którym użytkownik składa z dostępnych elementów reprezentowanych przez bloczki.
+\item Wiersz poleceń - umożliwia tworzenie programu poprzez wydawanie odpowiednich poleceń do programu.
 \item Konsola logowania zdarzeń programu - przechwytuje i wyświetla zdarzenia pochodzące z aplikacji oraz z magistrali.
 \item Konsola logowania zdarzeń GStreamera - przechwytuje i wyświetla zdarzenia pochodzące z biblioteki GStreamer.
 \end{enumerate}\paragraph{}\vspace{-3mm}
@@ -282,18 +295,23 @@ Główne menu programu umożliwia użytkownikowi dostęp do następujących funk
 \item wyświetlenie informacji o programie (\textit{Help->About GstCreator}).
 \end{itemize}
 \paragraph{}\vspace{-3mm}
-\textbf{Wskaźnik stanu modelu programu} \\
-Model programu może przyjmować trzy stany:
+\textbf{Wskaźnik stanu programu} \\
+Program stworzony w środowisku gst-creator może przyjmować trzy stany:
 \begin{itemize}
-\item stan zatrzymania (\textit{Stopped}),
-\item stan pauzy (\textit{Paused}),
-\item stan odtwarzania (\textit{Playing}).
+\item stan zatrzymania (\textit{Stopped}) - elementy nie generują żadnych zdarzeń ani nie są zdolne do reakcji na zdarzenia,
+\item stan pauzy (\textit{Paused}) - elementy reagują na zdarzenia, jednak dane multimedialne nie są przesyłane,
+\item stan odtwarzania (\textit{Playing}) - dane multimedialne są przesyłane pomiędzy elementami, elementy emitują i reagują na zdarzenia.
 \end{itemize}
-Wskaźnik stanu modelu pozwala nie tylko na podejrzenie aktualnego stanu modelu, ale również na jego zmianę. \paragraph{}\vspace{-3mm}
+Wskaźnik stanu programu pozwala nie tylko na podejrzenie aktualnego stanu programu stworzonego w środowisku, ale również na jego zmianę. \paragraph{}\vspace{-3mm}
 \textbf{Aktualnie zaznaczony element} \\
 Moduł aktualnie zaznaczonego elementu ma na celu przedstawić użytkownikowi element, który jest aktualnie zaznaczony. Ponadto, użytkownik ma możliwość szybkiego dostępu do własciwości elementu. Po wciśnięciu przycisku \textit{Properties}, zostanie wyświetlone kolejne okienko programu (rysunek ~\ref{fig:allPropertiesWindow}). \paragraph{}\vspace{-3mm}
 \textbf{Inspektor elementów} \\
 Inspektor elementów daje możliwość przejrzenia wszystkich dostępnych wtyczek (ang. \textit{plug-ins}) biblioteki GStreamer. Pozwala również na wyświetlenie informacji na temat zawartych w nich fabryk elementów, wraz ze szczegółowymi danymi każdej fabryki elementów. 
+\begin{figure}[H]
+  \includegraphics[width=12cm]{img/matroska-inspect-window.png}
+  \caption{Okno właściwości wtyczki \textit{matroska}}
+  \label{fig:matroskaInspectWindow}
+\end{figure}
 Lista wtyczek oraz dostępnych w nich fabryk wizualizowana jest w postaci drzewa obiektów. Wtyczka jest elementem nadrzędnym dla fabryki elementów. Oprócz tego moduł zawiera wyszukiwarkę, która umożliwia przeszukiwanie listy obiektów (rysunek ~\ref{fig:elementInspector}).
 W celu uzyskania informacji na temat konkretnej wtyczki, należy skierować kursor na nazwę danej wtyczki, a następnie dwukrotnie kliknąć na wskazany obiekt. Na ekranie użytkownika pokaże się okno (rysunek ~\ref{fig:matroskaInspectWindow}), zawierające informację na temat wtyczki:
 \begin{itemize}
@@ -315,11 +333,6 @@ W celu uzyskania informacji na temat konkretnej wtyczki, należy skierować kurs
 \end{figure}
 \noindent
 Aby uzyskać dostęp do informacji na temat konkretnej fabryki elementów, należy dwukrotnie kliknąć na obiekt inspektora elementów reprezentujący daną fabrykę. Spowoduje to wyświetlenie okna właściwości fabryki (rysunek ~\ref{fig:xingmuxFactoryInfoWindow}). Informacje rozmieszczone są w oknie w pięciu grupach.
-\begin{figure}[H]
-  \includegraphics[width=12cm]{img/matroska-inspect-window.png}
-  \caption{Okno właściwości wtyczki \textit{matroska}}
-  \label{fig:matroskaInspectWindow}
-\end{figure}
 \begin{itemize}
   \setlength{\itemsep}{0em}
 \item Szczegóły fabryki (ang. \textit{factory details}) - wyświetla podstawowe informacje na temat fabryki:
@@ -331,6 +344,11 @@ Aby uzyskać dostęp do informacji na temat konkretnej fabryki elementów, nale�
   \item autora.
   \end{itemize}
 \item Szablony gniazd (ang. \textit{pad templates}) - wyświetla wszystkie dostępne szablony gniazd, a także informacje o kompatybilnych formatach multimedialnych. Formaty wyświetlane są w postaci drzewa, tak, aby użytkownik mógł w łatwy sposób wyszukać pożądany format.
+\begin{figure}[H]
+  \includegraphics[width=110mm]{img/xingmux-factory-info-window.png}
+  \caption{Okno informacyjne dla fabryki elementu \textit{xingmux}}
+  \label{fig:xingmuxFactoryInfoWindow}
+\end{figure}\paragraph{}\vspace{-3mm}
 \item Gniazda (ang. \textit{pads}) - agreguje informacje na temat statycznych gniazd.
 \item Właściwości (ang. \textit{properties}) - prezentuje informacje dotyczące właściwości zdefiniowanych w danej fabryce elementów. Wyświetla informacje dotyczące:
   \begin{itemize}
@@ -343,13 +361,8 @@ Aby uzyskać dostęp do informacji na temat konkretnej fabryki elementów, nale�
   \end{itemize}
 \item Szczegóły wtyczki (ang. \textit{plugin details}) - wyświetla informacje na temat wtyczki, w której znajduje się fabryka.
 \end{itemize}
-\begin{figure}[H]
-  \includegraphics[width=110mm]{img/xingmux-factory-info-window.png}
-  \caption{Okno informacyjne dla fabryki elementu \textit{xingmux}}
-  \label{fig:xingmuxFactoryInfoWindow}
-\end{figure}\paragraph{}\vspace{-3mm}
 \textbf{Obszar roboczy programu} \\
-Obszar roboczy jest głównym modułem programu. Służy do tworzenia modelu programu metodą \textit{Drag\&Drop}. Każdy element modelu programu jest reprezentowany w obszarze roboczym poprzez zielony bloczek (rysunek ~\ref{fig:sampleBlock}). Przy brzegach bloczka znajdują się piny, które odzwierciedlają gniazda oraz szablony gniazd w modelu programu. \\
+Obszar roboczy jest głównym modułem programu. Służy do tworzenia programu metodą \textit{Drag\&Drop}. Każdy element programu jest reprezentowany w obszarze roboczym poprzez zielony bloczek (rysunek ~\ref{fig:sampleBlock}). Przy brzegach bloczka znajdują się piny, które odzwierciedlają gniazda oraz szablony gniazd w programie. \\
 Poniżej opisane zostały wszystkie funkcje, jakie oferuje obszar roboczy programu.
 \begin{figure}[H]
   \includegraphics[width=35mm]{img/sample-block.png}
@@ -360,14 +373,14 @@ Poniżej opisane zostały wszystkie funkcje, jakie oferuje obszar roboczy progra
   \setlength{\itemsep}{0em}
 
 \item 
-\textbf{Dodawanie elementów} - dodawanie elementów do modelu programu odbywa sie przy współpracy z inspektorem elementów. Aby dodać element, należy rozwinąć drzewo odpowiedniej wtyczki. Następnie, trzeba przeciągnąć dany element z inspektora elementów na obszar roboczy (rysunek ~\ref{fig:dragDropElement}). Po upuszczeniu obiektu, pojawia się okno z pytaniem o nazwę tworzonego elementu (rysunek ~\ref{fig:nameForElementWindow}).
+\textbf{Dodawanie elementów} - dodawanie elementów do programu odbywa sie przy współpracy z inspektorem elementów. Aby dodać element, należy rozwinąć drzewo odpowiedniej wtyczki. Następnie, trzeba przeciągnąć dany element z inspektora elementów na obszar roboczy (rysunek ~\ref{fig:dragDropElement}). Po upuszczeniu obiektu, pojawia się okno z pytaniem o nazwę tworzonego elementu (rysunek ~\ref{fig:nameForElementWindow}).
 \begin{figure}[H]
   \includegraphics[width=0.95\textwidth]{img/drag-drop-element.png}
   \caption{Dodawanie elementów do obszaru roboczego metodą drag\&drop}
   \label{fig:dragDropElement}
 \end{figure}
 \item \textbf{Usuwanie elementów}\\ 
-Aby usunąć element z modelu, należy kliknąć prawym przyciskiem myszy na danym elemencie.
+Aby usunąć element z programu, należy kliknąć prawym przyciskiem myszy na danym elemencie.
 \begin{figure}[H]
   \includegraphics[width=0.6\textwidth]{img/name-for-element-window.png}
   \caption{Okno konfiguracji nazwy nowego elementu}
@@ -386,14 +399,15 @@ Szablony gniazd, które mogą być utworzone na żadanie, są wyświetlane w obs
   \label{fig:onRequestPad}
 \end{figure}
 Po połączeniu pinu szablonu \textit{tee\_\%u} z gniazdem wejsciowym elementu \textit{qubbeue0}, zostało utworzone gniazdo \textit{src\_0}, które automatycznie zostało połączone z gniazdem \textit{sink}.
+\item \textbf{Tworzenie połączeń przyszłościowych} \\
+Nie znając dokładnego formatu przychodzacych danych multimedialnych, użytkownik nie jest w stanie zaprojektować działającego programu. Często zdarza się, że podczas odtwarzania np. pliku multimedialnego, nie można przewidzieć, ile ścieżek jest w nim zawartych. \textit{Połączenia przyszłościowe} mają na celu rozwiązanie tego problemu. Korzystając z połączeń przyszłościowych, użytkownik może zaplanować połączenie pomiędzy dwoma elementami, które wystąpi tylko w przypadku, gdy dany strumień będzie dostępny.
+Na rysunku ~\ref{fig:futureConnections} można zobaczyć przykładowe użycie połączeń przyszłościowych. Przed uruchomieniem programu, nie można określić, jakiego formatu dane pojawią się na wejściu elementu \textit{decodebin0}. Dlatego użytkownik może zaznaczyć, że w przypadku wystąpienia strumienia audio lub wideo, powinno wygenerować się połączenie pomiędzy dekoderem a jednym z rendererów. Można zauważyć, że dane multimedialne zawierały trzy strumienie (zostały wygenerowane trzy gniazda źródłowe w elemencie dekodującym). Użytkownik zaplanował jednak połączenia tylko dla dwóch gniazd, dlatego trzecie nie zostało podłaczone\\
 \begin{figure}[H]
   \includegraphics[width=14cm]{img/future-connections.png}
   \caption{Wykorzystanie połączeń przyszłościowych}
   \label{fig:futureConnections}
 \end{figure}
-\item \textbf{Tworzenie połączeń przyszłościowych} \\
-Nie znając dokładnego formatu przychodzacych danych multimedialnych, użytkownik nie jest w stanie zaprojektować działającego modelu programu. Jednak często zdarza się, że podczas odtwarzania np. pliku multimedialnego, nie można przewidzieć, ile ścieżek jest w nim zawartych. \textit{Połączenia przyszłościowe} mają na celu rozwiązanie tego problemu. Korzystając z połączeń przyszłościowych, użytkownik może zaplanować połączenie pomiędzy dwoma elementami, które wystąpi tylko w przypadku, gdy dany strumień będzie dostępny.
-Na rysunku ~\ref{fig:futureConnections} można zobaczyć przykładowe użycie połączeń przyszłościowych. Przed uruchomieniem programu, nie można określić, jakiego formatu dane pojawią się na wejściu elementu \textit{decodebin0}. Dlatego użytkownik może zaznaczyć, że w przypadku wystąpienia strumienia audio lub wideo, powinno wygenerować się połączenie pomiędzy dekoderem a jednym z rendererów. Można zauważyć, że dane multimedialne zawierały trzy strumienie (zostały wygenerowane trzy gniazda źródłowe w elemencie dekodującym). Użytkownik zaplanował jednak połączenia tylko dla dwóch gniazd, dlatego trzecie nie zostało podłaczone\\
+
 \item \textbf{Tworzenie inteligentnych połączeń} \\
 Każdy blok, zawierający piny wejściowe lub wyjściowe, posiada też tzw. \textit{inteligentne piny}, oznaczone w bloku jako \textit{ai\_sink} w przypadku pinów wejściowych, oraz \textit{ai\_src} w przypadku pinów wyjściowych. Kiedy użytkownik nie jest pewien tego, jakie gniazdo powinien wybrać dla danego połączenia, może skorzystać z \textit{inteligentnych połączeń}. Są to połączenia, w których występuje conajmniej jeden inteligentny pin. Po wykonaniu inteligentnego połączenia, zostanie ono zastapione przez najlepsze stałe połączenie. Proces inteligentnego łączenia przedstawia rysunek ~\ref{fig:aiConnectionProcess}. 
 \begin{figure}[H]
@@ -404,7 +418,7 @@ Każdy blok, zawierający piny wejściowe lub wyjściowe, posiada też tzw. \tex
 Po wykonaniu inteligentnego połączenia pomiędzy audio enkoderem \textit{avenc\_aac0} i elementu \textit{avimux0}, program wykonuje przeszukiwania, w celu wykonania najlepszego połączenia. Poprawnym wynikiem jest utworzenie połączenia pomiędzy gniazdem źródłowym enkodera i gniazdem wejściowym typu \textit{audio} elementu \textit{muxera}.
 \end{itemize}\paragraph{}\vspace{-3mm}
 \textbf{Wiersz poleceń} \\
-Wiersz poleceń umożliwia budowę modelu na podstawie prostych komend interpretowanych przez program. Wiersz poleceń posiada również mechanizm podpowiadania składni (rysunek ~\ref{fig:commandLine}), który ma na celu przyśpieszenie i ułatwienie użytkownikowi pracy z programem. W przypadku słów kluczowych, wielkość liter nie ma znaczenia. Poniżej przedstawiona zostanie syntaktyka poszczególnych poleceń. 
+Wiersz poleceń umożliwia budowę programu na podstawie prostych komend interpretowanych przez program. Wiersz poleceń posiada również mechanizm podpowiadania składni (rysunek ~\ref{fig:commandLine}), który ma na celu przyśpieszenie i ułatwienie użytkownikowi pracy z programem. W przypadku słów kluczowych, wielkość liter nie ma znaczenia. Poniżej przedstawiona zostanie syntaktyka poszczególnych poleceń. W sekcji \textit{Przykłady} pokazano przykładowe użycia danych poleceń z poprawną listą argumentów. 
 \begin{figure}[H]
   \includegraphics[width=140mm]{img/command-line.png}
   \caption{Mechanizm podpowiadania składni w wierszu poleceń}
@@ -412,7 +426,7 @@ Wiersz poleceń umożliwia budowę modelu na podstawie prostych komend interpret
 \end{figure}
 \begin{itemize}
   \setlength{\itemsep}{0em}
-\item \textbf{ADD} - dodaje element do modelu programu lub dodaje gniazdo do elementu.
+\item \textbf{ADD} - dodaje element do programu lub dodaje gniazdo do elementu.
 \underline{Składnia:} \\
 \texttt{ADD \\
 \hspace*{2em} \{ELEMENT \textit{fabryka} [\textit{nazwa\_elementu}]\} | \\
@@ -429,7 +443,7 @@ Wiersz poleceń umożliwia budowę modelu na podstawie prostych komend interpret
 \texttt{ADD ELEMENT fakesrc fake-generator} \\
 \texttt{ADD PAD TO tee0 USING src\_\%u} \\
 \texttt{ADD PAD to matroskamux0 USING subtitle\_\%u sub1}
-\item \textbf{REMOVE} - usuwa element z modelu programu lub usuwa gniazdo z elementu. \\
+\item \textbf{REMOVE} - usuwa element z programu lub usuwa gniazdo z elementu. \\
 \underline{Składnia:} \\
 \texttt{REMOVE \\
 \hspace*{2em} \{ELEMENT \textit{nazwa\_elementu}\} | \\
@@ -439,9 +453,14 @@ Wiersz poleceń umożliwia budowę modelu na podstawie prostych komend interpret
 \item \textit{nazwa\_gniazda} - nazwa gniazda, które ma zostać usunięte.
 \end{itemize}
 \underline{Przykłady:} \\
-\texttt{REMOVE ELEMENT videotestsrc0}
+\texttt{REMOVE ELEMENT videotestsrc0} \\
 \texttt{REMOVE PAD matroskamux0:sub1}
-\item \textbf{PROPERTY} - umożliwia zmianę właściwości elementu.
+\begin{figure}[H]
+  \includegraphics[width=150mm]{img/all-properties-window.png}
+  \caption{Okno konfiguracji parametrów elementu \textit{videotestsrc0} - wynik wykonania polecenia \texttt{PROPERTY videoetstsrc0}}
+  \label{fig:allPropertiesWindow}
+\end{figure}
+\item \textbf{PROPERTY} - umożliwia zmianę właściwości elementu.\\
 \underline{Składnia:} \\
 \texttt{PROPERTY \textit{element} [\textit{właściwość} \textit{wartość}]}
 \begin{itemize}
@@ -454,12 +473,7 @@ Wiersz poleceń umożliwia budowę modelu na podstawie prostych komend interpret
 \texttt{PROPERTY filesink0 location /home/m.kolny/output.mkv} \\
 \underline{Uwagi:} \\
 Użycie polecenia \textit{PROPERTY} w wariancie jednoargumentowym nie spowoduje de facto zmiany żadnego parametru. Wynikiem wykonania takiego polecenia będzie za to wyświetlenia okna z listą wszystkich dostępnych parametrów dla danego elementu(rysunek ~\ref{fig:allPropertiesWindow}), z możliwością zmiany tych parametrów.
-\begin{figure}[H]
-  \includegraphics[width=150mm]{img/all-properties-window.png}
-  \caption{Okno konfiguracji parametrów elementu \textit{videotestsrc0} - wynik wykonania polecenia \texttt{PROPERTY videoetstsrc0}}
-  \label{fig:allPropertiesWindow}
-\end{figure}
-\item \textbf{STATE} - zmienia stan modelu programu. \\
+\item \textbf{STATE} - zmienia stan programu. \\
 \underline{Składnia:} \\
 \texttt{STATE STOP | PAUSE | PLAY} \\
 \underline{Przykłady:} \\
@@ -485,7 +499,7 @@ Użycie polecenia \textit{PROPERTY} w wariancie jednoargumentowym nie spowoduje 
 \texttt{CONNECT pad matroskademux0:video\_\%u WITH xvimagesink0:sink FUTURE}
 \texttt{CONNECT ELEMENT audiotestsrc0:src WITH autoaudiosink0:sink} \\
 \underline{Uwagi:} \\
-Słowo kluczowe \texttt{FUTURE} powinno zostać użyte w przypadku, gdy dane gniazdo nie istnieje na etapie projektowania modelu programu, a jego istnienie jest zależne od formatu wejściowych danych multimedialnych.
+Słowo kluczowe \texttt{FUTURE} powinno zostać użyte w przypadku, gdy dane gniazdo nie istnieje na etapie projektowania programu, a jego istnienie jest zależne od formatu wejściowych danych multimedialnych.
 \item \textbf{DISCONNECT} - rozłącza ze sobą elementy lub gniazda. \\
 \underline{Składnia:} \\
 \texttt{DISCONNECT \\
@@ -507,9 +521,14 @@ Słowo kluczowe \texttt{FUTURE} powinno zostać użyte w przypadku, gdy dane gni
 \end{itemize}\paragraph{}\vspace{-3mm}
 \textbf{Konsola logowania zdarzeń programu} \\
 Konsola umożlwia użytkownikowi śledzić listę komend, jakie skierował do programu. Pozwala również na podglądanie wiadomości pojawiających się na magistrali programu. Użytkownik ma możliwość wyboru źródeł pochodzenia informacji.
+\begin{figure}[H]
+  \includegraphics[width=130mm]{img/debug-level-properties.png}
+  \caption{Okno konfiguracji zdarzeń biblioteki GStreamer}
+  \label{fig:debugLevelProperties}
+\end{figure}
 \paragraph{}\vspace{-3mm}
 \textbf{Konsola logowania zdarzeń GStreamera} \\
-Konsola wyświetla wszystkie wiadomości przydatne w procesie debugowania modelu programu, jakie pochodzą z biblioteki GStreamer. Użytkownik może wybrać, które z dostępnych informacji danego wpisu mają być wyświetlane. Dostępne są:
+Konsola wyświetla wszystkie wiadomości przydatne w procesie debugowania programu, jakie pochodzą z biblioteki GStreamer. Użytkownik może wybrać, które z dostępnych informacji danego wpisu mają być wyświetlane. Dostępne są:
 \begin{itemize}
  \setlength{\itemsep}{0em}
 \item kategoria,
@@ -519,12 +538,8 @@ Konsola wyświetla wszystkie wiadomości przydatne w procesie debugowania modelu
 \item nazwa funkcji, z której została wysłana wiadomość,
 \item treść wiadomości.
 \end{itemize}
+
 Ponadto użytkownik korzystając z przycisku \textit{Filter properties} ma możliwość ustawienia poziomu szczegółowości informacji debugujących. Okno konfiguracyjne (rysunek ~\ref{fig:debugLevelProperties}) pozwala użytkownikowi na ustawienie domyślnego poziomu szczegółowości, a także poziomu szczegółowości dla każdej z kategorii osobno. Po wybraniu domyślnego poziomu, i zatwierdzeniu wyboru przyciskiem \textit{OK}, wszystkie ustawienia dla konkretnych kategorii zostaną zapomniane, a poziom szczegółowości dla każdej kategorii zostanie ustawiony na wartość domyślnego poziomu.
-\begin{figure}[H]
-  \includegraphics[width=130mm]{img/debug-level-properties.png}
-  \caption{Okno konfiguracji zdarzeń biblioteki GStreamer}
-  \label{fig:debugLevelProperties}
-\end{figure}
 Użytkownik ma możliwość wyboru jednego z ośmiu poziomów logowania:
 \begin{enumerate}
  \setlength{\itemsep}{0em}
@@ -540,13 +555,13 @@ Użytkownik ma możliwość wyboru jednego z ośmiu poziomów logowania:
 Poziomy logowania mają strukturę hierarchiczną - włączając poziom logowania \textit{info}, zostaje automatycznie włączony poziom logowania \textit{fixme}, \textit{warnings} oraz \textit{error}.
 \subsubsection{Kreator wtyczek}
 Biblioteka GStreamer udostępnia użytkownikowi interfejs do pisania wtyczek. Przygotowanie szablonu do napisania własnej wtyczki jest jednak bardzo czasochłonne. Kreator wtyczek ma na celu przyspieszenie procesu tworzenia nowych wtyczek, poprzez wygenerowanie szablonu, zawierającego podstawowe informacje, oraz prostą implementację podstawowych funkcjonalności.
+Kreator pozwala również na utworzenie fabryki elementów. W kolejnych wersjach programu funkcjonalność ta zostanie rozbudowana o możliwość wygenerowania większej ilości fabryk w ramach jednej wtyczki.
+Okno kreatora podzielone jest na dwie zakładki (rysunek ~\ref{fig:pluginWizzard}). Pierwsza dotyczy informacji na temat fabryki zawartej we wtyczce, druga natomiast pozwala na zdefiniowanie szczegółów wtyczki.
 \begin{figure}[H]
-  \includegraphics[width=160mm]{img/plugin-wizzard.png}
+  \includegraphics[width=155mm]{img/plugin-wizzard.png}
   \caption{Karty kreatora wtyczek}
   \label{fig:pluginWizzard}
 \end{figure}
-Kreator pozwala również na utworzenie fabryki elementów. W kolejnych wersjach programu funkcjonalność ta zostanie rozbudowana o możliwość wygenerowania większej ilości fabryk w ramach jednej wtyczki.
-Okno kreatora podzielone jest na dwie zakładki (rysunek ~\ref{fig:pluginWizzard}). Pierwsza dotyczy informacji na temat fabryki zawartej we wtyczce, druga natomiast pozwala na zdefiniowanie szczegółów wtyczki.
 
 \noindent
 Oprócz metadanych fabryki elementów, użytkownik może również zażądać wygenerowania niektórych funkcji wirtualnych:
@@ -558,7 +573,7 @@ Oprócz metadanych fabryki elementów, użytkownik może również zażądać wy
 \item żądania nowego gniazda.
 \end{itemize}
 \subsubsection{Generator kodu}
-Przydatnym dla programisty narzędziem może okazać się generator kodu. Model programu, który został stworzony przez użytkownika, jest przekładany na kod źródłowy, i jest zapisywany do pliku. Okno generatora przedstawiono na rysunku ~\ref{fig:codeGenerator}. Wymagane jest jedynie podanie ścieżki do wygenerowanego pliku, oraz wybranie języka wygenerowanego kodu źródłowego.
+Przydatnym dla programisty narzędziem może okazać się generator kodu. Program, który został stworzony przez użytkownika, jest przekładany na kod źródłowy, i jest zapisywany do pliku. Okno generatora przedstawiono na rysunku ~\ref{fig:codeGenerator}. Wymagane jest jedynie podanie ścieżki do wygenerowanego pliku, oraz wybranie języka wygenerowanego kodu źródłowego.
 \begin{figure}[H]
   \includegraphics[width=80mm]{img/code-generator.png}
   \caption{Okno generatora kodu}
@@ -578,10 +593,15 @@ public:
 Metoda \texttt{get\_pipeline()} zwraca strumień przetwarzający dane multimedialne.\\
 Wraz z wygenerowanym kodem, dołączane jest również przykładowe użycie klasy.\\
 Kod źródłowy wygenerowany przez generator jest zgodny ze standardem języka C++11.
+\subsubsection{Format zapisu projektu}
+Środowisko gst-creator przewiduje możliwość zapisu, a także odczytu wcześniej przygotowanego programu z pliku. Plik projektu zapisywany jest w formacie XML 1.0.\\
+Elementem nadrzędnym jest węzeł \texttt{pipeline}, który zawiera w sobie węzły określające właściwości strumienia, oraz element \texttt{children}, wewnątrz którego zdefiniowane są pojedyncze bloczki programu. \\
+Każdy bloczek również określony jest przez listę właściwości, listę połączeń dla wszystkich gniazd wewnątrz bloczka, nazwę fabryki, która dany bloczek generuje, oraz przez położenie na obszarze roboczym. \\
+Na końcu pliku zdefiniowane są również połączenia przyszłościowe.
 \cleardoublepage
 \section{Specyfikacja wewnętrzna}
 \subsection{Rozwój biblioteki gstreamermm}
-Biblioteka gstreamermm miała swój początek na początku 2008 roku. Wydanie dotyczyło wersji 0.9.1 biblioteki GStreamer, dlatego biblioteka-adapter otrzymała również taki numer. Biblioteka była rozwijana przez dwóch programistów: José Alburquerque oraz Murraya Cumminga. Jednak po wydaniu wersji 0.10.11, projekt nie był dalej rozwijany. Ponieważ wykorzystuję bibliotekę GStreamer, postanowiłem kontynuować projekt gstreamermm.
+Biblioteka gstreamermm miała swój początek na początku 2008 roku. Wydanie dotyczyło wersji 0.9.1 biblioteki GStreamer, dlatego biblioteka-adapter otrzymała również taki numer. Biblioteka była rozwijana przez dwóch programistów: José Alburquerque oraz Murraya Cumminga. Jednak po wydaniu wersji 0.10.11, projekt nie był dalej rozwijany. Ponieważ wykorzystuję bibliotekę GStreamer, postanowiłem rozwinąć projekt gstreamermm.
 \subsubsection{Zmiany w blibliotece GStreamer}
 Nowa wersja (1.0) biblioteki GStreamer wnosiła wiele zmian w stosunku do poprzedniej wersji biblioteki (0.10), adapter więc wymagał też wielu poprawek. 
 \begin{itemize}
@@ -600,7 +620,7 @@ Do wersji 0.10, biblioteka gstreamermm nie była wyposażona w zautomatyzowany s
   \label{fig:gtestScreen}
 \end{figure}
 \subsubsection{Adaptacja modułu pisania wtyczek}
-Biblioteka GStreamer opiera się o wtyczki, umożliwiające wprowadzenie do systemu dowolnego algorytmu. Adapter gstreamermm w wersji wcześniejszej, niż 1.0, nie posiadał oficjalnie wsparcia do pisania własnych wtyczek w języku C++. Powstała jednak nieoficjalna implementacja\cite{pepergithub}, która oferowała programiście wsparcie dla pisania własnych wtyczek. Zaaplikowałem moduł do oficjalnego repozytorium. Dopisałem również brakującą klasę, która ułatwiała programiście dostęp do klasy danego elementu wtyczki.
+Biblioteka GStreamer opiera się o wtyczki, umożliwiające wprowadzenie do systemu dowolnego algorytmu. Adapter gstreamermm w wersji wcześniejszej, niż 1.0, nie posiadał oficjalnie wsparcia do pisania własnych wtyczek w języku C++. Powstała jednak nieoficjalna implementacja \cite{pepergithub}, która oferowała programiście wsparcie dla pisania własnych wtyczek. Zaaplikowałem moduł do oficjalnego repozytorium. Dopisałem również brakującą klasę, która ułatwiała programiście dostęp do klasy danego elementu wtyczki.
 \subsubsection{Poprawki w generatorach kodu}
 Przy rozwijaniu projektu gstreamermm, wystąpiło kilka problemów, które należało rozwiązać po stronie generatora kodu. Jednym z nich był brak możliwości wprowadzenia wartości typu wyliczeniowego jako definicji wieloargumentowej. Na listingu ~\ref{badEnumForGenerator} pokazany został kod, który z punktu widzenia generatora kodu, był niepoprawny.
     \begin{lstlisting}[caption=Przykładowy fragment niepoprawnego z punktu widzenia generatora kodu źródłowego, label=badEnumForGenerator]
@@ -649,7 +669,7 @@ Po wygenerowaniu kodu na podstawie powyższej definicji, oczekiwanym wynikiem je
 \subsection{Struktura programu gst-creator}
 Struktura programu podzielona jest na biblioteki, które gromadzą w sobie powiązane logicznie klasy. Poniżej przedstawione zostały wszystkie moduły, wraz z opisem oraz listą klas.
 \subsubsection{Moduł Commands}
-Biblioteka zawiera klasy implementujące wzorzec projektowy \textit{Commands}. Obiekty tych klas wykorzystywane są do operacji na modelu programu.
+Biblioteka zawiera klasy implementujące wzorzec projektowy \textit{Commands}. Obiekty tych klas wykorzystywane są do operacji zmiany struktury programu.
 \paragraph{}
 \textbf{Lista klas}
 \vspace{-2mm}
@@ -657,7 +677,7 @@ Biblioteka zawiera klasy implementujące wzorzec projektowy \textit{Commands}. O
  \setlength{\itemsep}{0em}
 \item \texttt{CommandListener} - definiuje interfejs, jaki musi spełniać obiekt nasłuchujący wykonania komend. Wszystkie metody w klasie mają swoją własną implementację, dla tego obiekt nasłuchujący może implementować tylko wybrane metody nasłuchujące zdarzenia.
 \item \texttt{Command} - klasa bazowa dla wszystkich klas będących komendami w bibliotece. Posiada abstrakcyjną metodę \texttt{run\_command(std::vector<CommandListener*> listeners)}, która musi być zdefiniowana w klasie reprezentującej konkretną komendę. Metoda odpowiedzialna jest za uruchomienie zdefiniowanego wcześniej polecenia. Oprócz tego klasa definiuje pole prywatne przechowujące typ komendy.
-\item \texttt{AddCommand} - komenda odpowiedzialna za dodawanie elementów do modelu programu lub gniazd do istniejących elementów. Definiuje metodę statyczną \\
+\item \texttt{AddCommand} - komenda odpowiedzialna za dodawanie elementów do programu lub gniazd do istniejących elementów. Definiuje metodę statyczną \\
 \texttt{static AddCommand* from\_args(const std::vector<std::string>\& args, const Glib::RefPtr<Gst::Pipeline>\& model);}\\
 która odpowiedziana jest za wygenerowanie obiektu komendy na podstawie listy argumentów.
 W ramach klasy została również zdefiniowana metoda \\
@@ -668,7 +688,7 @@ Metody \texttt{from\_args} oraz \texttt{get\_suggestion} zdefiniowane są równi
 \item \texttt{DisconnectCommand} - komenda usuwająca połączenia pomiędzy elementami.
 \item \texttt{PropertyCommand} - komenda zmieniająca właściwość elementu. W szczególnym przypadku może też posłużyć jako komenda wywołująca okno konfiguracji właściwości.
 \item \texttt{RemoveCommand} - komenda usuwająca elementy lub gniazda.
-\item \texttt{StateCommand} - komenda zmiany stanu modelu programu.
+\item \texttt{StateCommand} - komenda zmiany stanu programu.
 \end{itemize}
 \subsubsection{Moduł Console}
 Moduł odpowiada za wiersz poleceń. Zawiera klasy odpowiadające za logike oraz za widok konsoli. 
@@ -688,10 +708,10 @@ Biblioteka ta dostarcza zestaw klas realizujących podstawową logikę główneg
 \vspace{-2mm}
 \begin{itemize}
   \setlength{\itemsep}{0em}
-\item \texttt{CodeGenerator} - klasa generująca kod źródłowy na podstawie modelu programu.
+\item \texttt{CodeGenerator} - klasa generująca kod źródłowy na podstawie programu.
 \item \texttt{FileLoader} - klasa odpowiedzialna za załadowanie pliku projektu do programu.
 \item \texttt{FileWriter} - klasa realizuje funkcjonalność zapisuj stworzonego przez użytkownika projektu do pliku.
-\item \texttt{MainController} - klasa głównego kontrolera, odpowiedzialna jest głównie za wykrywanie zmian zachodzących w modelu programu.
+\item \texttt{MainController} - klasa głównego kontrolera, odpowiedzialna jest głównie za wykrywanie zmian zachodzących w programie.
 \item \texttt{FactoryInfo} - przechowuje informacje na temat fabryki elementów, jaka ma zostać wygenerowana przez kreator wtyczek. Generuje również kod źródłowy klasy fabryki.
 \item \texttt{PluginInfo} - klasa przechowująca informacje na temat wtyczki dla kreatora wtyczek. Ponadto generuje kod źródłowy klasy wtyczki.
 \item \texttt{PluginCodeGenerator} - główna klasa kreatora wtyczek. Uruchamia generator kodu źródłowego dla fabryki oraz wtyczki, zapisuje kod do pliku.
@@ -793,13 +813,13 @@ Zadaniem klasy jest dostarczenie metod operujących na typach wyliczeniowych. Kl
 \item \texttt{StringUtils} - jest to zbiór metod ułatwiających pracę z łańcuchami znaków.
 \end{itemize}
 \subsubsection{Moduł Workspace}
-Biblioteka Workspace odpowiada za poprawne działanie obszaru roboczego, na którym odbywa się graficzne projektowanie modelu programu. Jest ściśle powiązana z biblioteką qnelibrary.
+Biblioteka Workspace odpowiada za poprawne działanie obszaru roboczego, na którym odbywa się graficzne projektowanie programu. Jest ściśle powiązana z biblioteką qnelibrary.
 \paragraph{}
 \textbf{Lista klas}
 \vspace{-2mm}
 \begin{itemize}
   \setlength{\itemsep}{0em}
-\item \texttt{WorkspaceWidget} - klasa pochodna klasy \texttt{QWidget}, przedstawia kontrolkę obszaru roboczego. Ponadto klasa implementuje fragment interfejsu \texttt{CommandListener}, dzięki czemu zmiany w modelu programu są od razu widoczne w graficznej reprezentacji projektu. \\
+\item \texttt{WorkspaceWidget} - klasa pochodna klasy \texttt{QWidget}, przedstawia kontrolkę obszaru roboczego. Ponadto klasa implementuje fragment interfejsu \texttt{CommandListener}, dzięki czemu zmiany w programie są od razu widoczne w graficznej reprezentacji projektu. \\
 Klasa implementuje wszystkie funkcje, jakie potrzebne są podczas projektowania graficznego (przesuwanie blokczków, łączenie pinów, usuwanie połączeń, elementów).
 \end{itemize}
 \cleardoublepage
@@ -808,9 +828,9 @@ Oprogramowanie gst-creator przeszło szereg testów, które dowiodły poprawnoś
 Główne testy składały się z jedenastu etapów:
 \begin{enumerate}
   \setlength{\itemsep}{0em}
-\item Utworzenie modelu programu.
-\item Kilkukrotna zmiana stanu modelu programu.
-\item Wprowadzenie modelu programu w stan zatrzymania.
+\item Utworzenie programu.
+\item Kilkukrotna zmiana stanu programu.
+\item Wprowadzenie programu w stan zatrzymania.
 \item Zapis projektu.
 \begin{figure}[H]
   \includegraphics[width=160mm]{img/main-test-screen1.png}
@@ -818,11 +838,11 @@ Główne testy składały się z jedenastu etapów:
   \label{fig:mainTestScreen1}
 \end{figure}
 \item Załadowanie projektu. 
-\item Kilkukrotna zmiana stanu modelu programu.
+\item Kilkukrotna zmiana stanu programu.
 \item Zamknięcie aplikacji.
 \item Uruchomenie aplikacji.
-\item Kilkukrotna zmiana stanu modelu programu.
-\item Wygenerowanie kodu źródłowego na podstawie modelu programu.
+\item Kilkukrotna zmiana stanu programu.
+\item Wygenerowanie kodu źródłowego na podstawie programu.
 \item Kompilacja źródeł i uruchomienie aplikacji.
 \end{enumerate}
 Rysunki ~\ref{fig:mainTestScreen1} oraz ~\ref{fig:mainTestScreen2} przedstawiają przykładowe programy stworzone za pomocą aplikacji gst-creator, które wykorzystywane były w testach.
@@ -844,7 +864,7 @@ Wykonałem również testy pojedynczych modułów programu.
 \end{itemize}
 \cleardoublepage
 \section{Wnioski}
-W ramach projektu udało mi się zrealizować wszystkie założenia projektowe. Korzystając z oprogramowania, użytkownik może w swobodny sposób tworzyć programy przetwarzające strumienie multimedialne, które później może zastąpić kodem źródłowym, i użyć w swoim własnym programie. 
+\paragraph{}W ramach projektu udało mi się zrealizować wszystkie założenia projektowe. Korzystając z oprogramowania, użytkownik może w swobodny sposób tworzyć programy przetwarzające strumienie multimedialne, które później może zastąpić kodem źródłowym, i użyć w swoim własnym programie. 
 
 Zaimplementowany został również mechanizm zapisu projektu do pliku, dzięki czemu użytkownik w każdej chwili będzie mógł zmodyfikować swój projekt. 
 
@@ -852,10 +872,11 @@ Stworzony został moduł pozwalający na śledzenie wiadomości pochodzących z 
 
 Dodatkowo, w programie zaimplementowano funkcje, które nie były przewidziane w założeniach projektowych, ale mogą przydać się użytkownikowi podczas pracy z programem. Pierwsza z funkcji, to narzędzie kreatora wtyczek, dzięki któremu w łatwy sposób można wygenerować szablon dla własnej wtyczki. 
 
-Drugą istotną funkcją jest wiersz poleceń, dzięki któremu użytkownik może budować model programu używając tylko i wyłącznie klawiatury.
+Drugą istotną funkcją jest wiersz poleceń, dzięki któremu użytkownik może budować program używając tylko i wyłącznie klawiatury.
 
 Oprócz tego, w programie zawarłem też funkcjonalność przeglądania informacji na temat dostępnych wtyczek oraz fabryk elementów, co również jest bardzo przydatne na etapie prototypowania aplikacji.
 \cleardoublepage
+\addcontentsline{toc}{section}{Bibliography}
 \begin{thebibliography}{9}
 
 \bibitem{gstmainpage}
@@ -875,4 +896,15 @@ Oprócz tego, w programie zawarłem też funkcjonalność przeglądania informac
 \bibitem{meyers1}
   Scott Meyers , \textit{Język C++ bardziej efektywny}, Wydawnictwa Naukowo Techniczne, 1998, ISBN 83-204-2307-4.
 \end{thebibliography}
+\cleardoublepage
+\appendix
+\section{Dodatek. Płyta CD}
+Płyta CD zawiera:
+\begin{itemize}
+ \setlength{\itemsep}{0em}
+\item wersję elektroniczną pracy w formacie pdf,
+\item kompletny kod źródłowy środowiska programistycznego gst-creator,
+\item klon repozytorium projektu biblioteki gstreamermm.
+\end{itemize}
+
 \end{document}

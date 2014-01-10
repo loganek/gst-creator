@@ -1,6 +1,8 @@
 /*
  * AddCommand.cpp
  *
+ * Plik zawiera implementacje klasy AddCommand
+ *
  *  Created on: 2 lis 2013
  *      Author: Marcin Kolny
  */
