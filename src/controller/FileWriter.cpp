@@ -86,7 +86,7 @@ void FileWriter::write_single_element(const Glib::RefPtr<Gst::Element>& element)
 		writer.writeEndElement();
 	}
 
-	if (GST_IS_BIN(element->gobj()) && element == model) // TODO deeper search in a next version
+	if (GST_IS_BIN(element->gobj()) && element == model)
 	{
 		Glib::RefPtr<Gst::Bin> bin = bin.cast_static(element);
 		auto iterator = bin->iterate_elements();

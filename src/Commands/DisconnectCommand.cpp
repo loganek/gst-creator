@@ -28,7 +28,6 @@ DisconnectCommand::DisconnectCommand(const RefPtr<Object>& src, const RefPtr<Obj
 
 DisconnectCommand* DisconnectCommand::from_args(const vector<string>& args, const Glib::RefPtr<Gst::Pipeline>& model)
 {
-	// TODO remove future connections
 	if (args.size() != 4)
 		syntax_error("invalid arguments count. Expected 4, but " + to_string(args.size()) + " found.");
 
@@ -91,7 +90,7 @@ vector<string> DisconnectCommand::get_suggestions(const vector<string>& args, co
 		else if ((args.size() == 2 || args.size() == 4) && type == ObjectType::ELEMENT)
 			return GstUtils::get_elements_from_bin_string(model, false);
 		else if ((args.size() == 2 || args.size() == 4) && type == ObjectType::PAD)
-			return vector<string>(); // TODO
+			return vector<string>();
 		else if (args.size() == 3)
 			return {"WITH"};
 	}

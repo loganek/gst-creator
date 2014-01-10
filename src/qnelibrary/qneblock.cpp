@@ -145,7 +145,7 @@ void QNEBlock::load(QDataStream &ds, QMap<quint64, QNEPort*> &portMap)
 		ds >> name;
 		ds >> output;
 		ds >> flags;
-		// portMap[ptr] = addPort(name, output, flags, ptr); fixme is this function needed?
+		// portMap[ptr] = addPort(name, output, flags, ptr);
 	}
 }
 

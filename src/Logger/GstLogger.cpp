@@ -3,7 +3,7 @@
 #include "ui_GstLogger.h"
 #include <functional>
 
-#define MAX_LOGS 3000 // TODO
+#define MAX_LOGS 3000
 
 void log_function(GstDebugCategory * category,
 		GstDebugLevel      level,

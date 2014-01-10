@@ -150,7 +150,7 @@ void FileLoader::process_start_element()
 		if (!current_element->get_static_pad(pad_name))
 		{
 			AddCommand cmd(ObjectType::PAD, current_element,
-					pad_template); // todo and what about pad name?
+					pad_template);
 			cmd.run_command(listeners);
 		}
 

@@ -86,7 +86,7 @@ if ( $arg_cnt != 3 ) {
 }
 
 my $autogenerate_string = "// auto-generated file! Don't modify it!\n\n";
-my $state = 0;    # TODO check enum
+my $state = 0;
 my $enum_name;
 my @enum_values = ();
 

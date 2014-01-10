@@ -65,7 +65,7 @@ QGraphicsItem* WorkspaceWidget::item_at(const QPointF &pos)
 
 	return nullptr;
 }
-QPointF last_point; // fixme
+QPointF last_point;
 bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 {
 	QGraphicsSceneMouseEvent *me = (QGraphicsSceneMouseEvent*) e;
@@ -179,7 +179,7 @@ bool WorkspaceWidget::eventFilter(QObject *o, QEvent *e)
 					else if (!src_port->get_object_model() && sink_port->get_object_model())
 					{
 						lnk = GstUtils::find_connection(Glib::RefPtr<Gst::Object>::cast_static(src_port->block()->get_model()), sink_port->get_object_model());
-						if (GST_IS_PAD_TEMPLATE(sink_port->get_object_model()->gobj())) // todo it should be done in find_connection method!
+						if (GST_IS_PAD_TEMPLATE(sink_port->get_object_model()->gobj()))
 						{
 							lnk.sink = sink_port->get_object_model();
 							lnk.sink_parent = sink_port->block()->get_model();

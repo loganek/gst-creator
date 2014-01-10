@@ -40,7 +40,6 @@ void ConnectCommand::connect_future_pads(const RefPtr<Element>& src_parent, cons
 
 void ConnectCommand::element_pad_added(const RefPtr<Pad>& pad)
 {
-	// TODO check template pad
 
 	// check, is pad->pad connection defined
 	auto tpl = pad->get_pad_template();
@@ -108,7 +107,7 @@ ConnectCommand::ConnectCommand(const RefPtr<Object>& src, const RefPtr<Object>& 
 	{
 		type = ObjectType::PAD;
 		if (future)
-			syntax_error("invalid constructor used"); // fixme
+			syntax_error("invalid constructor used");
 	}
 	else
 		syntax_error("unknown object type");

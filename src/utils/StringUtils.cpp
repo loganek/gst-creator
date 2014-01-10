@@ -18,7 +18,6 @@ std::vector<std::string> StringUtils::split(std::string text,
 
 	while ((pos = text.find(delim)) != std::string::npos)
 	{
-		// TODO support arguments with " "
 		std::string v = text.substr(0, pos);
 		if (!v.empty())
 			values.push_back(v);
