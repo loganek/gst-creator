@@ -23,17 +23,11 @@ class CommandListener;
  */
 enum class CommandType
 {
-	/** Komenda dodająca */
 	ADD,
-	/** Komenda usuwająca */
 	REMOVE,
-	/** Komenda tworząca połączenie */
 	CONNECT,
-	/** Komenda usuwająca połączenie */
 	DISCONNECT,
-	/** Komenda dotycząca właściwości elementu */
 	PROPERTY,
-	/** Komenda stanu programu */
 	STATE,
 };
 
@@ -42,9 +36,7 @@ enum class CommandType
  */
 enum class ObjectType
 {
-	/** Gniazdo */
 	PAD,
-	/** Element */
 	ELEMENT
 };
 
@@ -70,11 +62,8 @@ enum class DataType
  */
 enum class State
 {
-	/** Stan odtwarzania */
 	PLAY,
-	/** Stan pauzy */
 	PAUSE,
-	/** Stan stopu */
 	STOP
 };
 
